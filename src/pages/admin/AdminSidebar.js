@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 const navItems = [
@@ -10,7 +10,13 @@ const navItems = [
 
 export default function AdminSidebar({ open, onClose }) {
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/feed");
+  };
 
   return (
     <>
@@ -82,19 +88,26 @@ export default function AdminSidebar({ open, onClose }) {
         {user && (
           <div className="p-4 border-t border-gray-100 dark:border-zinc-800">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold text-xs overflow-hidden">
-                {user.avatar_url ? (
-                  <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  <span>{user.username?.charAt(0)?.toUpperCase() || "?"}</span>
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{user.username}</p>
+              <Link to={`/profile/${user.username}`} onClick={onClose} className="shrink-0">
+                <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold text-xs overflow-hidden hover:ring-2 ring-indigo-400 transition-all">
+                  {user.avatar_url ? (
+                    <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <span>{user.username?.charAt(0)?.toUpperCase() || "?"}</span>
+                  )}
+                </div>
+              </Link>
+              <Link to={`/profile/${user.username}`} onClick={onClose} className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 dark:text-white truncate hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">{user.username}</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                   {user.roles?.map((r) => r.name).join(", ") || "user"}
                 </p>
-              </div>
+              </Link>
+              <button onClick={handleLogout} className="text-gray-400 hover:text-red-500 transition-colors shrink-0" title="Log out">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+              </button>
             </div>
           </div>
         )}
