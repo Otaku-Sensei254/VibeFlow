@@ -7,8 +7,11 @@ export default function AdminRoles() {
   const [name, setName] = useState("");
   const [selectedPermissions, setSelectedPermissions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
     try {
       const [rolesRes, permsRes] = await Promise.all([
         api.get("/admin/roles"),
@@ -16,8 +19,12 @@ export default function AdminRoles() {
       ]);
       setRoles(rolesRes.data.data.roles);
       setPermissions(permsRes.data.data.permissions);
-    } catch {}
-    setLoading(false);
+      setLoading(false);
+    } catch (err) {
+      console.error("Admin roles fetch failed:", err);
+      setError(err?.response?.data?.error || err?.message || "Failed to load roles");
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { fetchData(); }, [fetchData]);
@@ -94,6 +101,11 @@ export default function AdminRoles() {
           {loading ? (
             <div className="flex justify-center py-12">
               <div className="w-8 h-8 rounded-full border-[3px] border-tide-100 dark:border-tide-900/30 border-t-tide-500 animate-spin" />
+            </div>
+          ) : error ? (
+            <div className="text-center py-8">
+              <p className="text-red-500 dark:text-red-400 text-sm">{error}</p>
+              <button onClick={fetchData} className="mt-2 text-xs text-gray-500 dark:text-gray-400 hover:underline">Try again</button>
             </div>
           ) : roles.length === 0 ? (
             <p className="text-gray-500 dark:text-gray-400 text-sm py-8 text-center">No roles created yet.</p>

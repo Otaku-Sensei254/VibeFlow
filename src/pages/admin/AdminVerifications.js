@@ -5,14 +5,20 @@ export default function AdminVerifications() {
   const [requests, setRequests] = useState([]);
   const [filter, setFilter] = useState("pending");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const fetchRequests = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await api.get("/admin/verifications", { params: { filter } });
       setRequests(res.data.data.requests);
-    } catch {}
-    setLoading(false);
+      setLoading(false);
+    } catch (err) {
+      console.error("Admin verifications fetch failed:", err);
+      setError(err?.response?.data?.error || err?.message || "Failed to load requests");
+      setLoading(false);
+    }
   }, [filter]);
 
   useEffect(() => { fetchRequests(); }, [fetchRequests]);
@@ -57,6 +63,11 @@ export default function AdminVerifications() {
       {loading ? (
         <div className="flex justify-center py-24">
           <div className="w-10 h-10 rounded-full border-[3px] border-tide-100 dark:border-tide-900/30 border-t-tide-500 animate-spin" />
+        </div>
+      ) : error ? (
+        <div className="rounded-3xl border-2 border-red-200 dark:border-red-900/50 py-12 text-center bg-red-50/50 dark:bg-red-900/10">
+          <p className="text-red-600 dark:text-red-400 text-sm font-medium">{error}</p>
+          <button onClick={fetchRequests} className="mt-3 text-xs text-gray-500 dark:text-gray-400 hover:underline">Try again</button>
         </div>
       ) : requests.length === 0 ? (
         <div className="rounded-3xl border-2 border-dashed border-gray-200 dark:border-zinc-700 py-20 text-center bg-white/50 dark:bg-zinc-900/50">
