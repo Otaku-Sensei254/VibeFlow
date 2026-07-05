@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import api from "../../utils/api";
+import { useAuth } from "../../context/AuthContext";
 
 export default function AdminDashboard() {
+  const { user } = useAuth();
   const [stats, setStats] = useState(null);
   const [categories, setCategories] = useState([]);
   const [tags, setTags] = useState([]);
@@ -27,8 +30,23 @@ export default function AdminDashboard() {
   return (
     <>
       <div className="rounded-3xl border border-slate-200/70 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur p-6 lg:p-8 shadow-sm">
-        <h1 className="text-3xl lg:text-4xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">System Overview</h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Admin control center and live content pulse.</p>
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl lg:text-4xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">System Overview</h1>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Admin control center and live content pulse.</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="inline-flex items-center gap-2 bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-full px-4 py-2 text-sm font-semibold text-gray-800 dark:text-gray-100">
+              Welcome {user?.username}
+            </div>
+            <Link
+              to={`/profile/${user?.username}`}
+              className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              &larr; Back to Profile
+            </Link>
+          </div>
+        </div>
       </div>
 
       {loading ? (
