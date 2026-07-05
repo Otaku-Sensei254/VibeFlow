@@ -111,6 +111,8 @@ export default function App() {
           </Route>
           <Route path="/waves/view/:username" element={<WaveViewer />} />
           <Route path="/creator-hub" element={<ProtectedRoute><CreatorHub /></ProtectedRoute>} />
+          <Route path="/creator-hub/:username" element={<Navigate to="/creator-hub" replace />} />
+          <Route path="/users/:username/creator-hub" element={<ProtectedRoute><CreatorHub /></ProtectedRoute>} />
           <Route path="/admin" element={<ProtectedRoute><AdminRoute /></ProtectedRoute>}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route element={<AdminLayout />}>

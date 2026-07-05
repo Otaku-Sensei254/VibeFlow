@@ -1,20 +1,22 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import api from "../../utils/api";
 import { useAuth } from "../../context/AuthContext";
 
 export default function CreatorHub() {
+  const { username: paramUsername } = useParams();
   const { user } = useAuth();
+  const username = paramUsername || user?.username;
   const [posts, setPosts] = useState([]);
   const [totals, setTotals] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!user) return;
+    if (!username) return;
     (async () => {
       try {
-        const res = await api.get(`/users/${user.username}/creator-hub`);
+        const res = await api.get(`/users/${username}/creator-hub`);
         const stats = res.data.data.stats;
         setPosts(stats);
         setTotals({
@@ -30,7 +32,7 @@ export default function CreatorHub() {
         setLoading(false);
       }
     })();
-  }, [user]);
+  }, [username]);
 
   if (!user) return null;
 
