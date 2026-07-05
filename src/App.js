@@ -27,6 +27,7 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminVerifications from "./pages/admin/AdminVerifications";
 import AdminRoles from "./pages/admin/AdminRoles";
 import AdminRoute from "./pages/admin/AdminRoute";
+import AdminLayout from "./pages/admin/AdminLayout";
 
 
 
@@ -106,15 +107,17 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path="/admin" element={<ProtectedRoute><AdminRoute /></ProtectedRoute>}>
-              <Route index element={<Navigate to="dashboard" replace />} />
+          </Route>
+          <Route path="/waves/view/:username" element={<WaveViewer />} />
+          <Route path="/admin" element={<ProtectedRoute><AdminRoute /></ProtectedRoute>}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route element={<AdminLayout />}>
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="verifications" element={<AdminVerifications />} />
               <Route path="roles" element={<AdminRoles />} />
             </Route>
           </Route>
-          <Route path="/waves/view/:username" element={<WaveViewer />} />
         </Routes>
         </ThemeProvider>
       </AuthProvider>
