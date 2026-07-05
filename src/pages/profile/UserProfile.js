@@ -268,6 +268,11 @@ export default function UserProfile() {
                   <FiCalendar size={11} />
                   {formatDate(u.inserted_at)}
                 </span>
+                {u.roles?.map((r, i) => (
+                  <span key={i} className="px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 rounded-full border border-blue-100 dark:border-blue-800">
+                    {r.name}
+                  </span>
+                ))}
               </div>
 
               {/* Stats row */}
@@ -349,6 +354,24 @@ export default function UserProfile() {
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M18.75 12.75h1.5a.75.75 0 000-1.5h-1.5a.75.75 0 000 1.5zM12 6a.75.75 0 01.75.75v6.75a.75.75 0 01-1.5 0V6.75A.75.75 0 0112 6zM12 18a.75.75 0 100-1.5.75.75 0 000 1.5z" /><path fillRule="evenodd" d="M3 8a3 3 0 013-3h12a3 3 0 013 3v8a3 3 0 01-3 3H6a3 3 0 01-3-3V8zm3-1.5h12A1.5 1.5 0 0119.5 8v8a1.5 1.5 0 01-1.5 1.5H6A1.5 1.5 0 014.5 16V8A1.5 1.5 0 016 6.5z" clipRule="evenodd" /></svg>
                   Creative Hub
                 </Link>
+                {currentUser?.roles?.some((r) => r.name === "admin") && (
+                  <a href={`${process.env.REACT_APP_API_URL?.replace("/api/v1", "") || "http://localhost:4001"}/admin/dashboard`} className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-indigo-600/25 hover:shadow-indigo-600/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all">
+                    <FiShield size={14} />
+                    Admin Dashboard
+                  </a>
+                )}
+                {currentUser?.roles?.some((r) => r.name === "moderator") && (
+                  <a href={`${process.env.REACT_APP_API_URL?.replace("/api/v1", "") || "http://localhost:4001"}/moderator/dashboard`} className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-blue-600/25 hover:shadow-blue-600/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all">
+                    <FiShield size={14} />
+                    Mod Dashboard
+                  </a>
+                )}
+                {currentUser?.roles?.some((r) => r.name === "sales_executive") && (
+                  <a href={`${process.env.REACT_APP_API_URL?.replace("/api/v1", "") || "http://localhost:4001"}/sales-executive/dashboard`} className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-green-600/25 hover:shadow-green-600/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all">
+                    <FiShield size={14} />
+                    Sales Dashboard
+                  </a>
+                )}
               </>
             ) : currentUser ? (
               <>
