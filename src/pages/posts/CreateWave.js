@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 import { showToast } from "../../utils/toast";
 import { FiCamera, FiUpload, FiMusic, FiX, FiArrowLeft, FiRepeat, FiSend } from "react-icons/fi";
@@ -18,7 +18,6 @@ export default function CreateWave() {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [previewType, setPreviewType] = useState(null);
   const [caption, setCaption] = useState("");
-  const [uploading, setUploading] = useState(false);
 
   // Music state
   const [musicQuery, setMusicQuery] = useState("");
@@ -390,17 +389,10 @@ export default function CreateWave() {
         </div>
         <button
           onClick={handleShare}
-          disabled={uploading}
-          className="w-full py-3 rounded-xl bg-gradient-to-r from-flow-500 to-coral-500 text-white font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
+          className="w-full py-3 rounded-xl bg-gradient-to-r from-flow-500 to-coral-500 text-white font-semibold flex items-center justify-center gap-2"
         >
-          {uploading ? (
-            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-          ) : (
-            <>
-              <FiSend size={18} />
-              Share Wave
-            </>
-          )}
+          <FiSend size={18} />
+          Share Wave
         </button>
       </div>
     </div>
