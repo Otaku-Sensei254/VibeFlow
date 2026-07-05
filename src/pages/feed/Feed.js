@@ -275,49 +275,65 @@ export default function Feed() {
         {/* Center - Feed */}
         <div className="flex-1 min-w-0">
           {/* Waves Stories */}
-          {waveGroups.length > 0 && (
-            <div className="mb-4">
-              <div className="flex items-center gap-4 overflow-x-auto pb-2 scrollbar-hide">
-                {user && (
-                  <Link
-                    to={`/waves/view/${user.username}`}
-                    className="flex flex-col items-center gap-1 shrink-0"
-                  >
-                    <div className="p-[2px] rounded-full bg-gradient-to-br from-tide-500 to-flow-600">
-                      <div className="w-[52px] h-[52px] rounded-full bg-white dark:bg-gray-900 p-[2px]">
-                        <img
-                          src={user.avatar_url || `https://ui-avatars.com/api/?name=${user.username}&background=6366F1&color=fff`}
-                          alt={user.username}
-                          className="w-full h-full rounded-full object-cover"
-                        />
+          <div className="mb-4">
+            <div className="flex items-center gap-4 overflow-x-auto pb-2 scrollbar-hide">
+              {user && (
+                <Link
+                  to="/waves/new"
+                  className="flex flex-col items-center gap-1 shrink-0"
+                >
+                  <div className="relative w-14 h-14 rounded-full border-2 border-dashed border-flow-400 p-0.5 flex items-center justify-center">
+                    <img
+                      src={user.avatar_url || `https://ui-avatars.com/api/?name=${user.username}&background=6366F1&color=fff`}
+                      alt={user.username}
+                      className="w-full h-full rounded-full object-cover opacity-60"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="bg-flow-500 text-white rounded-full p-0.5 shadow-sm">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                        </svg>
                       </div>
                     </div>
-                    <span className="text-[11px] font-medium text-gray-500">You</span>
-                  </Link>
-                )}
-                {waveGroups.map((group) => (
+                  </div>
+                  <span className="text-[11px] font-medium text-gray-500">You</span>
+                </Link>
+              )}
+
+              {waveGroups.length > 0 && (
+                <div className="w-px bg-gray-200 dark:bg-zinc-700 h-14 shrink-0" />
+              )}
+
+              {waveGroups.length > 0 ? (
+                waveGroups.map((group) => (
                   <Link
                     key={group.user.id}
                     to={`/waves/view/${group.user.username}`}
                     className="flex flex-col items-center gap-1 shrink-0"
                   >
-                    <div className={`p-[2px] rounded-full ${group.has_unseen ? "bg-gradient-to-r from-sun-400 via-coral-500 to-flow-600" : "bg-gray-300 dark:bg-gray-600"}`}>
-                      <div className="w-[52px] h-[52px] rounded-full bg-white dark:bg-gray-900 p-[2px]">
-                        <img
-                          src={group.user.avatar_url || `https://ui-avatars.com/api/?name=${group.user.username}&background=6366F1&color=fff`}
-                          alt={group.user.username}
-                          className="w-full h-full rounded-full object-cover"
-                        />
+                    <div className={`p-[2px] rounded-full ${group.has_unseen ? "bg-gradient-to-r from-sun-400 via-coral-500 to-flow-600" : "border-2 border-gray-200 dark:border-zinc-700"}`}>
+                      <div className={group.has_unseen ? "bg-white dark:bg-gray-900 rounded-full p-[2px]" : ""}>
+                        <div className="w-[52px] h-[52px] rounded-full bg-white dark:bg-gray-900 p-[2px]">
+                          <img
+                            src={group.user.avatar_url || `https://ui-avatars.com/api/?name=${group.user.username}&background=6366F1&color=fff`}
+                            alt={group.user.username}
+                            className="w-full h-full rounded-full object-cover"
+                          />
+                        </div>
                       </div>
                     </div>
                     <span className="text-[11px] font-medium text-gray-500 truncate max-w-[64px]">
                       {group.user.id === user?.id ? "You" : group.user.username}
                     </span>
                   </Link>
-                ))}
-              </div>
+                ))
+              ) : (
+                <div className="flex items-center justify-center w-full py-2">
+                  <span className="text-xs text-gray-400">No waves yet — create one!</span>
+                </div>
+              )}
             </div>
-          )}
+          </div>
 
           {/* Search bar - matches feed width */}
           <div className="sticky top-14 z-10 pb-3 bg-white dark:bg-gray-900">

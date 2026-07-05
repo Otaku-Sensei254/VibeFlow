@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import api from "../utils/api";
 import { connectSocket, disconnectSocket, joinChannel, setStatusChangeCallback } from "../utils/realtime";
+import { showToast } from "../utils/toast";
 
 const AuthContext = createContext(null);
 
@@ -60,6 +61,22 @@ export function AuthProvider({ children }) {
         update_sidebar: () => {
           fetchCounts();
           setSidebarRefresh((c) => c + 1);
+        },
+        points_awarded: (payload) => {
+          if (!payload || !payload.amount) return;
+          setUser((prev) => {
+            if (!prev) return prev;
+            const updated = { ...prev, points: (prev.points || 0) + payload.amount };
+            localStorage.setItem("user", JSON.stringify(updated));
+            return updated;
+          });
+          const amount = payload.amount;
+          showToast({
+            type: "success",
+            title: `+${amount} pts`,
+            message: `You earned ${amount} point${amount !== 1 ? "s" : ""}!`,
+            duration: 4000,
+          });
         },
         // Backend always pushes the full authoritative presence_state on both
         // initial join AND every presence_diff – so we just replace state here.
