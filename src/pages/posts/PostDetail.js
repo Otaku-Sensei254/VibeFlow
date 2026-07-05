@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 import { useAuth } from "../../context/AuthContext";
@@ -37,6 +37,7 @@ export default function PostDetail() {
   const [errorType, setErrorType] = useState(null);
   const [commentText, setCommentText] = useState("");
   const [sending, setSending] = useState(false);
+  const sendingRef = useRef(false);
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editText, setEditText] = useState("");
   const [menuOpenId, setMenuOpenId] = useState(null);
@@ -152,19 +153,25 @@ export default function PostDetail() {
     e.preventDefault();
     if (!commentText.trim()) return;
     if (!user) { navigate("/login"); return; }
+    if (sendingRef.current) return;
+    sendingRef.current = true;
     setSending(true);
     try {
       const res = await api.post(`/posts/${uuid}/comments`, {
         comment: { content: commentText },
       });
       const newComment = res.data.data.comment;
-      setPost((prev) => ({
-        ...prev,
-        comments: [...(prev.comments || []), newComment],
-        comments_count: (prev.comments_count || 0) + 1,
-      }));
+      setPost((prev) => {
+        if (prev.comments?.some((x) => x.id === newComment.id)) return prev;
+        return {
+          ...prev,
+          comments: [...(prev.comments || []), newComment],
+          comments_count: (prev.comments_count || 0) + 1,
+        };
+      });
       setCommentText("");
     } catch {}
+    sendingRef.current = false;
     setSending(false);
   };
 
