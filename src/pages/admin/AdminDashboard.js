@@ -41,7 +41,7 @@ export default function AdminDashboard() {
             </div>
             <Link
               to={`/profile/${user?.username}`}
-              className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+              className="text-sm font-semibold text-flow-600 dark:text-flow-400 hover:underline"
             >
               &larr; Back to Profile
             </Link>
@@ -66,11 +66,11 @@ export default function AdminDashboard() {
             </div>
             <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-slate-200/70 dark:border-zinc-800">
               <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Total Posts</div>
-              <div className="mt-2 text-3xl font-bold text-blue-600 dark:text-blue-400">{stats?.total_posts ?? 0}</div>
+              <div className="mt-2 text-3xl font-bold text-flow-600 dark:text-flow-400">{stats?.total_posts ?? 0}</div>
             </div>
             <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-slate-200/70 dark:border-zinc-800">
               <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Total Comments</div>
-              <div className="mt-2 text-3xl font-bold text-emerald-600 dark:text-emerald-400">{stats?.total_comments ?? 0}</div>
+              <div className="mt-2 text-3xl font-bold text-tide-600 dark:text-tide-400">{stats?.total_comments ?? 0}</div>
             </div>
           </div>
 
@@ -86,7 +86,7 @@ export default function AdminDashboard() {
                       <span className="font-medium text-gray-700 dark:text-gray-300">{c.category}</span>
                       <div className="flex items-center gap-3">
                         <div className="h-2 w-24 bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                          <div className="h-full bg-blue-500 rounded-full" style={{ width: `${Math.min(c.count * 10, 100)}%` }} />
+                          <div className="h-full bg-gradient-to-r from-tide-500 to-flow-500 rounded-full" style={{ width: `${Math.min(c.count * 10, 100)}%` }} />
                         </div>
                         <span className="text-sm text-gray-500 dark:text-gray-400 w-12 text-right">{c.count} posts</span>
                       </div>
@@ -105,7 +105,7 @@ export default function AdminDashboard() {
                   {tags.map((t) => (
                     <div key={t.tag} className="flex items-center bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-full px-3 py-1.5">
                       <span className="text-gray-700 dark:text-gray-200 font-medium text-sm">#{t.tag}</span>
-                      <span className="ml-2 bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 text-xs font-bold px-2 py-0.5 rounded-full">{t.count}</span>
+                      <span className="ml-2 bg-tide-100 text-tide-700 dark:bg-tide-900/40 dark:text-tide-300 text-xs font-bold px-2 py-0.5 rounded-full">{t.count}</span>
                     </div>
                   ))}
                 </div>

@@ -28,6 +28,7 @@ import AdminVerifications from "./pages/admin/AdminVerifications";
 import AdminRoles from "./pages/admin/AdminRoles";
 import AdminRoute from "./pages/admin/AdminRoute";
 import AdminLayout from "./pages/admin/AdminLayout";
+import CreatorHub from "./pages/creator/CreatorHub";
 
 
 
@@ -109,6 +110,7 @@ export default function App() {
             />
           </Route>
           <Route path="/waves/view/:username" element={<WaveViewer />} />
+          <Route path="/creator-hub" element={<ProtectedRoute><CreatorHub /></ProtectedRoute>} />
           <Route path="/admin" element={<ProtectedRoute><AdminRoute /></ProtectedRoute>}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route element={<AdminLayout />}>

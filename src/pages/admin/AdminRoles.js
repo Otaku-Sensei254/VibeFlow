@@ -65,7 +65,7 @@ export default function AdminRoles() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. editor"
-              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-tide-500/40"
             />
           </div>
           <div className="mb-5">
@@ -77,7 +77,7 @@ export default function AdminRoles() {
                     type="checkbox"
                     checked={selectedPermissions.includes(perm.id)}
                     onChange={() => togglePermission(perm.id)}
-                    className="w-4 h-4 rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500/40"
+                    className="w-4 h-4 rounded border-gray-300 dark:border-zinc-600 text-tide-600 focus:ring-tide-500/40"
                   />
                   <div>
                     <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{perm.slug}</p>
@@ -90,7 +90,7 @@ export default function AdminRoles() {
           <button
             onClick={createRole}
             disabled={!name.trim()}
-            className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all"
+            className="w-full py-2.5 bg-gradient-to-r from-tide-600 to-flow-600 hover:from-tide-700 hover:to-flow-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all"
           >
             Create Role
           </button>
@@ -121,7 +121,7 @@ export default function AdminRoles() {
                     <div className="flex flex-wrap gap-1.5">
                       {role.permissions.map((p) => (
                         <span key={p.id} className="text-xs bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded-full">
-                          {p.name}
+                          {p.slug}
                         </span>
                       ))}
                     </div>

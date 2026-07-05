@@ -51,7 +51,7 @@ export default function AdminVerifications() {
             onClick={() => setFilter(f)}
             className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all capitalize ${
               filter === f
-                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/25"
+                ? "bg-gradient-to-r from-tide-600 to-flow-600 text-white shadow-lg shadow-tide-600/25"
                 : "bg-white dark:bg-zinc-900 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800"
             }`}
           >
@@ -80,7 +80,7 @@ export default function AdminVerifications() {
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <img
-                    src={req.user.avatar_url || `https://ui-avatars.com/api/?name=${req.user.username}&background=6366F1&color=fff&bold=true`}
+                    src={req.user.avatar_url || `https://ui-avatars.com/api/?name=${req.user.username}&background=0d9488&color=fff&bold=true`}
                     alt=""
                     className="w-10 h-10 rounded-full object-cover"
                   />
@@ -88,10 +88,10 @@ export default function AdminVerifications() {
                     <p className="font-semibold text-sm text-gray-900 dark:text-white">{req.user.username}</p>
                     <span className={`inline-block mt-0.5 text-xs font-semibold px-2 py-0.5 rounded-full ${
                       req.status === "pending"
-                        ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
+                        ? "bg-sun-100 text-sun-700 dark:bg-sun-900/30 dark:text-sun-300"
                         : req.status === "approved"
-                        ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
-                        : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
+                        ? "bg-tide-100 text-tide-700 dark:bg-tide-900/30 dark:text-tide-300"
+                        : "bg-coral-100 text-coral-700 dark:bg-coral-900/30 dark:text-coral-300"
                     }`}>
                       {req.status}
                     </span>
@@ -101,19 +101,20 @@ export default function AdminVerifications() {
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       onClick={() => handleApprove(req.id)}
-                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-xl transition-all"
+                      className="px-4 py-2 bg-tide-600 hover:bg-tide-700 text-white text-xs font-bold rounded-xl transition-all"
                     >
                       Approve
                     </button>
                     <button
                       onClick={() => handleReject(req.id)}
-                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl transition-all"
+                      className="px-4 py-2 bg-coral-600 hover:bg-coral-700 text-white text-xs font-bold rounded-xl transition-all"
                     >
                       Reject
                     </button>
                   </div>
                 )}
               </div>
+              {req.admin_notes && <p className="mt-2 text-xs text-gray-400 italic">Note: {req.admin_notes}</p>}
               {req.social_links?.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-2">
                   {req.social_links.map((link, i) => (
@@ -121,9 +122,7 @@ export default function AdminVerifications() {
                   ))}
                 </div>
               )}
-              {req.admin_notes && (
-                <p className="mt-2 text-xs text-gray-400 italic">Note: {req.admin_notes}</p>
-              )}
+
             </div>
           ))}
         </div>
