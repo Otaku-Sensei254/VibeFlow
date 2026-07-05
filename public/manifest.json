@@ -1,0 +1,20 @@
+{
+  "short_name": "Vibeflow",
+  "name": "Vibeflow - Connect, create, and share",
+  "icons": [
+    {
+      "src": "No4.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "No4.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#0d9488",
+  "background_color": "#f0fdfa"
+}
