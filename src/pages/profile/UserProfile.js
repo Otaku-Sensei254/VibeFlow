@@ -355,10 +355,10 @@ export default function UserProfile() {
                   Creative Hub
                 </Link>
                 {currentUser?.roles?.some((r) => r.name === "admin") && (
-                  <a href={`${process.env.REACT_APP_API_URL?.replace("/api/v1", "") || "http://localhost:4001"}/admin/dashboard`} className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-indigo-600/25 hover:shadow-indigo-600/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all">
+                  <Link to="/admin/dashboard" className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-indigo-600/25 hover:shadow-indigo-600/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all">
                     <FiShield size={14} />
                     Admin Dashboard
-                  </a>
+                  </Link>
                 )}
                 {currentUser?.roles?.some((r) => r.name === "moderator") && (
                   <a href={`${process.env.REACT_APP_API_URL?.replace("/api/v1", "") || "http://localhost:4001"}/moderator/dashboard`} className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-blue-600/25 hover:shadow-blue-600/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all">

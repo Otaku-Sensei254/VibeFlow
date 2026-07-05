@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import Layout from "./components/Layout";
@@ -22,7 +22,11 @@ import CreateWave from "./pages/posts/CreateWave";
 import CreateCurrent from "./pages/posts/CreateCurrent";
 import WaveStore from "./pages/WaveStore";
 import WaveViewer from "./pages/posts/WaveViewer";
-////test to see change
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminVerifications from "./pages/admin/AdminVerifications";
+import AdminRoles from "./pages/admin/AdminRoles";
+import AdminRoute from "./pages/admin/AdminRoute";
 
 
 
@@ -102,6 +106,13 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="/admin" element={<ProtectedRoute><AdminRoute /></ProtectedRoute>}>
+              <Route index element={<Navigate to="dashboard" replace />} />
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="verifications" element={<AdminVerifications />} />
+              <Route path="roles" element={<AdminRoles />} />
+            </Route>
           </Route>
           <Route path="/waves/view/:username" element={<WaveViewer />} />
         </Routes>
