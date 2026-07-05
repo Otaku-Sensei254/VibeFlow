@@ -355,7 +355,7 @@ export default function CreateWave() {
 
   const renderPreviewStep = () => (
     <div className="flex-1 flex flex-col">
-      <div className="flex-1 relative bg-black flex items-center justify-center">
+      <div className="h-[55vh] max-h-[55vh] relative bg-black flex items-center justify-center shrink-0">
         {previewType === "video" ? (
           <video src={previewUrl} controls autoPlay muted playsInline className="max-h-full max-w-full object-contain" />
         ) : (
