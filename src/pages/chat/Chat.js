@@ -7,7 +7,7 @@ import {
   FiSend, FiSearch, FiArrowLeft, FiUser, FiUsers,
   FiMessageCircle, FiAnchor, FiSmile, FiMic, FiStopCircle,
   FiImage, FiX, FiPlay, FiPause, FiSettings, FiPhone,
-  FiPhoneOff, FiVolume2, FiTrash2, FiCornerDownRight, FiCheck, FiCheckCircle,
+  FiPhoneOff, FiVolume2, FiTrash2, FiCheck, FiCheckCircle,
   FiMoreHorizontal, FiEdit3, FiStar
 } from "react-icons/fi";
 import data from "@emoji-mart/data";
@@ -635,13 +635,17 @@ export default function Chat() {
   }, [fetchCounts, user?.id]);
 
   // ── Sync URL param to active conversation ──
+  const prevUuidRef = useRef(null);
   useEffect(() => {
     if (!uuid || conversations.length === 0) {
       if (!uuid) setActiveConvo(null);
       return;
     }
     const match = conversations.find((c) => c.uuid === uuid);
-    if (match && (!activeConvo || activeConvo.uuid !== uuid)) openConversation(match);
+    if (match && prevUuidRef.current !== uuid) {
+      prevUuidRef.current = uuid;
+      openConversation(match);
+    }
   }, [uuid, conversations, openConversation]);
 
   // ── Auto scroll to bottom ──
