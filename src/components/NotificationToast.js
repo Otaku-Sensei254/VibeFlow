@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { onChannel } from "../utils/realtime";
-import { FiX, FiHeart, FiMessageCircle, FiUserPlus, FiRepeat, FiAtSign } from "react-icons/fi";
+import { FiX, FiHeart, FiMessageCircle, FiUserPlus, FiRepeat, FiAtSign, FiCheckCircle, FiAlertCircle } from "react-icons/fi";
 
 const NOTIF_ICONS = {
   like: { icon: FiHeart, color: "text-coral-500" },
@@ -57,6 +57,18 @@ export default function NotificationToast() {
   }, []);
 
   useEffect(() => {
+    const handler = (e) => {
+      const t = e.detail;
+      setQueue((prev) => {
+        if (prev.some((item) => item.id === t.id)) return prev;
+        return [...prev, { ...t, _app: true }];
+      });
+    };
+    window.addEventListener("app:toast", handler);
+    return () => window.removeEventListener("app:toast", handler);
+  }, []);
+
+  useEffect(() => {
     if (queue.length === 0) {
       if (timerRef.current) clearTimeout(timerRef.current);
       return;
@@ -75,6 +87,34 @@ export default function NotificationToast() {
   return (
     <div className="fixed top-4 right-4 z-[100] flex flex-col gap-2 max-w-sm w-full pointer-events-none">
       {queue.map((n) => {
+        if (n._app) {
+          return (
+            <div
+              key={n.id}
+              className="pointer-events-auto flex items-start gap-3 p-3.5 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl shadow-black/10 dark:shadow-black/30 transition-all duration-300 animate-slide-in-right"
+            >
+              <div className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center ${n.type === "error" ? "text-red-500" : "text-green-500"} bg-gray-100 dark:bg-gray-700`}>
+                {n.type === "error" ? <FiAlertCircle size={16} /> : <FiCheckCircle size={16} />}
+              </div>
+              <div className="flex-1 min-w-0">
+                {n.title && <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{n.title}</p>}
+                {n.message && <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{n.message}</p>}
+                {n.link && n.linkText && (
+                  <Link to={n.link} onClick={() => dismiss(n.id)} className="text-xs font-medium text-tide-600 dark:text-tide-400 hover:underline mt-1 inline-block">
+                    {n.linkText}
+                  </Link>
+                )}
+              </div>
+              <button
+                onClick={(e) => { e.stopPropagation(); dismiss(n.id); }}
+                className="shrink-0 p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                <FiX size={14} />
+              </button>
+            </div>
+          );
+        }
+
         const { icon: Icon, color } = getIcon(n.type);
         return (
           <div

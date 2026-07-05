@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { FiCamera, FiUpload, FiMusic, FiX, FiArrowLeft, FiSend, FiRepeat } from "react-icons/fi";
+import { useNavigate, Link } from "react-router-dom";
 import api from "../../utils/api";
+import { showToast } from "../../utils/toast";
+import { FiCamera, FiUpload, FiMusic, FiX, FiArrowLeft, FiRepeat, FiSend } from "react-icons/fi";
 
 export default function CreateWave() {
   const navigate = useNavigate();
@@ -136,7 +137,15 @@ export default function CreateWave() {
 
   const handleShare = async () => {
     if (!previewUrl) return;
-    setUploading(true);
+
+    navigate(-1);
+
+    showToast({
+      title: "Uploading...",
+      message: "Your wave is being published in the background.",
+      type: "success",
+      duration: 3000,
+    });
 
     try {
       const resp = await fetch(previewUrl);
@@ -159,7 +168,7 @@ export default function CreateWave() {
         musicTrackId = musicRes.data.data?.music_track?.id;
       }
 
-      await api.post("/waves", {
+      const waveRes = await api.post("/waves", {
         wave: {
           media_url: finalMediaUrl,
           media_type: previewType,
@@ -168,11 +177,22 @@ export default function CreateWave() {
         },
       });
 
-      navigate(-1);
+      showToast({
+        title: "Wave published!",
+        message: "Your wave is now live.",
+        link: `/waves/view/${waveRes.data.data?.wave?.user?.username || "me"}`,
+        linkText: "Click to view your wave",
+        type: "success",
+        duration: 8000,
+      });
     } catch {
-      alert("Failed to upload wave");
+      showToast({
+        title: "Upload failed",
+        message: "Something went wrong uploading your wave. Please try again.",
+        type: "error",
+        duration: 8000,
+      });
     }
-    setUploading(false);
   };
 
   // Music search

@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../../utils/api";
+import { showToast } from "../../utils/toast";
 import { FiArrowLeft, FiImage, FiX, FiFile } from "react-icons/fi";
 
 const CATEGORIES = [
@@ -52,6 +53,20 @@ export default function CreatePost() {
     e.preventDefault();
     setError("");
     setLoading(true);
+
+    const tags = form.tags
+      ? form.tags.split(",").map((t) => t.trim().toLowerCase()).filter(Boolean)
+      : [];
+
+    navigate("/feed");
+
+    showToast({
+      title: "Uploading...",
+      message: "Your post is being published in the background.",
+      type: "success",
+      duration: 3000,
+    });
+
     try {
       const mediaFiles = [];
       for (const sf of selectedFiles) {
@@ -61,22 +76,28 @@ export default function CreatePost() {
         mediaFiles.push({ url: result.url, type: result.resource_type || sf.type });
       }
 
-      const tags = form.tags
-        ? form.tags.split(",").map((t) => t.trim().toLowerCase()).filter(Boolean)
-        : [];
       const res = await api.post("/posts", {
         post: { ...form, tags, media_files: mediaFiles },
       });
-      navigate(`/posts/${res.data.data.post.uuid}`);
+
+      showToast({
+        title: "Post published!",
+        message: "Your post is now live.",
+        link: `/posts/${res.data.data.post.uuid}`,
+        linkText: "Click to view your post",
+        type: "success",
+        duration: 8000,
+      });
     } catch (err) {
-      const errors = err.response?.data?.errors;
-      if (errors) {
-        setError(Object.values(errors).flat().join(", "));
-      } else {
-        setError("Failed to create post");
-      }
+      showToast({
+        title: "Upload failed",
+        message: err.response?.data?.errors
+          ? Object.values(err.response.data.errors).flat().join(", ")
+          : "Something went wrong. Please try again.",
+        type: "error",
+        duration: 8000,
+      });
     }
-    setLoading(false);
   };
 
   return (
