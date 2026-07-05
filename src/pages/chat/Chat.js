@@ -8,7 +8,7 @@ import {
   FiMessageCircle, FiAnchor, FiSmile, FiMic, FiStopCircle,
   FiImage, FiX, FiPlay, FiPause, FiSettings, FiPhone,
   FiPhoneOff, FiVolume2, FiTrash2, FiCheck, FiCheckCircle,
-  FiMoreHorizontal, FiEdit3, FiStar
+  FiMoreHorizontal, FiEdit3, FiStar, FiCornerUpLeft
 } from "react-icons/fi";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
@@ -336,6 +336,9 @@ function MessageBubble({ msg, isMe, skin = "default", onImageClick, onReply, onD
             </button>
             {menuOpen && (
               <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-10 min-w-[130px]" onClick={(e) => e.stopPropagation()}>
+                <button onClick={() => { onReply?.(msg); closeMenu(); }} className="w-full px-3 py-1.5 text-xs text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-gray-700 dark:text-gray-200">
+                  <FiCornerUpLeft size={12} /> Reply
+                </button>
                 <button onClick={startEdit} className="w-full px-3 py-1.5 text-xs text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-gray-700 dark:text-gray-200">
                   <FiEdit3 size={12} /> Edit
                 </button>
@@ -443,6 +446,9 @@ function MessageBubble({ msg, isMe, skin = "default", onImageClick, onReply, onD
           </button>
           {menuOpen && (
             <div className="absolute right-0 bottom-full mb-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-10 min-w-[130px]" onClick={(e) => e.stopPropagation()}>
+              <button onClick={() => { onReply?.(msg); closeMenu(); }} className="w-full px-3 py-1.5 text-xs text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-gray-700 dark:text-gray-200">
+                <FiCornerUpLeft size={12} /> Reply
+              </button>
               <button onClick={() => { onStar?.(msg); closeMenu(); }} className="w-full px-3 py-1.5 text-xs text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-gray-700 dark:text-gray-200">
                 <FiStar size={12} className={isStarred ? "text-amber-400 fill-amber-400" : ""} /> {isStarred ? "Unstar" : "Star"}
               </button>
