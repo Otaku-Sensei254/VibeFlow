@@ -328,30 +328,34 @@ function MessageBubble({ msg, isMe, skin = "default", onImageClick, onReply, onD
       )}
 
       <div className={`flex flex-col max-w-[80%] md:max-w-[70%] ${isMe ? "items-end ml-auto" : "items-start"}`}>
-        {/* Three-dot menu */}
-        {isMe && (
-          <div className="relative mb-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button onClick={() => onToggleMenu?.(menuOpen ? null : msg.id)} className="p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded" title="More">
-              <FiMoreHorizontal size={14} />
-            </button>
-            {menuOpen && (
-              <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-10 min-w-[130px]" onClick={(e) => e.stopPropagation()}>
-                <button onClick={() => { onReply?.(msg); closeMenu(); }} className="w-full px-3 py-1.5 text-xs text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-gray-700 dark:text-gray-200">
-                  <FiCornerUpLeft size={12} /> Reply
-                </button>
+        {/* Floating actions (visible on hover, like LiveView) */}
+        <div className={`relative mb-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 ${isMe ? "self-end" : "self-start"}`}>
+          <button
+            onClick={() => { onReply?.(msg); }}
+            className="p-1 text-gray-400 hover:text-tide-600 dark:hover:text-tide-400 rounded transition-colors"
+            title="Reply"
+          >
+            <FiCornerUpLeft size={13} />
+          </button>
+          <button onClick={() => onToggleMenu?.(menuOpen ? null : msg.id)} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded transition-colors" title="More">
+            <FiMoreHorizontal size={13} />
+          </button>
+          {menuOpen && (
+            <div className={`absolute ${isMe ? "right-0 top-full" : "left-0 top-full"} mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-10 min-w-[120px]`} onClick={(e) => e.stopPropagation()}>
+              {isMe && (
                 <button onClick={startEdit} className="w-full px-3 py-1.5 text-xs text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-gray-700 dark:text-gray-200">
                   <FiEdit3 size={12} /> Edit
                 </button>
-                <button onClick={() => { onDelete?.(msg); closeMenu(); }} className="w-full px-3 py-1.5 text-xs text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-red-500">
-                  <FiTrash2 size={12} /> Delete
-                </button>
-                <button onClick={() => { onStar?.(msg); closeMenu(); }} className="w-full px-3 py-1.5 text-xs text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-gray-700 dark:text-gray-200">
-                  <FiStar size={12} className={isStarred ? "text-amber-400 fill-amber-400" : ""} /> {isStarred ? "Unstar" : "Star"}
-                </button>
-              </div>
-            )}
-          </div>
-        )}
+              )}
+              <button onClick={() => { onDelete?.(msg); closeMenu(); }} className="w-full px-3 py-1.5 text-xs text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-red-500">
+                <FiTrash2 size={12} /> Delete
+              </button>
+              <button onClick={() => { onStar?.(msg); closeMenu(); }} className="w-full px-3 py-1.5 text-xs text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-gray-700 dark:text-gray-200">
+                <FiStar size={12} className={isStarred ? "text-amber-400 fill-amber-400" : ""} /> {isStarred ? "Unstar" : "Star"}
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Reply preview */}
         {msg.reply_to && (
@@ -437,25 +441,6 @@ function MessageBubble({ msg, isMe, skin = "default", onImageClick, onReply, onD
           )}
         </div>
       </div>
-
-      {/* Three-dot menu for received messages */}
-      {!isMe && (
-        <div className="relative mb-3 self-end opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-          <button onClick={() => onToggleMenu?.(menuOpen ? null : msg.id)} className="p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded" title="More">
-            <FiMoreHorizontal size={14} />
-          </button>
-          {menuOpen && (
-            <div className="absolute right-0 bottom-full mb-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-10 min-w-[130px]" onClick={(e) => e.stopPropagation()}>
-              <button onClick={() => { onReply?.(msg); closeMenu(); }} className="w-full px-3 py-1.5 text-xs text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-gray-700 dark:text-gray-200">
-                <FiCornerUpLeft size={12} /> Reply
-              </button>
-              <button onClick={() => { onStar?.(msg); closeMenu(); }} className="w-full px-3 py-1.5 text-xs text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-gray-700 dark:text-gray-200">
-                <FiStar size={12} className={isStarred ? "text-amber-400 fill-amber-400" : ""} /> {isStarred ? "Unstar" : "Star"}
-              </button>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 }
