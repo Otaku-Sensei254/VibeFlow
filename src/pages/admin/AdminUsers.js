@@ -12,21 +12,17 @@ export default function AdminUsers() {
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     setError(null);
-    try {
-      const params = { sort_by: sortBy };
-      if (search) params.search = search;
-      const [usersRes, rolesRes] = await Promise.all([
-        api.get("/admin/users", { params }),
-        api.get("/admin/roles"),
-      ]);
-      setUsers(usersRes.data.data.users);
-      setRoles(rolesRes.data.data.roles);
-      setLoading(false);
-    } catch (err) {
-      console.error("Admin users fetch failed:", err);
-      setError(err?.response?.data?.error || err?.message || "Failed to load users");
-      setLoading(false);
-    }
+    const params = { sort_by: sortBy };
+    if (search) params.search = search;
+    const [usersRes, rolesRes] = await Promise.all([
+      api.get("/admin/users", { params }).catch((e) => { console.error("Users fetch failed:", e); return null; }),
+      api.get("/admin/roles").catch((e) => { console.error("Roles fetch failed:", e); return null; }),
+    ]);
+    if (usersRes) setUsers(usersRes.data.data.users);
+    else setError("Failed to load users");
+    if (rolesRes) setRoles(rolesRes.data.data.roles);
+    else console.warn("Roles unavailable — role toggle buttons hidden");
+    setLoading(false);
   }, [search, sortBy]);
 
   useEffect(() => { fetchUsers(); }, [fetchUsers]);

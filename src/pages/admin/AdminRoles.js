@@ -80,8 +80,8 @@ export default function AdminRoles() {
                     className="w-4 h-4 rounded border-gray-300 dark:border-zinc-600 text-indigo-600 focus:ring-indigo-500/40"
                   />
                   <div>
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{perm.name}</p>
-                    <p className="text-xs text-gray-400">{perm.slug}</p>
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{perm.slug}</p>
+                    <p className="text-xs text-gray-400">{perm.description}</p>
                   </div>
                 </label>
               ))}
