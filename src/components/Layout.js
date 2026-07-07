@@ -90,6 +90,7 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+      {location.pathname !== "/" && (
       <nav className="fixed top-0 z-50 w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2 shrink-0 md:gap-0">
@@ -226,6 +227,7 @@ export default function Layout() {
           </div>
         </div>
       </nav>
+      )}
 
       {menuOpen && (
         <div
@@ -400,11 +402,11 @@ export default function Layout() {
       <NotificationToast />
       <CookieConsent />
 
-      <main className={`pt-14 ${location.pathname.startsWith("/waves/") || location.pathname.match(/^\/chat\/[^/]+$/) ? "" : "pb-16"} md:pb-0`}>
+      <main className={`${location.pathname === "/" ? "pt-0" : "pt-14"} ${location.pathname === "/" || location.pathname.startsWith("/waves/") || location.pathname.match(/^\/chat\/[^/]+$/) ? "" : "pb-16"} md:pb-0`}>
         <Outlet />
       </main>
 
-      {!location.pathname.startsWith("/waves/") && !location.pathname.match(/^\/chat\/[^/]+$/) && (
+      {location.pathname !== "/" && !location.pathname.startsWith("/waves/") && !location.pathname.match(/^\/chat\/[^/]+$/) && (
       <nav className="fixed bottom-0 z-50 w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur border-t border-gray-200 dark:border-gray-700 md:hidden">
         <div className="flex items-center justify-around h-16">
           {bottomLinks.map((link) => {
@@ -444,6 +446,7 @@ export default function Layout() {
       </nav>
       )}
 
+      {location.pathname !== "/" && (
       <footer className="hidden md:block border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-center gap-6 text-xs text-gray-400 dark:text-gray-500">
@@ -453,6 +456,7 @@ export default function Layout() {
           </div>
         </div>
       </footer>
+      )}
     </div>
   );
 }
