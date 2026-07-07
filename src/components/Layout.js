@@ -41,6 +41,12 @@ export default function Layout() {
     }
   }, []);
 
+  useEffect(() => {
+    if (user && location.pathname === "/") {
+      navigate("/feed", { replace: true });
+    }
+  }, [user, location.pathname, navigate]);
+
   const handleLogout = async () => {
     setMenuOpen(false);
     setProfileOpen(false);
@@ -95,8 +101,8 @@ export default function Layout() {
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2 shrink-0 md:gap-0">
             <Link to={user ? "/feed" : "/"} className="hidden md:flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-tide-600 to-flow-600 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-tide-200 dark:shadow-tide-900/30">
-                V
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-tide-600 to-flow-600 flex items-center justify-center overflow-hidden shadow-md shadow-tide-200 dark:shadow-tide-900/30">
+                <img src="/No4.png" alt="Vibeflow" className="w-full h-full object-cover" />
               </div>
               <span className="text-lg font-extrabold tracking-wide bg-gradient-to-r from-tide-600 via-flow-600 to-coral-500 bg-clip-text text-transparent drop-shadow-sm">
                 Vibeflow
