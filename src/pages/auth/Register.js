@@ -10,10 +10,15 @@ export default function Register() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [agreeTerms, setAgreeTerms] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    if (!agreeTerms) {
+      setError("You must agree to the Terms and Privacy Policy");
+      return;
+    }
     setLoading(true);
     try {
       await register(form);
@@ -79,6 +84,24 @@ export default function Register() {
                 {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
               </button>
             </div>
+            <label className="flex items-start gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={agreeTerms}
+                onChange={(e) => setAgreeTerms(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-tide-600 focus:ring-tide-500 bg-white dark:bg-gray-800"
+              />
+              <span className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                I agree to the{" "}
+                <Link to="/terms" className="text-tide-600 hover:underline font-medium" target="_blank">
+                  Terms and Conditions
+                </Link>{" "}
+                and{" "}
+                <Link to="/privacy" className="text-tide-600 hover:underline font-medium" target="_blank">
+                  Privacy Policy
+                </Link>
+              </span>
+            </label>
             <button
               type="submit"
               disabled={loading}

@@ -60,6 +60,15 @@ export default function Home() {
             </div>
           ))}
         </div>
+
+        <div className="mt-12 text-center">
+          <p className="text-xs text-gray-400 dark:text-gray-500">
+            By using Vibeflow, you agree to our{" "}
+            <Link to="/terms" className="text-tide-600 hover:underline">Terms of Service</Link>{" "}
+            and{" "}
+            <Link to="/privacy" className="text-tide-600 hover:underline">Privacy Policy</Link>
+          </p>
+        </div>
       </div>
     </div>
   );

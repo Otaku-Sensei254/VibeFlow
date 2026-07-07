@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import PostCard from "../../components/PostCard";
 import { joinChannel, onChannel } from "../../utils/realtime";
 import { FiSearch, FiTrendingUp, FiLoader, FiClock, FiUsers, FiX } from "react-icons/fi";
+import { PostCardSkeleton } from "../../components/Skeleton";
 
 const CATEGORIES = [
   "Tech", "Drama", "Action", "Music", "Fitness", "Sports",
@@ -377,7 +378,12 @@ export default function Feed() {
                 <PostCard post={post} />
               </div>
             ))}
-            {loading && (
+            {loading && posts.length === 0 && (
+              <div className="space-y-4 sm:space-y-5">
+                {[1, 2, 3, 4, 5].map((i) => <PostCardSkeleton key={i} />)}
+              </div>
+            )}
+            {loading && posts.length > 0 && (
               <div className="text-center py-6">
                 <div className="animate-spin rounded-full h-7 w-7 border-[3px] border-tide-500 border-t-transparent mx-auto" />
               </div>

@@ -3,6 +3,7 @@ import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import NotificationToast from "../components/NotificationToast";
+import CookieConsent from "../components/CookieConsent";
 import {
   FiMenu, FiX, FiGrid, FiMessageCircle,
   FiBell, FiUser, FiLogOut, FiLogIn,
@@ -317,6 +318,22 @@ export default function Layout() {
                   {link.label}
                 </Link>
               ))}
+              <div className="border-t border-gray-100 dark:border-gray-700 mt-4 pt-4 px-3">
+                <Link
+                  to="/privacy"
+                  onClick={() => setMenuOpen(false)}
+                  className="block text-xs text-gray-400 hover:text-tide-600 transition-colors mb-2"
+                >
+                  Privacy Policy
+                </Link>
+                <Link
+                  to="/terms"
+                  onClick={() => setMenuOpen(false)}
+                  className="block text-xs text-gray-400 hover:text-tide-600 transition-colors"
+                >
+                  Terms of Service
+                </Link>
+              </div>
             </>
           )}
         </div>
@@ -381,6 +398,7 @@ export default function Layout() {
       )}
 
       <NotificationToast />
+      <CookieConsent />
 
       <main className={`pt-14 ${location.pathname.startsWith("/waves/") || location.pathname.match(/^\/chat\/[^/]+$/) ? "" : "pb-16"} md:pb-0`}>
         <Outlet />
@@ -425,6 +443,16 @@ export default function Layout() {
         </div>
       </nav>
       )}
+
+      <footer className="hidden md:block border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-center gap-6 text-xs text-gray-400 dark:text-gray-500">
+            <span>&copy; 2026 Vibeflow</span>
+            <Link to="/privacy" className="hover:text-tide-600 dark:hover:text-tide-400 transition-colors">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-tide-600 dark:hover:text-tide-400 transition-colors">Terms of Service</Link>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

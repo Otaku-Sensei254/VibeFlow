@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import api from "../utils/api";
 import PostCard from "../components/PostCard";
+import { PostCardSkeleton } from "../components/Skeleton";
 import { FiArrowLeft, FiHash } from "react-icons/fi";
 
 export default function TagPage() {
@@ -51,7 +52,12 @@ export default function TagPage() {
         {posts.map((post) => (
           <PostCard key={post.uuid} post={post} />
         ))}
-        {loading && (
+        {loading && posts.length === 0 && (
+          <div className="space-y-4 sm:space-y-5">
+            {[1, 2, 3].map((i) => <PostCardSkeleton key={i} />)}
+          </div>
+        )}
+        {loading && posts.length > 0 && (
           <div className="text-center py-6">
             <div className="animate-spin rounded-full h-7 w-7 border-[3px] border-tide-500 border-t-transparent mx-auto" />
           </div>

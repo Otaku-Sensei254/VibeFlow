@@ -78,8 +78,19 @@ export default function Notifications() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-16">
-        <div className="animate-spin rounded-full h-8 w-8 border-[3px] border-tide-500 border-t-transparent" />
+      <div className="max-w-2xl mx-auto px-3 sm:px-4 py-4 sm:py-6 animate-pulse">
+        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-full w-32 mb-6" />
+        <div className="space-y-3">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="flex items-start gap-3 p-4 bg-white dark:bg-gray-800/80 rounded-2xl border border-gray-100 dark:border-gray-700/60">
+              <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 shrink-0" />
+              <div className="flex-1 space-y-2">
+                <div className="h-3.5 bg-gray-200 dark:bg-gray-700 rounded-full w-3/4" />
+                <div className="h-3 bg-gray-100 dark:bg-gray-700/50 rounded-full w-1/3" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

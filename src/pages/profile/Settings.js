@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../utils/api";
-import { FiArrowLeft, FiUser, FiLock, FiEye } from "react-icons/fi";
+import { FiArrowLeft, FiUser, FiLock, FiEye, FiTrash2 } from "react-icons/fi";
 
 export default function Settings() {
   const { user, updateUser, showPresence, setShowPresence } = useAuth();
@@ -158,6 +158,24 @@ export default function Settings() {
             Update Password
           </button>
         </form>
+      </div>
+
+      <div className="bg-white dark:bg-gray-800/80 rounded-2xl border border-red-100 dark:border-red-900/30 shadow-sm p-5 sm:p-6 mt-5">
+        <div className="flex items-center gap-2 mb-3">
+          <FiTrash2 className="text-red-500" size={18} />
+          <h2 className="font-semibold text-lg text-red-600 dark:text-red-400">Delete Account</h2>
+        </div>
+        <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed mb-4">
+          Permanently delete your account and all associated data. This action cannot be undone.
+          To request deletion, email us at{" "}
+          <a href="mailto:vibeflowtech@gmail.com" className="text-tide-600 hover:underline font-medium">vibeflowtech@gmail.com</a>{" "}
+          from the email address linked to your account. We will process your request within 30 days.
+        </p>
+        <p className="text-xs text-gray-400 dark:text-gray-500">
+          See our{" "}
+          <Link to="/privacy" className="text-tide-600 hover:underline">Privacy Policy</Link>{" "}
+          for more details on data retention.
+        </p>
       </div>
     </div>
   );

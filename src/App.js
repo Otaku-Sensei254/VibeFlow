@@ -29,7 +29,8 @@ import AdminRoles from "./pages/admin/AdminRoles";
 import AdminRoute from "./pages/admin/AdminRoute";
 import AdminLayout from "./pages/admin/AdminLayout";
 import CreatorHub from "./pages/creator/CreatorHub";
-
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsConditions from "./pages/TermsConditions";
 
 
 
@@ -108,6 +109,8 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsConditions />} />
           </Route>
           <Route path="/waves/view/:username" element={<WaveViewer />} />
           <Route path="/creator-hub" element={<ProtectedRoute><CreatorHub /></ProtectedRoute>} />
