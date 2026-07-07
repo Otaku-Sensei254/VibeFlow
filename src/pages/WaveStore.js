@@ -299,7 +299,7 @@ function FlipCard({ item, category, onPurchase, purchasing }) {
 
 export default function WaveStore() {
   const { user } = useAuth();
-  const [items, setItems] = useState([]);
+  const [, setItems] = useState([]);
   const [grouped, setGrouped] = useState({});
   const [pointsBalance, setPointsBalance] = useState(0);
   const [loading, setLoading] = useState(true);
