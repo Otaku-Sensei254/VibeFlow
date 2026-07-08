@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import api from "../utils/api";
 import { connectSocket, disconnectSocket, joinChannel, setStatusChangeCallback } from "../utils/realtime";
 import { showToast } from "../utils/toast";
@@ -10,6 +10,8 @@ export function AuthProvider({ children }) {
     const stored = localStorage.getItem("user");
     return stored ? JSON.parse(stored) : null;
   });
+  const userRef = useRef(user);
+  userRef.current = user;
   const [loading, setLoading] = useState(true);
   const [notificationCount, setNotificationCount] = useState(0);
   const [chatUnreadCount, setChatUnreadCount] = useState(0);
@@ -60,7 +62,7 @@ export function AuthProvider({ children }) {
           if (
             payload?.user &&
             payload?.content &&
-            payload.user_id !== user?.id &&
+            payload.user_id !== userRef.current?.id &&
             !window.location.pathname.startsWith(`/chat/${payload.conversation_uuid}`)
           ) {
             showToast({
