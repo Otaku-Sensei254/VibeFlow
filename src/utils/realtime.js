@@ -107,16 +107,6 @@ export function joinChannel(topic, callbacks = {}) {
   }
 
   if (channels[topic]) {
-    Object.entries(callbacks).forEach(([event, handler]) => {
-      channels[topic].on(event, handler);
-    });
-    if (topic === "relay:user" && callbacks.presence_state) {
-      channels[topic].push("get_presence", {})
-        .receive("ok", (state) => {
-          callbacks.presence_state(state);
-        })
-        .receive("error", (err) => console.error("[realtime] get_presence error:", err));
-    }
     return;
   }
 
