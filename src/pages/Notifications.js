@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../utils/api";
 import { joinChannel, onChannel } from "../utils/realtime";
-import { FiHeart, FiMessageCircle, FiRepeat, FiUserPlus, FiAtSign, FiFileText } from "react-icons/fi";
+import { FiHeart, FiMessageCircle, FiRepeat, FiUserPlus, FiAtSign, FiFileText, FiUserCheck } from "react-icons/fi";
 
 const NOTIF_ICONS = {
   like: { icon: FiHeart, color: "text-coral-500", bg: "bg-coral-50 dark:bg-coral-900/20" },
@@ -31,9 +32,11 @@ function formatTime(dateStr) {
 }
 
 export default function Notifications() {
-  const { fetchCounts } = useAuth();
+  const { user: currentUser, fetchCounts } = useAuth();
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [followLoading, setFollowLoading] = useState({});
 
   const loadNotifications = useCallback(async () => {
     try {
@@ -64,6 +67,30 @@ export default function Notifications() {
       );
       fetchCounts();
     } catch {}
+  };
+
+  const getNotifLink = (n) => {
+    if (n.type === "follow") return `/profile/${n.actor?.username}`;
+    if (n.type === "shared_post") return n.conversation_uuid ? `/chat/${n.conversation_uuid}` : null;
+    if (["like", "comment", "repost", "mention", "new_post", "post_ready"].includes(n.type)) {
+      return n.post_uuid ? `/posts/${n.post_uuid}` : null;
+    }
+    return null;
+  };
+
+  const handleNotifClick = (n) => {
+    markRead(n.id);
+    const link = getNotifLink(n);
+    if (link) navigate(link);
+  };
+
+  const handleFollowBack = async (e, actorUsername, notifId) => {
+    e.stopPropagation();
+    setFollowLoading((prev) => ({ ...prev, [notifId]: true }));
+    try {
+      await api.post(`/users/${actorUsername}/follow`);
+    } catch {}
+    setFollowLoading((prev) => ({ ...prev, [notifId]: false }));
   };
 
   const markAllRead = async () => {
@@ -125,7 +152,7 @@ export default function Notifications() {
           return (
             <div
               key={n.id}
-              onClick={() => markRead(n.id)}
+              onClick={() => handleNotifClick(n)}
               className={`group relative flex items-start gap-3 p-3 sm:p-4 rounded-xl border cursor-pointer transition-all duration-200 ${
                 isUnread
                   ? "bg-gradient-to-r from-tide-50/80 to-white dark:from-tide-900/15 dark:to-gray-800/80 border-tide-200 dark:border-tide-800/50 hover:shadow-md"
@@ -151,13 +178,34 @@ export default function Notifications() {
                         : n.type === "repost" ? "reposted your post"
                         : n.type === "mention" ? "mentioned you"
                         : n.type === "new_post" ? "posted something new"
+                        : n.type === "shared_post" ? "shared a post with you"
                         : n.type}
                     </span>
                   </p>
                 </div>
-                <p className="text-xs text-gray-400 mt-1">
-                  {formatTime(n.inserted_at)}
-                </p>
+                <div className="flex items-center gap-3 mt-1">
+                  <p className="text-xs text-gray-400">
+                    {formatTime(n.inserted_at)}
+                  </p>
+                  {n.type === "follow" && currentUser?.username !== n.actor?.username && (
+                    <button
+                      onClick={(e) => handleFollowBack(e, n.actor?.username, n.id)}
+                      disabled={followLoading[n.id]}
+                      className={`text-xs font-semibold flex items-center gap-1 px-2.5 py-1 rounded-full transition-colors disabled:opacity-50 ${
+                        followLoading[n.id]
+                          ? "bg-gray-100 dark:bg-gray-700 text-gray-400"
+                          : "bg-tide-100 dark:bg-tide-900/30 text-tide-700 dark:text-tide-300 hover:bg-tide-200 dark:hover:bg-tide-800/50"
+                      }`}
+                    >
+                      {followLoading[n.id] ? (
+                        <span className="w-3 h-3 border border-tide-500 border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <FiUserCheck size={11} />
+                      )}
+                      {followLoading[n.id] ? "Following" : "Follow back"}
+                    </button>
+                  )}
+                </div>
               </div>
               {isUnread && (
                 <span className="shrink-0 w-2.5 h-2.5 bg-tide-600 rounded-full mt-2 ring-2 ring-white dark:ring-gray-900" />

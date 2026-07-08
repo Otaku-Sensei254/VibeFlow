@@ -54,9 +54,18 @@ export function AuthProvider({ children }) {
         update_notifications: () => {
           fetchCounts();
         },
-        new_sidebar_message: () => {
+        new_sidebar_message: (payload) => {
           fetchCounts();
           setSidebarRefresh((c) => c + 1);
+          if (payload?.user && payload?.content) {
+            showToast({
+              title: payload.user.username,
+              message: payload.content,
+              link: `/chat/${payload.conversation_uuid}`,
+              linkText: "Open chat",
+              duration: 6000,
+            });
+          }
         },
         update_sidebar: () => {
           fetchCounts();
