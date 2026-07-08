@@ -1,39 +1,68 @@
 # VibeFlow Progress
 
-## 2026-06-30
+## Done
 
-### Completed
-- Verified badge image (`/images/vibeflow_verified2.png`) displayed next to usernames in PostCard, PostDetail (post author + comments)
-- Real-time save/unsave broadcasts added in `posts.ex` and relay channel for both `relay:feed` and `relay:post:{uuid}`
-- Real-time repost + save event listeners in PostCard.js and PostDetail.js (counts update live)
-- Unfollow DELETE endpoint in UserController and router
-- `is_following` field in post detail API response
-- PostDetail.js redesigned with unified single-column layout (inline comments, follow button, desktop card + mobile optimizations)
-- Color palette: `tide` (teal), `flow` (cyan), `coral` (rose), `sun` (gold). Bulk-replaced across all React components. Signature gradient: `from-tide-500 via-flow-500 to-coral-500`
-- Tailwind config with custom water-themed colors
-- Show/hide password toggle (FiEye/FiEyeOff) in Login and Register forms
-- React app moved to `/home/dtech/VCF/Failsafe/Blog/VibeFlow/VibeFlow-React/vibeflow2.0`
-- Fixed 6 ESLint warnings blocking Vercel build (unused imports, missing useEffect deps)
-- `index.html` and `manifest.json` updated: logo = `No4.png`, theme color = `#0d9488`
-- **Live notification + chat unread counters**: `notificationCount` and `chatUnreadCount` in AuthContext; fetched on mount via `/notifications` and `/chat/unread-count`; real-time updates via `relay:user` channel events (`new_notification`, `update_notifications`, `new_sidebar_message`, `update_sidebar`); badge overlays on bell and chat icons in desktop nav, mobile bottom nav, and slide-out menu; Notifications.js and Chat.js sync counts on load/mark-read
+### Profile & Settings
+- Extracted `USERNAME_STYLES` / `DARK_USERNAME_STYLES` to `src/constants/usernameStyles.js` with a `"none"` entry
+- Fixed neon-green glow default bug in `UserProfile.js`: `u.username_style || "neon-green"` → `u.username_style ? styleMap[...] : styleMap["none"]`
+- Added avatar upload to `Settings.js`: file input + preview + upload via `POST /uploads/media`
+- Added glow style picker to `Settings.js`: visual grid of 7 options, gated behind `profile-glow` inventory check
+- Glow picker shows purchase prompt if not owned, fetches from `GET /store/items`
+- **Avatar frame ring** in `WaveViewer.js`: reads `current.user?.frame` from API, applies ring shadow
 
-## 2026-07-08
+### Posts & Feed
+- **Fixed post creation "?" bug**: `CreatePost.js` passes full post via `navigate("/feed", { state: { newPost } })`; `Feed.js` reads and prepends it
+- Repost behaviour improved
 
-### Completed
-- **TrailC landing page design** — Dark hero (`bg-zinc-950`) with letter-by-letter VIBEFLOW reveal, blinking cursor, rotating marquee tagline, mouse-following glow orb, grid texture background, floating emoji icons
-- **Split layout** — Left: VibeFlow headline + CTAs + social proof avatars. Right: dark-theme mockup feed cards
-- **Feature stat row** — 4 compact badges (Global, Real-Time, Chat, Community) below the hero
-- **Nav hidden on landing** — Top navbar, bottom mobile nav, and footer all hidden on `/` via Layout conditional checks
-- **CTA links to /feed** — "join the current" button now goes to `/feed` instead of `/register`
-- **Auth redirect from /** — Logged-in users hitting `/` are instantly redirected to `/feed` with `replace: true`
-- **App logo in navbar** — Replaced styled "V" letter with actual `No4.png` logo image
-- **Fixed Vercel build** — Resolved `items` unused-variable warning in WaveStore.js by stripping destructured read
+### Chat
+- **Fixed send DM in `WaveViewer.js`**: uses `current.user?.username` instead of static URL `username` param
+- **Message button on UserProfile** auto-creates/finds conversation via `POST /chat/start/:username` then navigates to `/chat/:uuid` (loading spinner while resolving)
+- **Toast notifications for new messages**: `AuthContext.js` shows toast with username, message preview, and "Open chat" link on `new_sidebar_message`
+  - Skips if sender is the current user
+  - Skips if already viewing that conversation
+  - Duration 8s
+- **Desktop footer hidden on chat pages**: `/chat` paths excluded from footer
 
-### Key Decisions
-- React app: `/home/dtech/VCF/Failsafe/Blog/VibeFlow/VibeFlow-React/vibeflow2.0`
-- Backend: `/home/dtech/VCF/Failsafe/Blog/VibeFlow/ZCHAT/vibeflow/`
-- Vercel treats ESLint warnings as errors — zero warnings required
-- Notification/chat counts live in AuthContext for cross-page persistence
-- Replaced indigo/purple/pink with tide/flow/coral for water-theme consistency
-- Landing page uses distinct `zinc-950` dark tone vs app's `gray-900` for a premium "gateway" feel; rest of app stays on existing palette
-- Landing page is full-screen with no nav/footer chrome — clean arrival experience before entering the app
+### Notifications
+- **Follow-back button** for follow-type notifications with loading spinner
+- **Navigation on tap**: clicking navigates to profile, post, or chat based on type
+- **Rich notification JSON**: backend returns `post_uuid`, `post_title`, `conversation_uuid`
+- Backend preloads `:conversation` in `list_user_notifications`
+- Real-time channel payload (`new_notification`) already includes `post.uuid` and `post.title`
+
+### Cosmetics & Store
+- Backend ownership validation in `user_controller.ex`: rejects `username_style` with 403 if user lacks `profile-glow`
+- Added `frame` field to wave `user_json` via `Store.get_active_cosmetics/1`
+
+### Share Modal
+- Added contacts (followers/following) to share modal: 3-tab layout (All/Followers/Following) + search
+- Loaded via `Promise.allSettled` so one failing endpoint doesn't break the other
+
+### Performance & Cleanup
+- **Removed console.logs from `realtime.js`**: all `console.warn`/`console.log`/`console.error` stripped
+- **Fixed duplicate channel listeners**: `joinChannel` returns early when channel already exists
+- **Fixed `user?.id` stale closure**: used `useRef` in `AuthContext.js` to avoid ESLint CI failure
+- **Global image fallback**: `App.js` catches all `<img>` load errors for Cloudinary URLs and replaces with placeholder — stops 401 console noise
+- **Backend uploads saved locally**: both `media_controller.ex` and `upload_controller.ex` save to `priv/static/uploads/` and return `/uploads/...` URLs instead of uploading to Cloudinary
+
+### Deployments
+- Frontend pushed to `Matrix` branch on GitHub (auto-deploys via Vercel)
+- Backend pushed to `zchat2.0` branch on GitHub + Gigalixir deploy
+
+## Fixed Bugs
+- Neon-green default glow on all users
+- Post creation showing "?" instead of title
+- Like wave toggle always returning `false`
+- Send DM using wrong username param
+- Toast showing for sender / when already in the conversation
+- Toast not respecting `duration` field (hardcoded 5s)
+- Duplicate event listeners causing double toasts
+- `start_conversation` 500 from unhandled match error + missing association preload
+- Cloudinary 401 errors from old URLs
+- Console.logs leaking sensitive info (socket URL, channel names)
+- Backend `create_direct_conversation` missing `{:error, _}` branch
+- Toast overflowing left on small screens
+
+## Beefs with VibeFlow/Lingot
+- No inline solutions that bypass backend ownership validation
+- Route for wave viewer: `/waves/view/:username` — the `username` param is the wave creator, but wave chaining advances past that user, so `handleSendDM` must use `current.user?.username`
