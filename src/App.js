@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
@@ -32,9 +33,20 @@ import CreatorHub from "./pages/creator/CreatorHub";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 
-
+const FALLBACK_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect fill='%23e5e7eb' width='40' height='40'/%3E%3Ctext x='20' y='26' text-anchor='middle' fill='%239ca3af' font-size='18' font-family='sans-serif'%3E?%3C/text%3E%3C/svg%3E";
 
 export default function App() {
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.target?.tagName === "IMG" && e.target?.src?.includes("cloudinary") && !e.target.dataset?.fallback) {
+        e.target.dataset.fallback = "1";
+        e.target.src = FALLBACK_AVATAR;
+      }
+    };
+    document.addEventListener("error", handler, true);
+    return () => document.removeEventListener("error", handler, true);
+  }, []);
+
   return (
     <BrowserRouter>
       <AuthProvider>
