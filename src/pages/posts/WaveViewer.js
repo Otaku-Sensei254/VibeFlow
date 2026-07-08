@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { FiX, FiChevronLeft, FiVolume2, FiVolumeX, FiHeart, FiSend, FiShare2 } from "react-icons/fi";
+import { FiX, FiChevronLeft, FiVolume2, FiVolumeX, FiHeart, FiSend, FiShare2, FiUsers } from "react-icons/fi";
 import api from "../../utils/api";
+import { useAuth } from "../../context/AuthContext";
 
 const VIDEO_EXTS = [".mp4", ".webm", ".mov", ".mkv", ".avi", ".m4v"];
 
@@ -28,6 +29,7 @@ function formatTime(dateStr) {
 
 export default function WaveViewer() {
   const { username } = useParams();
+  const { user: currentUser } = useAuth();
   const navigate = useNavigate();
   const videoRef = useRef(null);
   const audioRef = useRef(null);
@@ -46,6 +48,10 @@ export default function WaveViewer() {
   const [messageText, setMessageText] = useState("");
   const [sending, setSending] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [followers, setFollowers] = useState([]);
+  const [following, setFollowing] = useState([]);
+  const [contactsTab, setContactsTab] = useState("all");
+  const [contactsLoaded, setContactsLoaded] = useState(false);
   const [shareSearch, setShareSearch] = useState("");
   const [shareResults, setShareResults] = useState([]);
   const [sharing, setSharing] = useState(false);
@@ -179,11 +185,29 @@ export default function WaveViewer() {
     }
   };
 
+  useEffect(() => {
+    if (!showShareModal || contactsLoaded) return;
+    const loadContacts = async () => {
+      try {
+        const [folRes, folngRes] = await Promise.allSettled([
+          api.get(`/users/${currentUser?.username}/followers`),
+          api.get(`/users/${currentUser?.username}/following`),
+        ]);
+        setFollowers(folRes.status === "fulfilled" ? folRes.value.data.data?.users || [] : []);
+        setFollowing(folngRes.status === "fulfilled" ? folngRes.value.data.data?.users || [] : []);
+      } catch {}
+      setContactsLoaded(true);
+    };
+    loadContacts();
+  }, [showShareModal, currentUser?.username, contactsLoaded]);
+
   const handleSendDM = async () => {
     if (!messageText.trim() || !current || sending) return;
+    const targetUser = current.user?.username;
+    if (!targetUser) return;
     setSending(true);
     try {
-      const convRes = await api.post(`/chat/start/${username}`);
+      const convRes = await api.post(`/chat/start/${targetUser}`);
       const convUuid = convRes.data.data?.conversation?.uuid;
       if (convUuid) {
         await api.post(`/chat/conversations/${convUuid}/messages`, {
@@ -415,7 +439,7 @@ export default function WaveViewer() {
       {showShareModal && (
         <div
           className="fixed inset-0 z-[60] bg-black/60 flex items-end sm:items-center justify-center"
-          onClick={() => setShowShareModal(false)}
+          onClick={() => { setShowShareModal(false); setContactsLoaded(false); }}
         >
           <div
             className="bg-gray-900 w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-4 max-h-[70vh] flex flex-col"
@@ -426,40 +450,110 @@ export default function WaveViewer() {
               type="text"
               value={shareSearch}
               onChange={(e) => handleShareSearch(e.target.value)}
-              placeholder="Search users..."
+              placeholder="Search all users..."
               className="w-full bg-white/10 text-white text-sm rounded-lg px-4 py-2 outline-none placeholder-white/40 mb-3"
               autoFocus
             />
-            <div className="flex-1 overflow-y-auto space-y-1">
-              {shareResults.length === 0 && shareSearch.trim() === "" ? (
-                <p className="text-white/40 text-sm text-center py-8">
-                  Type a name to search
-                </p>
-              ) : shareResults.length === 0 ? (
-                <p className="text-white/40 text-sm text-center py-8">
-                  No users found
-                </p>
-              ) : (
-                shareResults.map((u) => (
+            {shareSearch.trim() === "" ? (
+              <>
+                <div className="flex gap-2 mb-3">
                   <button
-                    key={u.id}
-                    onClick={() => handleShare(u.username)}
-                    disabled={sharing}
-                    className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors disabled:opacity-50"
+                    onClick={() => setContactsTab("all")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                      contactsTab === "all"
+                        ? "bg-white/20 text-white"
+                        : "text-white/50 hover:text-white/80"
+                    }`}
                   >
-                    <img
-                      src={
-                        u.avatar_url ||
-                        `https://ui-avatars.com/api/?name=${u.username}&background=6366F1&color=fff`
-                      }
-                      alt=""
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                    <span className="text-white text-sm font-medium">{u.username}</span>
+                    <FiUsers size={14} className="inline mr-1" />
+                    Contacts
                   </button>
-                ))
-              )}
-            </div>
+                  <button
+                    onClick={() => setContactsTab("followers")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                      contactsTab === "followers"
+                        ? "bg-white/20 text-white"
+                        : "text-white/50 hover:text-white/80"
+                    }`}
+                  >
+                    Followers
+                  </button>
+                  <button
+                    onClick={() => setContactsTab("following")}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                      contactsTab === "following"
+                        ? "bg-white/20 text-white"
+                        : "text-white/50 hover:text-white/80"
+                    }`}
+                  >
+                    Following
+                  </button>
+                </div>
+                <div className="flex-1 overflow-y-auto space-y-1">
+                  {!contactsLoaded ? (
+                    <div className="flex justify-center py-8">
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    </div>
+                  ) : (
+                    (contactsTab === "all"
+                      ? [...new Map([...followers, ...following].map((u) => [u.id, u])).values()]
+                      : contactsTab === "followers" ? followers : following
+                    ).map((u) => (
+                      <button
+                        key={u.id}
+                        onClick={() => handleShare(u.username)}
+                        disabled={sharing}
+                        className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors disabled:opacity-50"
+                      >
+                        <img
+                          src={
+                            u.avatar_url ||
+                            `https://ui-avatars.com/api/?name=${u.username}&background=6366F1&color=fff`
+                          }
+                          alt=""
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                        <span className="text-white text-sm font-medium">{u.username}</span>
+                      </button>
+                    ))
+                  )}
+                  {contactsLoaded && (
+                    contactsTab === "all"
+                      ? [...new Map([...followers, ...following].map((u) => [u.id, u])).values()].length === 0
+                      : contactsTab === "followers" ? followers.length === 0 : following.length === 0
+                    ) && (
+                      <p className="text-white/40 text-sm text-center py-8">No contacts yet</p>
+                    )}
+                </div>
+              </>
+            ) : (
+              <div className="flex-1 overflow-y-auto space-y-1">
+                {shareResults.length === 0 ? (
+                  <p className="text-white/40 text-sm text-center py-8">
+                    No users found
+                  </p>
+                ) : (
+                  shareResults.map((u) => (
+                    <button
+                      key={u.id}
+                      onClick={() => handleShare(u.username)}
+                      disabled={sharing}
+                      className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors disabled:opacity-50"
+                    >
+                      <img
+                        src={
+                          u.avatar_url ||
+                          `https://ui-avatars.com/api/?name=${u.username}&background=6366F1&color=fff`
+                        }
+                        alt=""
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                      <span className="text-white text-sm font-medium">{u.username}</span>
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
