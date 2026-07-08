@@ -321,14 +321,22 @@ export default function WaveViewer() {
 
       {/* Bottom: user info + like count + share */}
       <div className="px-4 pt-4 flex items-center gap-3">
-        <img
-          src={
-            current.user?.avatar_url ||
-            `https://ui-avatars.com/api/?name=${current.user?.username || "?"}&background=6366F1&color=fff`
-          }
-          alt=""
-          className="w-9 h-9 rounded-full object-cover ring-2 ring-white/20"
-        />
+        <div className="relative shrink-0">
+          <img
+            src={
+              current.user?.avatar_url ||
+              `https://ui-avatars.com/api/?name=${current.user?.username || "?"}&background=6366F1&color=fff`
+            }
+            alt=""
+            className={`w-9 h-9 rounded-full object-cover ${
+              current.user?.frame === "red"
+                ? "ring-2 ring-red-500 shadow-[0_0_8px_rgba(239,68,68,0.7)]"
+                : current.user?.frame === "blue"
+                ? "ring-2 ring-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.7)]"
+                : "ring-2 ring-white/20"
+            }`}
+          />
+        </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-white truncate">
             {current.user?.username}

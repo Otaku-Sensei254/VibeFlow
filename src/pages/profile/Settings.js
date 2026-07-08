@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
@@ -78,6 +78,19 @@ export default function Settings() {
     }
   };
 
+  const [ownedItems, setOwnedItems] = useState(null);
+  const [inventoryLoading, setInventoryLoading] = useState(true);
+
+  useEffect(() => {
+    api.get("/store/items").then((res) => {
+      const items = res.data.data?.items || [];
+      const owned = {};
+      items.forEach((item) => { owned[item.item_slug] = item.owned; });
+      setOwnedItems(owned);
+    }).catch(() => {}).finally(() => setInventoryLoading(false));
+  }, []);
+
+  const hasGlow = ownedItems?.["profile-glow"] === true;
   const styleMap = isDark ? DARK_USERNAME_STYLES : USERNAME_STYLES;
 
   return (
@@ -188,33 +201,51 @@ export default function Settings() {
           {/* Username Style Picker */}
           <div>
             <p className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Username Style</p>
-            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-              {Object.keys(USERNAME_STYLES).map((key) => {
-                const previewStyle = styleMap[key] || {};
-                const selected = form.username_style === key;
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => setForm({ ...form, username_style: key })}
-                    className={`relative flex items-center justify-center h-10 rounded-xl text-xs font-bold border transition-all ${
-                      selected
-                        ? "border-tide-500 ring-2 ring-tide-500/30 bg-tide-50 dark:bg-tide-900/20"
-                        : "border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-500"
-                    }`}
-                    style={key === "none" ? {} : previewStyle}
-                    title={key}
-                  >
-                    {key === "none" ? "Default" : key.replace("neon-", "").replace("font-", "")}
-                    {selected && (
-                      <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-tide-600 text-white flex items-center justify-center">
-                        <FiCheck size={9} />
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
+            {inventoryLoading ? (
+              <div className="h-10 flex items-center">
+                <div className="w-5 h-5 rounded-full border-2 border-tide-500 border-t-transparent animate-spin" />
+              </div>
+            ) : hasGlow ? (
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                {Object.keys(USERNAME_STYLES).map((key) => {
+                  const previewStyle = styleMap[key] || {};
+                  const selected = form.username_style === key;
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => setForm({ ...form, username_style: key })}
+                      className={`relative flex items-center justify-center h-10 rounded-xl text-xs font-bold border transition-all ${
+                        selected
+                          ? "border-tide-500 ring-2 ring-tide-500/30 bg-tide-50 dark:bg-tide-900/20"
+                          : "border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-500"
+                      }`}
+                      style={key === "none" ? {} : previewStyle}
+                      title={key}
+                    >
+                      {key === "none" ? "Default" : key.replace("neon-", "").replace("font-", "")}
+                      {selected && (
+                        <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-tide-600 text-white flex items-center justify-center">
+                          <FiCheck size={9} />
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/15 border border-amber-200 dark:border-amber-800/50">
+                <p className="text-sm text-amber-800 dark:text-amber-200 font-medium">
+                  Unlock the Profile Glow cosmetic from the Wave Store to customize your username style!
+                </p>
+                <Link
+                  to="/wave-store"
+                  className="inline-flex items-center gap-1.5 mt-2 text-xs font-semibold text-amber-700 dark:text-amber-300 hover:underline"
+                >
+                  Visit Wave Store →
+                </Link>
+              </div>
+            )}
           </div>
 
           <button
