@@ -15,8 +15,6 @@ const getSocketUrl = () => {
 
 const SOCKET_URL = getSocketUrl();
 
-console.warn("[realtime] ⚡ Socket URL resolved to:", SOCKET_URL);
-
 let socket = null;
 const channels = {};
 let statusChangeCallback = null;
@@ -44,7 +42,6 @@ function notifyStatus(label = "") {
   if (!statusChangeCallback) return;
 
   if (!socket) {
-    console.warn("[realtime] notifyStatus: no socket → disconnected", label);
     statusChangeCallback("disconnected");
     return;
   }
@@ -54,17 +51,14 @@ function notifyStatus(label = "") {
     : socket.isConnected?.() ? "open" : "closed";
 
   const state = normalizeConnectionState(rawState);
-  console.warn(`[realtime] notifyStatus${label ? " (" + label + ")" : ""}: raw="${rawState}" → "${state}"`);
   statusChangeCallback(state);
 }
 
 export function connectSocket(token, onReady) {
   if (socket) {
-    console.log("[realtime] connectSocket: socket already exists, ready=", isSocketReady);
     if (isSocketReady && onReady) {
       onReady();
     } else if (onReady) {
-      // Queue callback for when socket opens
       const prev = socket._onOpen;
       socket.onOpen(() => {
         if (prev) prev();
@@ -74,22 +68,18 @@ export function connectSocket(token, onReady) {
     return;
   }
 
-  console.warn("[realtime] connectSocket: creating socket →", SOCKET_URL);
   socket = new Socket(SOCKET_URL, { params: { token }, heartbeatIntervalMs: 15000 });
 
   socket.onOpen(() => {
-    console.warn("[realtime] ✅ socket OPEN");
     isSocketReady = true;
     if (onReady) onReady();
     notifyStatus("open");
   });
   socket.onClose(() => {
-    console.warn("[realtime] 🔴 socket CLOSED");
     isSocketReady = false;
     notifyStatus("close");
   });
   socket.onError((err) => {
-    console.error("[realtime] ❌ socket ERROR:", err);
     isSocketReady = false;
     notifyStatus("error");
   });
@@ -99,7 +89,6 @@ export function connectSocket(token, onReady) {
 }
 
 export function disconnectSocket() {
-  console.log("[realtime] disconnectSocket called");
   Object.keys(channels).forEach((t) => {
     try { channels[t].leave(); } catch {}
     delete channels[t];
@@ -114,21 +103,16 @@ export function disconnectSocket() {
 
 export function joinChannel(topic, callbacks = {}) {
   if (!socket) {
-    console.warn("[realtime] joinChannel: no socket, cannot join", topic);
     return;
   }
 
   if (channels[topic]) {
-    console.log("[realtime] joinChannel: channel already exists for", topic, "— re-attaching listeners");
     Object.entries(callbacks).forEach(([event, handler]) => {
       channels[topic].on(event, handler);
     });
-    // Request a fresh presence snapshot so we don't miss state pushed on initial join
     if (topic === "relay:user" && callbacks.presence_state) {
-      console.log("[realtime] requesting fresh presence snapshot via get_presence");
       channels[topic].push("get_presence", {})
         .receive("ok", (state) => {
-          console.log("[realtime] get_presence reply:", state);
           callbacks.presence_state(state);
         })
         .receive("error", (err) => console.error("[realtime] get_presence error:", err));
@@ -136,24 +120,18 @@ export function joinChannel(topic, callbacks = {}) {
     return;
   }
 
-  console.log("[realtime] joinChannel: joining", topic);
   const channel = socket.channel(topic);
   Object.entries(callbacks).forEach(([event, handler]) => {
     channel.on(event, handler);
   });
   channel.join()
-    .receive("ok", () => {
-      console.log("[realtime] ✅ joined channel:", topic);
-    })
-    .receive("error", (resp) => {
-      console.error("[realtime] ❌ failed to join channel:", topic, resp);
-    });
+    .receive("ok", () => {})
+    .receive("error", (resp) => {});
   channels[topic] = channel;
 }
 
 export function leaveChannel(topic) {
   if (!channels[topic]) return;
-  console.log("[realtime] leaveChannel:", topic);
   try { channels[topic].leave(); } catch {}
   delete channels[topic];
 }

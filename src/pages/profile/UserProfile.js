@@ -5,9 +5,10 @@ import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
 import {
   FiGrid, FiHeart, FiMessageCircle, FiPlay, FiBookmark, FiX,
-  FiCalendar, FiUsers, FiUserCheck, FiCamera, FiSend, FiShield
+  FiCalendar, FiUsers, FiUserCheck, FiCamera, FiSend, FiShield, FiLoader
 } from "react-icons/fi";
 import { USERNAME_STYLES, DARK_USERNAME_STYLES } from "../../constants/usernameStyles";
+import { showToast } from "../../utils/toast";
 
 function formatDate(dateStr) {
   if (!dateStr) return "";
@@ -111,6 +112,7 @@ export default function UserProfile() {
   const [showFollowingModal, setShowFollowingModal] = useState(false);
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
+  const [messaging, setMessaging] = useState(false);
 
   const loadProfile = useCallback(async () => {
     setLoading(true);
@@ -162,6 +164,20 @@ export default function UserProfile() {
       if (following) setProfile((prev) => prev ? { ...prev, is_following: prev.is_following || true } : prev);
       loadProfile();
     } catch {}
+  };
+
+  const handleMessage = async () => {
+    setMessaging(true);
+    try {
+      const res = await api.post(`/chat/start/${username}`);
+      const conv = res.data?.data?.conversation;
+      if (conv?.uuid) {
+        navigate(`/chat/${conv.uuid}`);
+      }
+    } catch {
+      showToast({ type: "error", title: "Error", message: "Could not start conversation" });
+    }
+    setMessaging(false);
   };
 
   if (loading) {
@@ -366,9 +382,9 @@ export default function UserProfile() {
                   <FiUserCheck size={15} />
                   {profile.is_following ? "Following" : "Follow"}
                 </button>
-                <button onClick={() => navigate(`/chat?user=${username}`)} className="inline-flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-200 text-sm font-semibold rounded-xl border border-gray-200 dark:border-zinc-700 shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-700 hover:border-tide-200 dark:hover:border-tide-800 transition-all">
-                  <FiSend size={14} />
-                  Message
+                <button onClick={handleMessage} disabled={messaging} className="inline-flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-200 text-sm font-semibold rounded-xl border border-gray-200 dark:border-zinc-700 shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-700 hover:border-tide-200 dark:hover:border-tide-800 transition-all disabled:opacity-50">
+                  {messaging ? <FiLoader size={14} className="animate-spin" /> : <FiSend size={14} />}
+                  {messaging ? "Opening..." : "Message"}
                 </button>
               </>
             ) : null}

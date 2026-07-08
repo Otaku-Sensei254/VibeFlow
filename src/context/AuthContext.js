@@ -57,13 +57,18 @@ export function AuthProvider({ children }) {
         new_sidebar_message: (payload) => {
           fetchCounts();
           setSidebarRefresh((c) => c + 1);
-          if (payload?.user && payload?.content) {
+          if (
+            payload?.user &&
+            payload?.content &&
+            payload.user_id !== user?.id &&
+            !window.location.pathname.startsWith(`/chat/${payload.conversation_uuid}`)
+          ) {
             showToast({
               title: payload.user.username,
               message: payload.content,
               link: `/chat/${payload.conversation_uuid}`,
               linkText: "Open chat",
-              duration: 6000,
+              duration: 8000,
             });
           }
         },

@@ -74,9 +74,10 @@ export default function NotificationToast() {
       return;
     }
     if (timerRef.current) clearTimeout(timerRef.current);
+    const duration = queue[0].duration || 5000;
     timerRef.current = setTimeout(() => {
       setQueue((prev) => prev.slice(1));
-    }, 5000);
+    }, duration);
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
