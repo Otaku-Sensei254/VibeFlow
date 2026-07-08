@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import api from "../../utils/api";
 import { useAuth } from "../../context/AuthContext";
 import PostCard from "../../components/PostCard";
@@ -199,6 +199,19 @@ export default function Feed() {
   useEffect(() => {
     if (page > 1) fetchPosts(page);
   }, [page, fetchPosts]);
+
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.newPost) {
+      const p = location.state.newPost;
+      setPosts((prev) => {
+        if (prev.some((x) => x.uuid === p.uuid)) return prev;
+        return [p, ...prev];
+      });
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     joinChannel("relay:feed", {});

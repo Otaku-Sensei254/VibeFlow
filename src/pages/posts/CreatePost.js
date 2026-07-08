@@ -80,10 +80,13 @@ export default function CreatePost() {
         post: { ...form, tags, media_files: mediaFiles },
       });
 
+      const newPost = res.data.data.post;
+      navigate("/feed", { state: { newPost }, replace: true });
+
       showToast({
         title: "Post published!",
         message: "Your post is now live.",
-        link: `/posts/${res.data.data.post.uuid}`,
+        link: `/posts/${newPost.uuid}`,
         linkText: "Click to view your post",
         type: "success",
         duration: 8000,

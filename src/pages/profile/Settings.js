@@ -1,15 +1,25 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useTheme } from "../../context/ThemeContext";
 import api from "../../utils/api";
-import { FiArrowLeft, FiUser, FiLock, FiEye, FiTrash2 } from "react-icons/fi";
+import { FiArrowLeft, FiUser, FiLock, FiEye, FiTrash2, FiUpload, FiCheck } from "react-icons/fi";
+import { USERNAME_STYLES, DARK_USERNAME_STYLES } from "../../constants/usernameStyles";
 
 export default function Settings() {
   const { user, updateUser, showPresence, setShowPresence } = useAuth();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const fileInputRef = useRef(null);
   const [form, setForm] = useState({
     username: user?.username || "",
     bio: user?.bio || "",
+    avatar_url: user?.avatar_url || "",
+    username_style: user?.username_style || "none",
   });
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(user?.avatar_url || null);
+  const [uploading, setUploading] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
     current_password: "",
     password: "",
@@ -18,18 +28,36 @@ export default function Settings() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  const handleAvatarChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+  };
+
   const updateProfile = async (e) => {
     e.preventDefault();
     setError("");
     setMessage("");
+    setUploading(true);
     try {
-      const res = await api.put("/users/profile", { user: form });
+      let payload = { ...form };
+      if (avatarFile) {
+        const uploadRes = await api.post("/uploads/media", avatarFile, {
+          headers: { "Content-Type": avatarFile.type },
+        });
+        payload.avatar_url = uploadRes.data.data.url;
+      }
+      const res = await api.put("/users/profile", { user: payload });
       updateUser(res.data.data.user);
+      setForm((prev) => ({ ...prev, avatar_url: res.data.data.user.avatar_url || "" }));
+      setAvatarFile(null);
       setMessage("Profile updated");
     } catch (err) {
       const errors = err.response?.data?.errors;
       setError(errors ? Object.values(errors).flat().join(", ") : "Update failed");
     }
+    setUploading(false);
   };
 
   const updatePassword = async (e) => {
@@ -49,6 +77,8 @@ export default function Settings() {
       setError(errors ? Object.values(errors).flat().join(", ") : "Update failed");
     }
   };
+
+  const styleMap = isDark ? DARK_USERNAME_STYLES : USERNAME_STYLES;
 
   return (
     <div className="max-w-2xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
@@ -97,6 +127,48 @@ export default function Settings() {
           <h2 className="font-semibold text-lg">Profile</h2>
         </div>
         <form onSubmit={updateProfile} className="space-y-4">
+          {/* Avatar */}
+          <div className="flex items-center gap-4">
+            <div className="relative shrink-0">
+              <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100 dark:bg-zinc-800 ring-2 ring-gray-200 dark:ring-zinc-700">
+                {avatarPreview ? (
+                  <img src={avatarPreview} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500 font-bold text-xl">
+                    {user?.username?.charAt(0).toUpperCase() || "?"}
+                  </div>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-tide-600 text-white flex items-center justify-center shadow-md hover:bg-tide-700 transition-colors"
+              >
+                <FiUpload size={11} />
+              </button>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Avatar</p>
+              <p className="text-xs text-gray-500 mt-0.5">Click the icon to upload a new photo</p>
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarChange}
+              className="hidden"
+            />
+            {avatarFile && (
+              <button
+                type="button"
+                onClick={() => { setAvatarFile(null); setAvatarPreview(user?.avatar_url || null); }}
+                className="text-xs text-red-500 hover:text-red-600 font-semibold"
+              >
+                Remove
+              </button>
+            )}
+          </div>
+
           <input
             type="text"
             placeholder="Username"
@@ -112,11 +184,45 @@ export default function Settings() {
             rows={3}
             className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 focus:ring-2 focus:ring-tide-500 focus:border-transparent outline-none text-sm resize-none transition-all"
           />
+
+          {/* Username Style Picker */}
+          <div>
+            <p className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Username Style</p>
+            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+              {Object.keys(USERNAME_STYLES).map((key) => {
+                const previewStyle = styleMap[key] || {};
+                const selected = form.username_style === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setForm({ ...form, username_style: key })}
+                    className={`relative flex items-center justify-center h-10 rounded-xl text-xs font-bold border transition-all ${
+                      selected
+                        ? "border-tide-500 ring-2 ring-tide-500/30 bg-tide-50 dark:bg-tide-900/20"
+                        : "border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-500"
+                    }`}
+                    style={key === "none" ? {} : previewStyle}
+                    title={key}
+                  >
+                    {key === "none" ? "Default" : key.replace("neon-", "").replace("font-", "")}
+                    {selected && (
+                      <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-tide-600 text-white flex items-center justify-center">
+                        <FiCheck size={9} />
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <button
             type="submit"
-            className="px-6 py-2.5 bg-gradient-to-r from-tide-600 to-flow-600 text-white rounded-xl font-semibold hover:from-tide-700 hover:to-flow-700 transition-all duration-200 shadow-md shadow-tide-200 dark:shadow-tide-900/30"
+            disabled={uploading}
+            className="px-6 py-2.5 bg-gradient-to-r from-tide-600 to-flow-600 text-white rounded-xl font-semibold hover:from-tide-700 hover:to-flow-700 transition-all duration-200 shadow-md shadow-tide-200 dark:shadow-tide-900/30 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Save Profile
+            {uploading ? "Saving..." : "Save Profile"}
           </button>
         </form>
       </div>
