@@ -45,7 +45,7 @@ export default function NotificationToast() {
         return [...prev, { ...n, id }];
       });
 
-      if (Notification.permission === "granted") {
+      if (typeof Notification !== "undefined" && Notification.permission === "granted") {
         const body = getToastText(n);
         new Notification("Vibeflow", {
           body,
