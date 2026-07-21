@@ -1,12 +1,14 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
+import CustomVideoPlayer from "./CustomVideoPlayer";
+
 function VideoSlide({ src, isVisible }) {
-  const videoRef = useRef(null);
+  const playerRef = useRef(null);
   const observerRef = useRef(null);
 
   useEffect(() => {
-    const el = videoRef.current;
+    const el = playerRef.current;
     if (!el) return;
 
     observerRef.current = new IntersectionObserver(
@@ -25,14 +27,10 @@ function VideoSlide({ src, isVisible }) {
   }, [isVisible]);
 
   return (
-    <video
-      ref={videoRef}
+    <CustomVideoPlayer
+      ref={playerRef}
       src={src}
-      muted
-      loop
-      playsInline
-      controls
-      preload="metadata"
+      useAutoplay={false}
       className="w-full max-h-[32rem] object-contain bg-black/5 dark:bg-black/20"
     />
   );

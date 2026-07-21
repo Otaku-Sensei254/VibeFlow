@@ -1,0 +1,131 @@
+# VibeFlow Engagement & Growth Modifications — Phase 1 (Implemented)
+# All frontend changes build clean (zero warnings). Backend endpoints needed for full functionality.
+
+## Frontend Changes Made
+
+### 1. Home Page — Dynamic Stats (Home.js)
+- Replaced hardcoded "12k+ creators active" with dynamic data from `GET /api/v1/stats/brief`
+- Shows real user count (< 100: exact number, >= 100: formatted with "k+")
+- Shows "X online now" in green when `online_now > 0`
+- Falls back gracefully (shows "..." ) if endpoint doesn't exist yet
+- Added: `import api from "../utils/api"`, `useEffect` fetch on mount
+
+### 2. Quick Inline Post from Feed (Layout.js)
+- "+" modal (`postModalOpen`) now has inline textarea instead of navigation-only buttons
+- Textarea with auto-focus on modal open, Ctrl/Cmd+Enter to post
+- Category dropdown selector (reuses CATEGORIES from Feed.js)
+- Posts via `POST /api/v1/posts` with title from first line + content
+- On success: toast notification + navigates to feed with newPost state
+- Secondary toolbar: Wave icon (→ /waves/new), Current icon (→ /currents/new), Edit icon (→ /posts/new) for advanced creation
+- Added: `api`, `showToast` imports, `handleInlinePost` handler, `inlineInputRef` auto-focus effect
+- Added state: `inlinePost`, `inlineCategory`, `inlinePosting`
+
+### 3. Empty State Redesign
+- **Feed.js** — "No posts yet" → rich component with gradient icon, CTA buttons (Create Post / Join VibeFlow / Invite friends), contextual message based on category filter
+  - "No waves yet" → links to `/waves/new` with "earn 10 pts" incentive
+  - "You are all caught up" → adds "Share something or invite a friend" subtext
+  - "No trending posts" → "Be the first to spark a trend" subtext
+- **Notifications.js** — Added Link imports, "Share your profile to get noticed" CTA, browse feed link
+- **Chat.js** — All 4 tab empty states (bottles/groups/direct/all) now have contextual descriptions
+  - "No messages yet" → "Send a message to start the conversation"
+
+### 4. Daily Active Streak (AuthContext.js + Layout.js)
+- **AuthContext.js**: Added `streak` state (initialized from localStorage + fetched from `GET /api/v1/users/streak`)
+  - On mount: pings `POST /api/v1/users/ping` once per calendar day (checks localStorage `vibeflow_last_ping`)
+  - Updates streak from backend response, persists to localStorage `vibeflow_streak`
+  - Exposes `streak` in context value: `{ current: Int, longest: Int }`
+- **Layout.js**: Shows 🔥 + streak count in profile dropdown when `streak.current > 0`
+  - Imported `streak` from `useAuth()`
+- **Key design choice**: Uses `last_active_at` (tracked per API request), NOT login events — users who never log out still build streak
+
+### 5. Onboarding Follow Suggestions
+- **New page**: `src/pages/OnboardingSuggestions.js`
+  - Route: `/onboarding` (ProtectedRoute)
+  - Fetches suggested users from `GET /api/v1/users/suggestions?limit=8`
+  - Shows user cards with Follow/Following toggle
+  - "Skip" button or "Continue (N)" to batch-follow via `POST /api/v1/users/batch-follow`
+  - Graceful empty state: "No one to follow yet — be the first to post!"
+- **Register.js**: After successful registration, redirects to `/onboarding` instead of directly to `/feed`
+  - Also reads `?ref=` query param from invite links, passes as `invite_code` in registration form
+
+### 6. Referral / Invite System
+- **New page**: `src/pages/Invite.js` (ProtectedRoute at `/invite`)
+  - Shows user's invite link (based on username)
+  - Copy-to-clipboard button with checkmark confirmation
+  - Native share API (`navigator.share`) with fallback to copy
+  - "How it works" info box explaining 50 pts per referral
+- **New page**: `src/pages/InviteLanding.js` (Public at `/invite/:code`)
+  - Fetches inviter profile via `GET /api/v1/users/profile/:code`
+  - Shows inviter avatar, "You were invited by @username"
+  - Passes `?ref=code` to register/login links
+  - Fallback: shows generic "Join VibeFlow" if code invalid
+- **Layout.js**: Added "Invite friends" link with amber/gift icon in profile dropdown + mobile drawer
+  - Added `FiGift` import
+- **App.js**: Imported and registered both `Invite` and `InviteLanding` routes
+
+### 7. Public Bottles Feed (Ephemeral Anonymous Messages)
+- **New page**: `src/pages/Bottles.js` at `/bottles`
+  - Public feed of anonymous messages that expire in 24h
+  - Drop a bottle: modal with textarea (max 280 chars), character counter
+  - Reply to bottle: modal showing original content + reply textarea
+  - Time remaining display per bottle ("2h 30m left", "Expired")
+  - Reply count per bottle
+  - Empty state: "The sea is empty" with CTA to drop first bottle (or "Join to drop" if not logged in)
+  - Loading skeleton with spinner
+  - Graceful fallback if endpoints don't exist
+- **Layout.js**: Replaced "Currents" with "Bottles" in both desktop navLinks and mobile bottomLinks
+  - Added `FiAnchor` import
+- **App.js**: Imported `Bottles` and registered `/bottles` route
+
+### 8. Nav Reorganization
+- Desktop nav: Feed, Bottles, Chat, Alerts (removed Currents)
+- Mobile bottom nav: Feed, Bottles, Chat, Alerts, Profile (removed Currents)
+- Currents still accessible via the inline post modal secondary toolbar
+
+### 9. App.js — Route Additions
+- `/onboarding` → OnboardingSuggestions (ProtectedRoute)
+- `/invite` → Invite (ProtectedRoute)
+- `/invite/:code` → InviteLanding (public)
+- `/bottles` → Bottles (public)
+- Imported all 4 new page components
+
+## New Files Created
+```
+src/pages/OnboardingSuggestions.js
+src/pages/Invite.js
+src/pages/InviteLanding.js
+src/pages/Bottles.js
+backend-requirements.md
+```
+
+## Files Modified
+```
+src/pages/Home.js              — dynamic stats fetch + display
+src/components/Layout.js        — inline post modal, streak display, invite link, bottles nav, FiGift/FiAnchor
+src/context/AuthContext.js      — streak state, ping effect, context export
+src/pages/auth/Register.js      — onboarding redirect, invite ref param
+src/pages/feed/Feed.js          — all empty states redesigned
+src/pages/Notifications.js      — Link import, empty state CTAs
+src/pages/chat/Chat.js          — empty state descriptions for all 4 tabs
+src/App.js                      — 4 new routes + imports
+```
+
+## Backend Endpoints Required (see backend-requirements.md for full spec)
+```
+GET  /api/v1/stats/brief           — for Home page stats
+POST /api/v1/users/ping            — for daily active streak tracking
+GET  /api/v1/users/streak          — for streak count display
+GET  /api/v1/users/suggestions     — for onboarding follow suggestions
+POST /api/v1/users/batch-follow     — for onboarding batch follow
+POST /api/v1/invite/claim           — for referral points award
+GET  /api/v1/users/profile/:username — for invite landing page
+GET  /api/v1/bottles               — bottle feed
+POST /api/v1/bottles               — drop a bottle
+POST /api/v1/bottles/:id/reply     — reply to a bottle
+```
+
+## Schema Changes Needed (backend)
+- User: add `last_active_at` (utc_datetime), `streak_count` (integer, default 0)
+- User: add `invite_code` (string, unique), `referred_by_id` (nullable FK)
+- New table: `bottles` — id, content (string max 280), inserted_at, expires_at, reply_count, user_id (nullable)
+- Cron: delete bottles where expires_at < now() (every hour)

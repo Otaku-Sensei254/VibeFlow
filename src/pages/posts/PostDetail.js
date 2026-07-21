@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 import { useAuth } from "../../context/AuthContext";
+import { useFollow } from "../../context/FollowContext";
+import { showToast } from "../../utils/toast";
 import { joinChannel, onChannel } from "../../utils/realtime";
 import {
   FiHeart, FiMessageCircle, FiRepeat, FiBookmark, FiSend,
@@ -31,6 +33,7 @@ function formatTime(dateStr) {
 export default function PostDetail() {
   const { uuid } = useParams();
   const { user } = useAuth();
+  const { followedUsers, setFollowing: setFollowState } = useFollow();
   const navigate = useNavigate();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -49,22 +52,26 @@ export default function PostDetail() {
   const [following, setFollowing] = useState([]);
   const [sharing, setSharing] = useState(false);
 
-  const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+
+  const authorId = post?.user?.id;
+  const isFollowing = authorId ? (followedUsers[authorId] !== undefined ? followedUsers[authorId] : false) : false;
 
   const loadPost = useCallback(async () => {
     try {
       const res = await api.get(`/posts/${uuid}`);
       const p = res.data.data.post;
       setPost(p);
-      setIsFollowing(p.is_following || false);
+      if (p.user?.id) {
+        setFollowState(p.user.id, p.is_following || false);
+      }
       api.post(`/posts/${uuid}/view`).catch(() => {});
     } catch (err) {
       if (err.response?.status === 401) setErrorType("auth");
       else setErrorType("not_found");
     }
     setLoading(false);
-  }, [uuid]);
+  }, [uuid, setFollowState]);
 
   useEffect(() => {
     loadPost();
@@ -249,17 +256,21 @@ export default function PostDetail() {
   };
 
   const handleFollow = async () => {
-    if (!user) { navigate("/login"); return; }
+    if (!user) {
+      showToast({ type: "error", title: "Login Required", message: `You need to be logged in to follow @${post.user?.username}` });
+      navigate("/login");
+      return;
+    }
     if (followLoading) return;
     setFollowLoading(true);
     const username = post.user?.username;
     try {
       if (isFollowing) {
         await api.delete(`/users/${username}/follow`);
-        setIsFollowing(false);
+        setFollowState(authorId, false);
       } else {
         await api.post(`/users/${username}/follow`);
-        setIsFollowing(true);
+        setFollowState(authorId, true);
       }
     } catch {}
     setFollowLoading(false);
@@ -492,7 +503,7 @@ export default function PostDetail() {
                   <p className="text-xs text-gray-400">{formatTime(post.inserted_at)}</p>
                 </div>
               </Link>
-              {user && user.id !== post.user?.id && (
+              {user?.id !== post.user?.id && (
                 <button
                   onClick={handleFollow}
                   disabled={followLoading}

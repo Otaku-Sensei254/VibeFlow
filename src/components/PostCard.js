@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FiHeart, FiMessageCircle, FiRepeat, FiBookmark, FiMoreHorizontal, FiSend, FiX, FiSearch } from "react-icons/fi";
+import { FiHeart, FiMessageCircle, FiRepeat, FiBookmark, FiMoreHorizontal, FiSend, FiX, FiSearch, FiUserPlus, FiUserCheck, FiLoader } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
+import { useFollow } from "../context/FollowContext";
 import { joinChannel, onChannel } from "../utils/realtime";
 import api from "../utils/api";
+import { showToast } from "../utils/toast";
 import MediaCarousel from "./MediaCarousel";
 
 function formatTime(dateStr) {
@@ -21,6 +23,7 @@ function formatTime(dateStr) {
 
 export default function PostCard({ post, onLike: externalOnLike }) {
   const { user } = useAuth();
+  const { followedUsers, setFollowing: setFollowState } = useFollow();
   const navigate = useNavigate();
   const [liked, setLiked] = useState(post.is_liked || false);
   const [likesCount, setLikesCount] = useState(post.likes_count || 0);
@@ -35,8 +38,12 @@ export default function PostCard({ post, onLike: externalOnLike }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [shareRecipients, setShareRecipients] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
+  const [followLoading, setFollowLoading] = useState(false);
   const [following, setFollowing] = useState([]);
   const [sharing, setSharing] = useState(false);
+
+  const authorId = post.user?.id;
+  const isFollowing = authorId ? (followedUsers[authorId] !== undefined ? followedUsers[authorId] : (post.is_following || false)) : false;
 
   useEffect(() => {
     setLiked(post.is_liked || false);
@@ -137,6 +144,27 @@ export default function PostCard({ post, onLike: externalOnLike }) {
     }
   };
 
+  const handleFollow = async () => {
+    if (!user) {
+      showToast({ type: "error", title: "Login Required", message: `You need to be logged in to follow @${post.user?.username}` });
+      navigate("/login");
+      return;
+    }
+    if (followLoading || post.user?.id === user.id) return;
+    setFollowLoading(true);
+    const username = post.user?.username;
+    try {
+      if (isFollowing) {
+        await api.delete(`/users/${username}/follow`);
+        setFollowState(authorId, false);
+      } else {
+        await api.post(`/users/${username}/follow`);
+        setFollowState(authorId, true);
+      }
+    } catch {}
+    setFollowLoading(false);
+  };
+
   const handleShareSearch = async (q) => {
     setSearchQuery(q);
     if (!q.trim()) { setSearchResults([]); return; }
@@ -213,6 +241,26 @@ export default function PostCard({ post, onLike: externalOnLike }) {
               </div>
               <p className="text-xs text-gray-400">{formatTime(post.inserted_at)}</p>
             </div>
+            {user?.id !== post.user?.id && (
+              <button
+                onClick={handleFollow}
+                disabled={followLoading}
+                className={`shrink-0 p-1.5 rounded-full transition-all ${
+                  isFollowing
+                    ? "text-tide-500 bg-tide-50 dark:bg-tide-900/20 hover:bg-tide-100 dark:hover:bg-tide-900/30"
+                    : "text-gray-300 hover:text-tide-500 hover:bg-tide-50 dark:hover:bg-tide-900/10"
+                }`}
+                title={isFollowing ? "Following" : "Follow"}
+              >
+                {followLoading ? (
+                  <FiLoader size={14} className="animate-spin" />
+                ) : isFollowing ? (
+                  <FiUserCheck size={14} />
+                ) : (
+                  <FiUserPlus size={14} />
+                )}
+              </button>
+            )}
             <button className="text-gray-300 hover:text-gray-500 dark:hover:text-gray-400 transition-colors p-1">
               <FiMoreHorizontal size={16} />
             </button>

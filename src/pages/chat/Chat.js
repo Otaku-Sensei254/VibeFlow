@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../utils/api";
 import { joinChannel, leaveChannel, onChannel } from "../../utils/realtime";
+import CustomVideoPlayer from "../../components/CustomVideoPlayer";
 import {
   FiSend, FiSearch, FiArrowLeft, FiUser, FiUsers,
   FiMessageCircle, FiAnchor, FiSmile, FiMic, FiStopCircle,
@@ -390,7 +391,14 @@ function MessageBubble({ msg, isMe, skin = "default", onImageClick, onReply, onD
                 );
               }
               if (media.type === "video") {
-                return <video key={i} src={media.url} controls playsInline className="max-w-[240px] rounded-xl border" />;
+                return (
+                  <CustomVideoPlayer
+                    key={i}
+                    src={media.url}
+                    useAutoplay={false}
+                    className="max-w-[240px] rounded-xl border border-white/10"
+                  />
+                );
               }
               if (media.type === "audio") {
                 return <WavePlayer key={i} url={media.url} sentByMe={isMe} />;
@@ -977,11 +985,20 @@ export default function Chat() {
           ) : filteredConvos.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-gray-400">
               {activeTab === "bottles" ? (
-                <><FiAnchor size={32} className="mb-2 opacity-50" /><p className="text-sm">No bottle messages yet</p></>
+                <><FiAnchor size={32} className="mb-2 opacity-50" />
+                  <p className="text-sm font-medium mb-1">No bottle messages yet</p>
+                  <p className="text-xs text-gray-500 px-6 text-center">Drop an anonymous message into the sea and see who finds it</p>
+                </>
               ) : activeTab === "groups" ? (
-                <><FiUsers size={32} className="mb-2 opacity-50" /><p className="text-sm">No group chats yet</p></>
+                <><FiUsers size={32} className="mb-2 opacity-50" />
+                  <p className="text-sm font-medium mb-1">No group chats yet</p>
+                  <p className="text-xs text-gray-500 px-6 text-center">Start a group to chat with multiple friends at once</p>
+                </>
               ) : (
-                <><FiMessageCircle size={32} className="mb-2 opacity-50" /><p className="text-sm">No conversations yet</p></>
+                <><FiMessageCircle size={32} className="mb-2 opacity-50" />
+                  <p className="text-sm font-medium mb-1">No conversations yet</p>
+                  <p className="text-xs text-gray-500 px-6 text-center">Search for someone above or visit their profile to send a message</p>
+                </>
               )}
             </div>
           ) : (
@@ -1059,7 +1076,10 @@ export default function Chat() {
             {/* Messages */}
             <div className="flex-1 overflow-y-auto scrollbar-hide px-3 py-3 space-y-2">
               {messages.length === 0 ? (
-                <div className="flex items-center justify-center h-full text-gray-400 text-sm">No messages yet. Say hello!</div>
+                <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                  <p className="text-sm mb-1">No messages yet</p>
+                  <p className="text-xs text-gray-500">Send a message to start the conversation</p>
+                </div>
               ) : (
                 messages.map((msg, index) => {
                   const prevMsg = index > 0 ? messages[index - 1] : null;

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../utils/api";
 import { joinChannel, onChannel } from "../utils/realtime";
@@ -217,7 +217,24 @@ export default function Notifications() {
           <div className="text-center py-16">
             <FiHeart className="mx-auto text-gray-300 dark:text-gray-600 mb-3" size={40} />
             <p className="text-gray-500 text-lg mb-1">No notifications yet</p>
-            <p className="text-gray-400 text-sm">When someone interacts with your posts, it'll show up here</p>
+            <p className="text-gray-400 text-sm mb-6 max-w-xs mx-auto">
+              When someone likes your posts, follows you, or replies, it'll show up here
+            </p>
+            <div className="flex flex-col items-center gap-2">
+              <Link
+                to={`/profile/${currentUser?.username}`}
+                className="text-sm font-medium text-tide-600 hover:text-tide-700 hover:underline transition"
+              >
+                Share your profile to get noticed
+              </Link>
+              <p className="text-xs text-gray-500">
+                Or browse{" "}
+                <Link to="/feed" className="text-tide-500 hover:underline">
+                  the feed
+                </Link>{" "}
+                and interact with others
+              </p>
+            </div>
           </div>
         )}
       </div>

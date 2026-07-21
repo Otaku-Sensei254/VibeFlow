@@ -342,8 +342,15 @@ export default function Feed() {
                   </Link>
                 ))
               ) : (
-                <div className="flex items-center justify-center w-full py-2">
-                  <span className="text-xs text-gray-400">No waves yet — create one!</span>
+                <div className="flex items-center justify-center w-full py-4">
+                  <div className="text-center">
+                    <span className="text-xs text-gray-400 block">No waves yet — create one and earn 10 pts!</span>
+                    {user && (
+                      <Link to="/waves/new" className="text-xs font-medium text-tide-500 hover:text-tide-400 mt-1 inline-block">
+                        Record your first wave &rarr;
+                      </Link>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -402,12 +409,44 @@ export default function Feed() {
               </div>
             )}
             {!hasMore && posts.length > 0 && (
-              <p className="text-center text-sm text-gray-400 py-4">You are all caught up</p>
+              <div className="text-center py-6">
+                <p className="text-sm text-gray-400 mb-2">You are all caught up</p>
+                <p className="text-xs text-gray-500">Share something or invite a friend to keep the feed flowing</p>
+              </div>
             )}
             {!loading && posts.length === 0 && (
               <div className="text-center py-16">
-                <p className="text-gray-400 text-lg mb-2">No posts yet</p>
-                <p className="text-gray-500 text-sm">Be the first to share something!</p>
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-tide-50 dark:bg-tide-900/20 flex items-center justify-center">
+                  <FiTrendingUp className="text-tide-400" size={28} />
+                </div>
+                <p className="text-gray-500 text-lg mb-2 font-medium">Nothing here yet</p>
+                <p className="text-gray-400 text-sm mb-6 max-w-sm mx-auto">
+                  {category ? `No posts in "${category}" yet.` : "Follow more people to see their posts here."}
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                  {user && (
+                    <Link
+                      to="/posts/new"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-tide-600 to-flow-600 text-white rounded-xl text-sm font-semibold hover:from-tide-700 hover:to-flow-700 transition-all shadow-md shadow-tide-200 dark:shadow-tide-900/30"
+                    >
+                      Create a post
+                    </Link>
+                  )}
+                  {!user && (
+                    <Link
+                      to="/register"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-tide-600 to-flow-600 text-white rounded-xl text-sm font-semibold hover:from-tide-700 hover:to-flow-700 transition-all shadow-md shadow-tide-200 dark:shadow-tide-900/30"
+                    >
+                      Join VibeFlow
+                    </Link>
+                  )}
+                  <Link
+                    to="/invite"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-750 transition-all"
+                  >
+                    Invite friends &mdash; earn 50 pts
+                  </Link>
+                </div>
               </div>
             )}
           </div>
@@ -445,7 +484,10 @@ export default function Feed() {
                   </Link>
                 ))}
                 {trending.length === 0 && (
-                  <p className="text-sm text-gray-400 px-3 py-4 text-center">No trending posts</p>
+                  <div className="px-3 py-6 text-center">
+                    <p className="text-sm text-gray-400 mb-1">No trending posts yet</p>
+                    <p className="text-xs text-gray-500">Be the first to spark a trend</p>
+                  </div>
                 )}
               </div>
             </div>

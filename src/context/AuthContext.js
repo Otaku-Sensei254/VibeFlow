@@ -23,11 +23,33 @@ export function AuthProvider({ children }) {
   const [showPresence, setShowPresenceState] = useState(() => {
     return localStorage.getItem("vibeflow_show_presence") !== "false";
   });
+  const [streak, setStreak] = useState(() => {
+    const stored = localStorage.getItem("vibeflow_streak");
+    return stored ? JSON.parse(stored) : { current: 0, longest: 0 };
+  });
 
   const setShowPresence = (val) => {
     localStorage.setItem("vibeflow_show_presence", String(val));
     setShowPresenceState(val);
   };
+
+  useEffect(() => {
+    if (!user) return;
+    const today = new Date().toDateString();
+    const lastPing = localStorage.getItem("vibeflow_last_ping");
+    if (lastPing !== today) {
+      api.post("/users/ping").then(() => {
+        localStorage.setItem("vibeflow_last_ping", today);
+      }).catch(() => {});
+    }
+    api.get("/users/streak").then((res) => {
+      if (res.data.data) {
+        const s = { current: res.data.data.current_streak || 0, longest: res.data.data.longest_streak || 0 };
+        setStreak(s);
+        localStorage.setItem("vibeflow_streak", JSON.stringify(s));
+      }
+    }).catch(() => {});
+  }, [user]);
 
   const fetchCounts = useCallback(async () => {
     try {
@@ -169,7 +191,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, login, register, logout, updateUser, notificationCount, chatUnreadCount, fetchCounts, onlineUsers, connectionStatus, sidebarRefresh, showPresence, setShowPresence }}
+      value={{ user, loading, login, register, logout, updateUser, notificationCount, chatUnreadCount, fetchCounts, onlineUsers, connectionStatus, sidebarRefresh, showPresence, setShowPresence, streak }}
     >
       {children}
     </AuthContext.Provider>

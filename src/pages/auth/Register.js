@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
 
 export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ username: "", email: "", password: "" });
+  const [searchParams] = useSearchParams();
+  const inviteRef = searchParams.get("ref") || "";
+  const [form, setForm] = useState({ username: "", email: "", password: "", invite_code: inviteRef });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -22,7 +24,7 @@ export default function Register() {
     setLoading(true);
     try {
       await register(form);
-      navigate("/feed");
+      navigate("/onboarding");
     } catch (err) {
       const errors = err.response?.data?.errors;
       if (errors) {

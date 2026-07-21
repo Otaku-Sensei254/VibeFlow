@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import api from "../utils/api";
 import { FiGlobe, FiZap, FiMessageCircle, FiUsers } from "react-icons/fi";
 
 const phrases = [
@@ -195,6 +196,13 @@ const features = [
 export default function Home() {
   const { user } = useAuth();
   const mouse = useMouseGlow();
+  const [briefStats, setBriefStats] = useState(null);
+
+  useEffect(() => {
+    api.get("/stats/brief").then((res) => {
+      setBriefStats(res.data.data);
+    }).catch(() => {});
+  }, []);
 
   return (
     <div className="min-h-screen bg-zinc-950 overflow-hidden relative selection:bg-tide-500/30">
@@ -273,7 +281,7 @@ export default function Home() {
               </div>
             )}
 
-            <div className="flex items-center gap-4 mt-8">
+              <div className="flex items-center gap-4 mt-8">
               <div className="flex -space-x-2">
                 {["🎨", "🎵", "🌍", "⚡"].map((e, i) => (
                   <div key={i} className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs border-2 border-zinc-950 shadow-sm">
@@ -282,7 +290,19 @@ export default function Home() {
                 ))}
               </div>
               <p className="text-xs text-zinc-600">
-                <span className="font-semibold text-zinc-400">12k+</span> creators active
+                <span className="font-semibold text-zinc-400">
+                  {briefStats ? (
+                    briefStats.user_count < 100
+                      ? `${briefStats.user_count}`
+                      : `${(briefStats.user_count / 1000).toFixed(1)}k+`
+                  ) : "..."}
+                </span>{" "}
+                {briefStats?.user_count === 1 ? "creator" : "creators"}
+                {briefStats?.online_now > 0 && (
+                  <span className="ml-2 text-emerald-400/70">
+                    &middot; {briefStats.online_now} online now
+                  </span>
+                )}
               </p>
             </div>
           </div>

@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { FiX, FiChevronLeft, FiVolume2, FiVolumeX, FiHeart, FiSend, FiShare2, FiUsers } from "react-icons/fi";
+import { FiX, FiChevronLeft, FiVolume2, FiVolumeX, FiHeart, FiSend, FiShare2, FiUsers, FiMoreHorizontal } from "react-icons/fi";
 import api from "../../utils/api";
 import { useAuth } from "../../context/AuthContext";
+import CustomVideoPlayer from "../../components/CustomVideoPlayer";
 
 const VIDEO_EXTS = [".mp4", ".webm", ".mov", ".mkv", ".avi", ".m4v"];
 
@@ -22,8 +23,8 @@ function formatTime(dateStr) {
   const now = new Date();
   const diff = (now - d) / 1000;
   if (diff < 60) return "just now";
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}m`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
   return d.toLocaleDateString();
 }
 
@@ -48,6 +49,7 @@ export default function WaveViewer() {
   const [messageText, setMessageText] = useState("");
   const [sending, setSending] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showOverflow, setShowOverflow] = useState(false);
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
   const [contactsTab, setContactsTab] = useState("all");
@@ -118,6 +120,26 @@ export default function WaveViewer() {
     }
   }, [current]);
 
+  useEffect(() => {
+    setProgress(0);
+    clearInterval(timerRef.current);
+    if (!current || !loaded || paused) return;
+    const isVid = isVideo(current);
+    const duration = isVid ? 15000 : 5000;
+    const step = 100 / (duration / 50);
+    timerRef.current = setInterval(() => {
+      setProgress((p) => {
+        if (p >= 100) {
+          clearInterval(timerRef.current);
+          setTimeout(goNext, 0);
+          return 0;
+        }
+        return p + step;
+      });
+    }, 50);
+    return () => clearInterval(timerRef.current);
+  }, [index, current?.uuid, loaded, paused]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const goNext = useCallback(() => {
     if (index < waves.length - 1) {
       setIndex((i) => i + 1);
@@ -138,26 +160,6 @@ export default function WaveViewer() {
       setIndex(prevWaves.length - 1);
     }
   }, [index, groupIndex, waveGroups, chainEnabled]);
-
-  useEffect(() => {
-    setProgress(0);
-    clearInterval(timerRef.current);
-    if (!current || !loaded || paused) return;
-    const isVid = isVideo(current);
-    const duration = isVid ? 15000 : 5000;
-    const step = 100 / (duration / 50);
-    timerRef.current = setInterval(() => {
-      setProgress((p) => {
-        if (p >= 100) {
-          clearInterval(timerRef.current);
-          setTimeout(goNext, 0);
-          return 0;
-        }
-        return p + step;
-      });
-    }, 50);
-    return () => clearInterval(timerRef.current);
-  }, [index, current?.uuid, loaded, paused, goNext]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handlePointerDown = () => {
     setPaused(true);
@@ -184,22 +186,6 @@ export default function WaveViewer() {
       setLikesCount(prevCount);
     }
   };
-
-  useEffect(() => {
-    if (!showShareModal || contactsLoaded) return;
-    const loadContacts = async () => {
-      try {
-        const [folRes, folngRes] = await Promise.allSettled([
-          api.get(`/users/${currentUser?.username}/followers`),
-          api.get(`/users/${currentUser?.username}/following`),
-        ]);
-        setFollowers(folRes.status === "fulfilled" ? folRes.value.data.data?.users || [] : []);
-        setFollowing(folngRes.status === "fulfilled" ? folngRes.value.data.data?.users || [] : []);
-      } catch {}
-      setContactsLoaded(true);
-    };
-    loadContacts();
-  }, [showShareModal, currentUser?.username, contactsLoaded]);
 
   const handleSendDM = async () => {
     if (!messageText.trim() || !current || sending) return;
@@ -244,6 +230,22 @@ export default function WaveViewer() {
     setShowShareModal(false);
   };
 
+  useEffect(() => {
+    if (!showShareModal || contactsLoaded) return;
+    const loadContacts = async () => {
+      try {
+        const [folRes, folngRes] = await Promise.allSettled([
+          api.get(`/users/${currentUser?.username}/followers`),
+          api.get(`/users/${currentUser?.username}/following`),
+        ]);
+        setFollowers(folRes.status === "fulfilled" ? folRes.value.data.data?.users || [] : []);
+        setFollowing(folngRes.status === "fulfilled" ? folngRes.value.data.data?.users || [] : []);
+      } catch {}
+      setContactsLoaded(true);
+    };
+    loadContacts();
+  }, [showShareModal, currentUser?.username, contactsLoaded]);
+
   if (!current) {
     return (
       <div className="fixed inset-0 z-50 bg-black flex items-center justify-center">
@@ -261,6 +263,8 @@ export default function WaveViewer() {
     );
   }
 
+  const allWaves = chainEnabled ? waveGroups.flatMap((g) => g.waves) : waves;
+
   return (
     <div
       className="fixed inset-0 z-50 bg-black flex flex-col select-none"
@@ -271,52 +275,78 @@ export default function WaveViewer() {
     >
       <audio ref={audioRef} />
 
-      {/* Top bar: progress + close + like + mute */}
-      <div className="absolute top-0 left-0 right-0 z-10 px-3 pt-3 space-y-3">
+      {/* Segmented progress bar */}
+      <div className="absolute top-0 left-0 right-0 z-10 px-3 pt-3">
         <div className="flex gap-0.5">
-          {(chainEnabled ? waveGroups.flatMap((g) => g.waves) : waves).map((w, i) => (
+          {allWaves.map((w, i) => (
             <div key={w.id || i} className="flex-1 h-[3px] rounded-full bg-white/20 overflow-hidden">
               <div
                 className="h-full bg-white transition-all duration-100 ease-linear rounded-full"
                 style={{
                   width:
-                    i < globalIndex
-                      ? "100%"
-                      : i === globalIndex
-                        ? `${progress}%`
-                        : "0%",
+                    i < globalIndex ? "100%"
+                    : i === globalIndex ? `${progress}%`
+                    : "0%",
                 }}
               />
             </div>
           ))}
         </div>
-        <div className="flex items-center justify-between">
-          <button onClick={() => navigate(-1)} className="text-white/70 hover:text-white p-1">
-            <FiX size={22} />
-          </button>
-          <div className="flex items-center gap-3">
-            <button onClick={handleLike} className="text-white/70 hover:text-white p-1 transition-all">
-              <FiHeart size={18} className={liked ? "fill-coral-500 text-coral-500" : ""} />
+      </div>
+
+      {/* Top-left: avatar + @handle + timestamp */}
+      <div className="absolute top-8 left-3 z-10 flex items-center gap-2.5">
+        <img
+          src={current.user?.avatar_url ||
+            `https://ui-avatars.com/api/?name=${current.user?.username || "?"}&background=6366F1&color=fff`}
+          alt=""
+          className="w-8 h-8 rounded-full object-cover ring-2 ring-white/20"
+        />
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-white leading-tight truncate max-w-[140px]">
+            @{current.user?.username}
+          </p>
+          <p className="text-[10px] text-white/50">{formatTime(current.inserted_at)}</p>
+        </div>
+      </div>
+
+      {/* Top-right: overflow menu */}
+      <div className="absolute top-8 right-3 z-10">
+        <button onClick={() => setShowOverflow(!showOverflow)}
+          className="text-white/70 hover:text-white p-1.5">
+          <FiMoreHorizontal size={20} />
+        </button>
+        {showOverflow && (
+          <div className="absolute right-0 top-10 bg-gray-900 rounded-xl shadow-xl border border-white/10 py-1 min-w-[160px]"
+            onMouseLeave={() => setShowOverflow(false)}>
+            <button onClick={() => { setShowShareModal(true); setShowOverflow(false); }}
+              className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-white hover:bg-white/10 transition-colors">
+              <FiShare2 size={14} /> Share
             </button>
             {isVideo(current) && (
-              <button onClick={() => setMuted(!muted)} className="text-white/70 hover:text-white p-1">
-                {muted ? <FiVolumeX size={18} /> : <FiVolume2 size={18} />}
+              <button onClick={() => { setMuted(!muted); setShowOverflow(false); }}
+                className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-white hover:bg-white/10 transition-colors">
+                {muted ? <FiVolumeX size={14} /> : <FiVolume2 size={14} />} {muted ? "Unmute" : "Mute"}
               </button>
             )}
+            <button onClick={() => { navigate(-1); setShowOverflow(false); }}
+              className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-white hover:bg-white/10 transition-colors">
+              <FiX size={14} /> Close
+            </button>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Media area */}
       <div className="flex-1 relative flex items-center justify-center">
         {isVideo(current) ? (
-          <video
+          <CustomVideoPlayer
             ref={videoRef}
             key={current.uuid}
             src={current.media_url}
-            autoPlay
+            useAutoplay={false}
             muted={muted}
-            playsInline
+            onMuteChange={setMuted}
             onLoadedData={() => setLoaded(true)}
             onError={() => setLoaded(true)}
             className="max-h-full max-w-full object-contain"
@@ -332,10 +362,8 @@ export default function WaveViewer() {
           />
         )}
 
-        <button
-          onClick={goPrev}
-          className="absolute left-0 top-0 bottom-0 w-[30%] flex items-center justify-start pl-2"
-        >
+        <button onClick={goPrev}
+          className="absolute left-0 top-0 bottom-0 w-[30%] flex items-center justify-start pl-2">
           {(chainEnabled && groupIndex > 0) || index > 0 ? (
             <FiChevronLeft size={32} className="text-white/50 drop-shadow-lg" />
           ) : null}
@@ -343,70 +371,13 @@ export default function WaveViewer() {
         <button onClick={goNext} className="absolute right-0 top-0 bottom-0 w-[70%]" />
       </div>
 
-      {/* Bottom: user info + like count + share */}
-      <div className="px-4 pt-4 flex items-center gap-3">
-        <div className="relative shrink-0">
-          <img
-            src={
-              current.user?.avatar_url ||
-              `https://ui-avatars.com/api/?name=${current.user?.username || "?"}&background=6366F1&color=fff`
-            }
-            alt=""
-            className={`w-9 h-9 rounded-full object-cover ${
-              current.user?.frame === "red"
-                ? "ring-2 ring-red-500 shadow-[0_0_8px_rgba(239,68,68,0.7)]"
-                : current.user?.frame === "blue"
-                ? "ring-2 ring-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.7)]"
-                : "ring-2 ring-white/20"
-            }`}
-          />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-white truncate">
-            {current.user?.username}
-            {current.user?.is_verified && (
-              <img
-                src="/images/vibeflow_verified2.png"
-                alt=""
-                className="inline w-4 h-4 ml-1 -mt-0.5"
-              />
-            )}
-          </p>
-          <p className="text-xs text-white/60">{formatTime(current.inserted_at)}</p>
-        </div>
-        {likesCount > 0 && (
-          <span className="text-xs text-white/50 flex items-center gap-1">
-            <FiHeart size={12} className="fill-coral-500 text-coral-500" />
-            {likesCount}
-          </span>
-        )}
-        <button
-          onClick={() => setShowShareModal(true)}
-          className="text-white/70 hover:text-white p-2"
-        >
-          <FiShare2 size={18} />
-        </button>
-      </div>
-
-      {current.caption && (
-        <div className="px-4 pb-2">
-          <p className="text-sm text-white/90">{current.caption}</p>
-        </div>
-      )}
-
+      {/* Music info */}
       {current.music_track && (
-        <div className="px-4 pb-2 flex items-center gap-2">
+        <div className="absolute bottom-20 left-4 right-4 z-10 flex items-center gap-2">
           <div className="flex items-end gap-0.5 h-4">
             {[1,2,3,4,5].map((i) => (
-              <div
-                key={i}
-                className="w-0.5 bg-white rounded-full animate-pulse"
-                style={{
-                  height: `${40 + Math.random() * 60}%`,
-                  animationDelay: `${i * 0.1}s`,
-                  animationDuration: "0.8s",
-                }}
-              />
+              <div key={i} className="w-0.5 bg-white rounded-full animate-pulse"
+                style={{ height: `${40 + Math.random() * 60}%`, animationDelay: `${i * 0.1}s`, animationDuration: "0.8s" }} />
             ))}
           </div>
           <div className="min-w-0">
@@ -416,142 +387,87 @@ export default function WaveViewer() {
         </div>
       )}
 
-      {/* DM reply input */}
-      <div className="px-4 pb-6 flex items-center gap-2">
-        <input
-          type="text"
-          value={messageText}
-          onChange={(e) => setMessageText(e.target.value)}
-          placeholder="Send a message..."
-          className="flex-1 bg-white/10 text-white text-sm rounded-full px-4 py-2 outline-none placeholder-white/40"
-          onKeyDown={(e) => e.key === "Enter" && handleSendDM()}
-        />
-        <button
-          onClick={handleSendDM}
-          disabled={!messageText.trim() || sending}
-          className="text-white/70 hover:text-white p-2 disabled:opacity-30"
-        >
-          <FiSend size={18} />
-        </button>
+      {/* Caption */}
+      {current.caption && (
+        <div className="absolute bottom-16 left-4 right-16 z-10">
+          <p className="text-sm text-white/90">{current.caption}</p>
+        </div>
+      )}
+
+      {/* Bottom bar: reply input + like + send */}
+      <div className="absolute bottom-0 left-0 right-0 z-10 bg-gradient-to-t from-black/80 to-transparent pt-8 pb-4 px-4">
+        <div className="flex items-center gap-2">
+          <div className="flex-1 flex items-center gap-2 bg-white/10 rounded-full px-4 py-1.5">
+            <input
+              type="text"
+              value={messageText}
+              onChange={(e) => setMessageText(e.target.value)}
+              placeholder="Send a reply"
+              className="flex-1 bg-transparent text-white text-sm outline-none placeholder-white/40 min-w-0"
+              onKeyDown={(e) => e.key === "Enter" && handleSendDM()}
+            />
+            <button onClick={handleLike} className="text-white/70 hover:text-coral-400 p-1 transition-all">
+              <FiHeart size={18} className={liked ? 'fill-coral-500 text-coral-500' : ''} />
+            </button>
+          </div>
+          <button
+            onClick={handleSendDM}
+            disabled={!messageText.trim() || sending}
+            className="text-white/70 hover:text-white p-2 disabled:opacity-30"
+          >
+            <FiSend size={18} />
+          </button>
+        </div>
       </div>
 
       {/* Share modal */}
       {showShareModal && (
-        <div
-          className="fixed inset-0 z-[60] bg-black/60 flex items-end sm:items-center justify-center"
-          onClick={() => { setShowShareModal(false); setContactsLoaded(false); }}
-        >
-          <div
-            className="bg-gray-900 w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-4 max-h-[70vh] flex flex-col"
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div className="fixed inset-0 z-[60] bg-black/60 flex items-end sm:items-center justify-center"
+          onClick={() => { setShowShareModal(false); setContactsLoaded(false); }}>
+          <div className="bg-gray-900 w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-4 max-h-[70vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}>
             <h3 className="text-white font-semibold text-lg mb-3">Share wave</h3>
-            <input
-              type="text"
-              value={shareSearch}
-              onChange={(e) => handleShareSearch(e.target.value)}
-              placeholder="Search all users..."
-              className="w-full bg-white/10 text-white text-sm rounded-lg px-4 py-2 outline-none placeholder-white/40 mb-3"
-              autoFocus
-            />
+            <input type="text" value={shareSearch} onChange={(e) => handleShareSearch(e.target.value)}
+              placeholder="Search all users..." autoFocus
+              className="w-full bg-white/10 text-white text-sm rounded-lg px-4 py-2 outline-none placeholder-white/40 mb-3" />
             {shareSearch.trim() === "" ? (
               <>
                 <div className="flex gap-2 mb-3">
-                  <button
-                    onClick={() => setContactsTab("all")}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                      contactsTab === "all"
-                        ? "bg-white/20 text-white"
-                        : "text-white/50 hover:text-white/80"
-                    }`}
-                  >
-                    <FiUsers size={14} className="inline mr-1" />
-                    Contacts
-                  </button>
-                  <button
-                    onClick={() => setContactsTab("followers")}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                      contactsTab === "followers"
-                        ? "bg-white/20 text-white"
-                        : "text-white/50 hover:text-white/80"
-                    }`}
-                  >
-                    Followers
-                  </button>
-                  <button
-                    onClick={() => setContactsTab("following")}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                      contactsTab === "following"
-                        ? "bg-white/20 text-white"
-                        : "text-white/50 hover:text-white/80"
-                    }`}
-                  >
-                    Following
-                  </button>
+                  {["all", "followers", "following"].map((t) => (
+                    <button key={t} onClick={() => setContactsTab(t)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${contactsTab === t ? 'bg-white/20 text-white' : 'text-white/50 hover:text-white/80'}`}>
+                      {t === "all" ? <><FiUsers size={14} className="inline mr-1" /> Contacts</> : t.charAt(0).toUpperCase() + t.slice(1)}
+                    </button>
+                  ))}
                 </div>
                 <div className="flex-1 overflow-y-auto space-y-1">
                   {!contactsLoaded ? (
-                    <div className="flex justify-center py-8">
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    </div>
+                    <div className="flex justify-center py-8"><div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /></div>
                   ) : (
                     (contactsTab === "all"
                       ? [...new Map([...followers, ...following].map((u) => [u.id, u])).values()]
                       : contactsTab === "followers" ? followers : following
                     ).map((u) => (
-                      <button
-                        key={u.id}
-                        onClick={() => handleShare(u.username)}
-                        disabled={sharing}
-                        className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors disabled:opacity-50"
-                      >
-                        <img
-                          src={
-                            u.avatar_url ||
-                            `https://ui-avatars.com/api/?name=${u.username}&background=6366F1&color=fff`
-                          }
-                          alt=""
-                          className="w-10 h-10 rounded-full object-cover"
-                        />
+                      <button key={u.id} onClick={() => handleShare(u.username)} disabled={sharing}
+                        className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors disabled:opacity-50">
+                        <img src={u.avatar_url || `https://ui-avatars.com/api/?name=${u.username}&background=6366F1&color=fff`} alt="" className="w-10 h-10 rounded-full object-cover" />
                         <span className="text-white text-sm font-medium">{u.username}</span>
                       </button>
                     ))
                   )}
-                  {contactsLoaded && (
-                    contactsTab === "all"
-                      ? [...new Map([...followers, ...following].map((u) => [u.id, u])).values()].length === 0
-                      : contactsTab === "followers" ? followers.length === 0 : following.length === 0
-                    ) && (
-                      <p className="text-white/40 text-sm text-center py-8">No contacts yet</p>
-                    )}
                 </div>
               </>
             ) : (
               <div className="flex-1 overflow-y-auto space-y-1">
                 {shareResults.length === 0 ? (
-                  <p className="text-white/40 text-sm text-center py-8">
-                    No users found
-                  </p>
-                ) : (
-                  shareResults.map((u) => (
-                    <button
-                      key={u.id}
-                      onClick={() => handleShare(u.username)}
-                      disabled={sharing}
-                      className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors disabled:opacity-50"
-                    >
-                      <img
-                        src={
-                          u.avatar_url ||
-                          `https://ui-avatars.com/api/?name=${u.username}&background=6366F1&color=fff`
-                        }
-                        alt=""
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
-                      <span className="text-white text-sm font-medium">{u.username}</span>
-                    </button>
-                  ))
-                )}
+                  <p className="text-white/40 text-sm text-center py-8">No users found</p>
+                ) : shareResults.map((u) => (
+                  <button key={u.id} onClick={() => handleShare(u.username)} disabled={sharing}
+                    className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors disabled:opacity-50">
+                    <img src={u.avatar_url || `https://ui-avatars.com/api/?name=${u.username}&background=6366F1&color=fff`} alt="" className="w-10 h-10 rounded-full object-cover" />
+                    <span className="text-white text-sm font-medium">{u.username}</span>
+                  </button>
+                ))}
               </div>
             )}
           </div>

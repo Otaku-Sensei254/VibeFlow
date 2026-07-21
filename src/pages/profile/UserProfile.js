@@ -2,11 +2,13 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 import { useAuth } from "../../context/AuthContext";
+import { useFollow } from "../../context/FollowContext";
 import { useTheme } from "../../context/ThemeContext";
 import {
   FiGrid, FiHeart, FiMessageCircle, FiPlay, FiBookmark, FiX,
   FiCalendar, FiUsers, FiUserCheck, FiCamera, FiSend, FiShield, FiLoader
 } from "react-icons/fi";
+import { GiBigWave } from "react-icons/gi";
 import { USERNAME_STYLES, DARK_USERNAME_STYLES } from "../../constants/usernameStyles";
 import { showToast } from "../../utils/toast";
 
@@ -95,6 +97,7 @@ function PostGridCard({ post }) {
 export default function UserProfile() {
   const { username } = useParams();
   const { user: currentUser, onlineUsers, showPresence } = useAuth();
+  const { followedUsers, setFollowing: setFollowState } = useFollow();
   const [profile, setProfile] = useState(null);
   const [posts, setPosts] = useState([]);
   const [savedPosts, setSavedPosts] = useState([]);
@@ -157,11 +160,23 @@ export default function UserProfile() {
     } catch {}
   };
 
+  const profileUserId = profile?.user?.id;
+  const profileIsFollowing = profileUserId ? (followedUsers[profileUserId] !== undefined ? followedUsers[profileUserId] : (profile?.is_following || false)) : false;
+
   const handleFollow = async () => {
+    if (!currentUser) {
+      showToast({ type: "error", title: "Login Required", message: `You need to be logged in to follow @${username}` });
+      navigate("/login");
+      return;
+    }
+    if (!profileUserId) return;
     try {
       const res = await api.post(`/users/${username}/follow`);
       const following = res.data?.data?.following;
-      if (following) setProfile((prev) => prev ? { ...prev, is_following: prev.is_following || true } : prev);
+      if (following) {
+        setFollowState(profileUserId, true);
+        setProfile((prev) => prev ? { ...prev, is_following: true } : prev);
+      }
       loadProfile();
     } catch {}
   };
@@ -372,22 +387,24 @@ export default function UserProfile() {
                   </a>
                 )}
               </>
-            ) : currentUser ? (
+            ) : (
               <>
                 <button onClick={handleFollow} className={`inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl transition-all shadow-sm ${
-                  profile.is_following
+                  profileIsFollowing
                     ? "bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-zinc-700 hover:border-coral-200 hover:bg-coral-50 hover:text-coral-600 dark:hover:bg-coral-900/20 dark:hover:text-coral-400"
                     : "bg-gradient-to-r from-tide-600 to-flow-600 text-white hover:from-tide-700 hover:to-flow-700 shadow-lg shadow-tide-600/25 hover:shadow-tide-600/40 hover:-translate-y-0.5 active:scale-[0.98]"
                 }`}>
                   <FiUserCheck size={15} />
-                  {profile.is_following ? "Following" : "Follow"}
+                  {profileIsFollowing ? "Following" : "Follow"}
                 </button>
-                <button onClick={handleMessage} disabled={messaging} className="inline-flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-200 text-sm font-semibold rounded-xl border border-gray-200 dark:border-zinc-700 shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-700 hover:border-tide-200 dark:hover:border-tide-800 transition-all disabled:opacity-50">
-                  {messaging ? <FiLoader size={14} className="animate-spin" /> : <FiSend size={14} />}
-                  {messaging ? "Opening..." : "Message"}
-                </button>
+                {currentUser && (
+                  <button onClick={handleMessage} disabled={messaging} className="inline-flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-200 text-sm font-semibold rounded-xl border border-gray-200 dark:border-zinc-700 shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-700 hover:border-tide-200 dark:hover:border-tide-800 transition-all disabled:opacity-50">
+                    {messaging ? <FiLoader size={14} className="animate-spin" /> : <FiSend size={14} />}
+                    {messaging ? "Opening..." : "Message"}
+                  </button>
+                )}
               </>
-            ) : null}
+            )}
           </div>
         </div>
       </div>
@@ -395,7 +412,7 @@ export default function UserProfile() {
       {/* Tabs */}
       <div className="flex items-center gap-0 mb-6 border-b border-gray-200 dark:border-zinc-800">
         {[
-          { key: "posts", icon: FiGrid, label: "Posts" },
+          { key: "posts", icon: FiGrid, label: "Posts"} , {key: "currents", icon: GiBigWave, label: "Currents"},
           ...(isOwn ? [{ key: "saved", icon: FiBookmark, label: "Saved" }] : []),
         ].map((tab) => (
           <button

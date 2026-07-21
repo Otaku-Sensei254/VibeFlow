@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { FollowProvider } from "./context/FollowContext";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
@@ -18,7 +19,11 @@ import Settings from "./pages/profile/Settings";
 import Chat from "./pages/chat/Chat";
 import TagPage from "./pages/TagPage";
 import Notifications from "./pages/Notifications";
-import Currents from "./pages/Currents";
+import CurrentsFeed from "./pages/currents/CurrentsFeed";
+import OnboardingSuggestions from "./pages/OnboardingSuggestions";
+import Invite from "./pages/Invite";
+import InviteLanding from "./pages/InviteLanding";
+import Bottles from "./pages/Bottles";
 import CreateWave from "./pages/posts/CreateWave";
 import CreateCurrent from "./pages/posts/CreateCurrent";
 import WaveStore from "./pages/WaveStore";
@@ -51,11 +56,15 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <ThemeProvider>
+        <FollowProvider>
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/onboarding" element={<ProtectedRoute><OnboardingSuggestions /></ProtectedRoute>} />
+            <Route path="/invite" element={<ProtectedRoute><Invite /></ProtectedRoute>} />
+            <Route path="/invite/:code" element={<InviteLanding />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route path="/confirm-email/:token" element={<ConfirmEmail />} />
@@ -94,7 +103,8 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path="/currents" element={<Currents />} />
+            <Route path="/currents" element={<CurrentsFeed />} />
+            <Route path="/bottles" element={<Bottles />} />
             <Route path="/wave-store" element={<WaveStore />} />
             <Route
               path="/waves/new"
@@ -138,6 +148,7 @@ export default function App() {
             </Route>
           </Route>
         </Routes>
+        </FollowProvider>
         </ThemeProvider>
       </AuthProvider>
     </BrowserRouter>

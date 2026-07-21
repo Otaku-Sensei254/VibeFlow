@@ -8,11 +8,11 @@ import {
   FiMenu, FiX, FiGrid, FiMessageCircle,
   FiBell, FiUser, FiLogOut, FiLogIn,
   FiChevronDown, FiPlus, FiPlayCircle, FiEdit, FiMusic,
-  FiSun, FiMoon
+  FiSun, FiMoon, FiGift
 } from "react-icons/fi";
 
 export default function Layout() {
-  const { user, logout, notificationCount, chatUnreadCount, connectionStatus } = useAuth();
+  const { user, logout, notificationCount, chatUnreadCount, connectionStatus, streak } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
@@ -96,7 +96,7 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      {location.pathname !== "/" && (
+      {location.pathname !== "/" && !location.pathname.startsWith("/currents") && (
       <nav className="fixed top-0 z-50 w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2 shrink-0 md:gap-0">
@@ -181,11 +181,18 @@ export default function Layout() {
                   />
                 </button>
 
-                {profileOpen && (
+                    {profileOpen && (
                   <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-xl shadow-black/5 dark:shadow-black/20 py-1.5 z-50">
                     <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 mb-1">
                       <p className="font-semibold text-sm">{user.username}</p>
                       <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                      {streak.current > 0 && (
+                        <p className="text-xs mt-1">
+                          <span className="inline-flex items-center gap-1 text-amber-500">
+                            <span>🔥</span> {streak.current} day{streak.current !== 1 ? "s" : ""}
+                          </span>
+                        </p>
+                      )}
                     </div>
                     <Link
                       to={`/profile/${user.username}`}
@@ -194,6 +201,14 @@ export default function Layout() {
                     >
                       <FiUser size={16} className="text-gray-400" />
                       Profile
+                    </Link>
+                    <Link
+                      to="/invite"
+                      onClick={() => setProfileOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition"
+                    >
+                      <FiGift size={16} />
+                      Invite friends
                     </Link>
                     <Link
                       to="/settings"
@@ -261,7 +276,10 @@ export default function Layout() {
                   <p className="text-xs text-gray-500">{user.email}</p>
                 </div>
               </div>
-              {navLinks.concat({ to: `/profile/${user.username}`, label: "Profile", icon: FiUser }).map((link) => {
+              {navLinks.concat(
+                { to: `/profile/${user.username}`, label: "Profile", icon: FiUser },
+                { to: "/invite", label: "Invite", icon: FiGift }
+              ).map((link) => {
                 const count = badgeFor(link.label);
                 return (
                   <Link
@@ -352,54 +370,56 @@ export default function Layout() {
           <div className="fixed inset-0 z-40 bg-black/30" onClick={() => setPostModalOpen(false)} />
           <div
             ref={postModalRef}
-            className="fixed left-0 right-0 z-50 bg-white dark:bg-gray-800 shadow-2xl md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:max-w-md md:rounded-2xl md:border md:border-gray-200 dark:md:border-gray-700 bottom-0 rounded-t-2xl border-t border-gray-100 dark:border-gray-700 animate-slide-up"
+            className="fixed left-0 right-0 z-50 bg-white dark:bg-gray-800 shadow-2xl md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:max-w-sm md:rounded-2xl md:border md:border-gray-200 dark:md:border-gray-700 bottom-0 rounded-t-2xl border-t border-gray-100 dark:border-gray-700 animate-slide-up"
           >
             <div className="flex items-center justify-center pt-3 pb-1 md:hidden">
               <div className="w-10 h-1 rounded-full bg-gray-300 dark:bg-gray-600" />
             </div>
-            <div className="p-4 space-y-1 pb-16 md:pb-4">
-              <div className="flex items-center justify-between px-4 pb-2">
+            <div className="p-2 pb-20 md:pb-4">
+              <div className="flex items-center justify-between mb-4">
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Create</p>
-                <button onClick={() => setPostModalOpen(false)} className="hidden md:block p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                <button onClick={() => setPostModalOpen(false)} className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
                   <FiX size={18} />
                 </button>
               </div>
-              <button
-                onClick={() => { setPostModalOpen(false); navigate("/posts/new"); }}
-                className="flex items-center gap-4 w-full px-4 py-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition text-left"
-              >
-                <div className="w-10 h-10 rounded-xl bg-tide-100 dark:bg-tide-900/30 flex items-center justify-center text-tide-600">
-                  <FiEdit size={20} />
-                </div>
-                <div>
-                  <p className="font-medium text-sm text-gray-900 dark:text-gray-100">Post</p>
-                  <p className="text-xs text-gray-500">Share a thought, story, or update</p>
-                </div>
-              </button>
-              <button
-                onClick={() => { setPostModalOpen(false); navigate("/waves/new"); }}
-                className="flex items-center gap-4 w-full px-4 py-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition text-left"
-              >
-                <div className="w-10 h-10 rounded-xl bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center text-cyan-600">
-                  <FiMusic size={20} />
-                </div>
-                <div>
-                  <p className="font-medium text-sm text-gray-900 dark:text-gray-100">Wave</p>
-                  <p className="text-xs text-gray-500">Share music, audio, or a vibe</p>
-                </div>
-              </button>
-              <button
-                onClick={() => { setPostModalOpen(false); navigate("/currents/new"); }}
-                className="flex items-center gap-4 w-full px-4 py-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition text-left"
-              >
-                <div className="w-10 h-10 rounded-xl bg-flow-100 dark:bg-flow-900/30 flex items-center justify-center text-flow-600">
-                  <FiPlayCircle size={20} />
-                </div>
-                <div>
-                  <p className="font-medium text-sm text-gray-900 dark:text-gray-100">Current</p>
-                  <p className="text-xs text-gray-500">Upload a short-form video</p>
-                </div>
-              </button>
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={() => { setPostModalOpen(false); navigate("/waves/new"); }}
+                  className="flex items-center gap-4 px-4 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500/10 to-blue-500/10 dark:from-cyan-500/20 dark:to-blue-500/20 border border-cyan-200/30 dark:border-cyan-800/30 text-gray-900 dark:text-white font-semibold hover:opacity-90 transition"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
+                    <FiMusic size={18} className="text-white" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-sm font-semibold">Wave</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Share a photo, video, or sound</p>
+                  </div>
+                </button>
+                <button
+                  onClick={() => { setPostModalOpen(false); navigate("/currents/new"); }}
+                  className="flex items-center gap-4 px-4 py-3.5 rounded-xl bg-gradient-to-r from-flow-500/10 to-coral-500/10 dark:from-flow-500/20 dark:to-coral-500/20 border border-flow-200/30 dark:border-flow-800/30 text-gray-900 dark:text-white font-semibold hover:opacity-90 transition"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-flow-500 to-coral-500 flex items-center justify-center">
+                    <FiPlayCircle size={18} className="text-white" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-sm font-semibold">Current</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Upload a short video</p>
+                  </div>
+                </button>
+                <button
+                  onClick={() => { setPostModalOpen(false); navigate("/posts/new"); }}
+                  className="flex items-center gap-4 px-4 py-3.5 rounded-xl bg-gradient-to-r from-tide-500/10 to-flow-500/10 dark:from-tide-500/20 dark:to-flow-500/20 border border-tide-200/30 dark:border-tide-800/30 text-gray-900 dark:text-white font-semibold hover:opacity-90 transition"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-tide-500 to-flow-500 flex items-center justify-center">
+                    <FiEdit size={18} className="text-white" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-sm font-semibold">Post</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Write a text post with media</p>
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
         </>
@@ -408,11 +428,11 @@ export default function Layout() {
       <NotificationToast />
       <CookieConsent />
 
-      <main className={`${location.pathname === "/" ? "pt-0" : "pt-14"} ${location.pathname === "/" || location.pathname.startsWith("/waves/") || location.pathname.match(/^\/chat\/[^/]+$/) ? "" : "pb-16"} md:pb-0`}>
+      <main className={`${location.pathname === "/" || location.pathname.startsWith("/currents") ? "pt-0" : "pt-14"} ${location.pathname === "/" || location.pathname.startsWith("/currents") ? "h-dvh overflow-hidden" : ""} ${location.pathname === "/" || location.pathname.startsWith("/waves/") || location.pathname.match(/^\/chat\/[^/]+$/) || location.pathname === "/currents/new" ? "" : "pb-16"} md:pb-0`}>
         <Outlet />
       </main>
 
-      {location.pathname !== "/" && !location.pathname.startsWith("/waves/") && !location.pathname.match(/^\/chat\/[^/]+$/) && (
+      {location.pathname !== "/" && !location.pathname.startsWith("/waves/") && !location.pathname.match(/^\/chat\/[^/]+$/) && location.pathname !== "/currents/new" && (
       <nav className="fixed bottom-0 z-50 w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur border-t border-gray-200 dark:border-gray-700 md:hidden">
         <div className="flex items-center justify-around h-16">
           {bottomLinks.map((link) => {
