@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiHeart, FiMessageCircle, FiShare2, FiVolume2, FiVolumeX, FiCamera } from "react-icons/fi";
+import CurrentCommentSheet from "../../components/comments/CurrentCommentSheet";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../utils/api";
 import VideoPlayer from "../../components/VideoPlayer";
@@ -34,6 +35,7 @@ export default function CurrentsFeed() {
   const [hasMore, setHasMore] = useState(true);
   const [muted, setMuted] = useState(true);
   const [liking, setLiking] = useState(false);
+  const [commentTarget, setCommentTarget] = useState(null);
   const containerRef = useRef(null);
 
   const fetchCurrents = useCallback(async (pageNum, append = false) => {
@@ -101,7 +103,7 @@ export default function CurrentsFeed() {
 
   const handleComment = (post) => {
     if (!user) { navigate("/login"); return; }
-    navigate(`/posts/${post.uuid}`);
+    setCommentTarget(post);
   };
 
   const handleShare = (post) => {
@@ -223,6 +225,15 @@ export default function CurrentsFeed() {
         className="absolute top-6 right-4 z-20 text-white/50 hover:text-white p-2 bg-white/10 backdrop-blur-md rounded-full transition-all">
         {muted ? <FiVolumeX size={16} /> : <FiVolume2 size={16} />}
       </button>
+
+      {/* Comment sheet overlay */}
+      {commentTarget && (
+        <CurrentCommentSheet
+          current={commentTarget}
+          currentUser={user}
+          onClose={() => setCommentTarget(null)}
+        />
+      )}
     </div>
   );
 }

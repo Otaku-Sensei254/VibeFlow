@@ -93,6 +93,14 @@ export default function VideoPlayer({
     videoRef.current.currentTime = percentage * duration;
   };
 
+  if (!src) {
+    return (
+      <div className={`relative w-full h-full flex items-center justify-center bg-black/10 dark:bg-black/30 ${className}`}>
+        <span className="text-xs text-gray-400">No video source</span>
+      </div>
+    );
+  }
+
   return (
     <div className={`relative w-full h-full group cursor-pointer ${className}`}>
       {/* Video element */}
@@ -103,7 +111,7 @@ export default function VideoPlayer({
         muted={isMuted}
         loop={loop}
         playsInline={playsInline}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-contain"
         onClick={togglePlayPause}
       />
 
@@ -136,7 +144,7 @@ export default function VideoPlayer({
       {/* Progress bar */}
       {duration > 0 && (
         <div
-          className="absolute bottom-0 left-0 right-0 h-1 bg-gray-700/50 cursor-pointer"
+          className="absolute bottom-2 left-0 right-0 h-1 bg-gray-700/50 cursor-pointer"
           onClick={handleProgressClick}
         >
           <div

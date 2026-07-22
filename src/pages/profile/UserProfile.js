@@ -55,6 +55,37 @@ function SocialIcon({ platform }) {
   }
 }
 
+const SOCIAL_PLATFORM_COLORS = {
+  youtube: {
+    circle: "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 group-hover:bg-red-100 dark:group-hover:bg-red-900/40",
+    label: "text-red-500/70 dark:text-red-400/60 group-hover:text-red-600 dark:group-hover:text-red-400",
+  },
+  instagram: {
+    circle: "bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-400 group-hover:bg-pink-100 dark:group-hover:bg-pink-900/40",
+    label: "text-pink-500/70 dark:text-pink-400/60 group-hover:text-pink-600 dark:group-hover:text-pink-400",
+  },
+  x: {
+    circle: "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 group-hover:bg-gray-200 dark:group-hover:bg-gray-700",
+    label: "text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300",
+  },
+  twitch: {
+    circle: "bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 group-hover:bg-purple-100 dark:group-hover:bg-purple-900/40",
+    label: "text-purple-500/70 dark:text-purple-400/60 group-hover:text-purple-600 dark:group-hover:text-purple-400",
+  },
+  tiktok: {
+    circle: "bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 group-hover:bg-rose-100 dark:group-hover:bg-rose-900/40",
+    label: "text-rose-500/70 dark:text-rose-400/60 group-hover:text-rose-600 dark:group-hover:text-rose-400",
+  },
+  discord: {
+    circle: "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40",
+    label: "text-indigo-500/70 dark:text-indigo-400/60 group-hover:text-indigo-600 dark:group-hover:text-indigo-400",
+  },
+  default: {
+    circle: "bg-white/10 dark:bg-white/5 text-gray-400 dark:text-gray-500 group-hover:bg-white/20 dark:group-hover:bg-white/10 group-hover:text-gray-600 dark:group-hover:text-gray-300",
+    label: "text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400",
+  },
+};
+
 function PostGridCard({ post }) {
   const firstMedia = post.media_files?.[0];
   const isVideo = firstMedia?.type === "video" || firstMedia?.url?.match(/\.(mp4|mov|webm)$/i);
@@ -100,6 +131,7 @@ export default function UserProfile() {
   const { followedUsers, setFollowing: setFollowState } = useFollow();
   const [profile, setProfile] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [currents, setCurrents] = useState([]);
   const [savedPosts, setSavedPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("posts");
@@ -122,7 +154,9 @@ export default function UserProfile() {
     try {
       const res = await api.get(`/users/${username}`);
       setProfile(res.data.data);
+      setSocialAccounts(res.data.data.user.social_accounts || []);
       setPosts(res.data.data.posts || []);
+      setCurrents(res.data.data.currents || []);
       if (currentUser?.username === username) {
         const saved = await api.get("/users/saved-posts");
         setSavedPosts(saved.data.data.posts || []);
@@ -261,7 +295,7 @@ export default function UserProfile() {
             </div>
 
             <div className="flex-1 min-w-0 pt-2 sm:pt-14">
-              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 pt-2">
                 <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight inline-flex items-center gap-2" style={currentStyle}>
                   {u.username}
                   {u.is_verified && (
@@ -335,6 +369,26 @@ export default function UserProfile() {
               </span>
             )}
           </div>
+
+          {/* Social Accounts */}
+          {socialAccounts.length > 0 && (
+            <div className="flex flex-wrap items-center gap-4 mb-5">
+              {socialAccounts.map((sa) => {
+                const colors = SOCIAL_PLATFORM_COLORS[sa.platform] || SOCIAL_PLATFORM_COLORS.default;
+                return (
+                  <a key={sa.id} href={sa.url} target="_blank" rel="noopener noreferrer"
+                    className="flex flex-col items-center gap-1 group">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${colors.circle}`}>
+                      <SocialIcon platform={sa.platform} />
+                    </div>
+                    <span className={`text-[11px] truncate max-w-[60px] transition-colors ${colors.label}`}>
+                      {sa.username}
+                    </span>
+                  </a>
+                );
+              })}
+            </div>
+          )}
 
           {/* Actions */}
           <div className="flex flex-wrap items-center gap-2.5 pt-2 border-t border-gray-100 dark:border-zinc-800">
@@ -430,7 +484,7 @@ export default function UserProfile() {
         ))}
       </div>
 
-      {/* Posts / Saved Grid */}
+      {/* Posts / Currents / Saved Grid */}
       {activeTab === "posts" ? (
         posts.length === 0 ? (
           <div className="rounded-3xl border-2 border-dashed border-gray-200 dark:border-zinc-700 py-20 flex flex-col items-center justify-center text-center bg-white/50 dark:bg-zinc-900/50">
@@ -443,6 +497,20 @@ export default function UserProfile() {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {posts.map((post) => <PostGridCard key={post.uuid} post={post} />)}
+          </div>
+        )
+      ) : activeTab === "currents" ? (
+        currents.length === 0 ? (
+          <div className="rounded-3xl border-2 border-dashed border-gray-200 dark:border-zinc-700 py-20 flex flex-col items-center justify-center text-center bg-white/50 dark:bg-zinc-900/50">
+            <div className="w-16 h-16 bg-gray-100 dark:bg-zinc-800 rounded-2xl flex items-center justify-center mb-4">
+              <GiBigWave size={24} className="text-gray-300 dark:text-gray-600" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">No Currents Yet</h3>
+            <p className="text-gray-400 text-sm mt-1">When you post a current, they will appear here.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {currents.map((current) => <PostGridCard key={current.uuid} post={current} />)}
           </div>
         )
       ) : (

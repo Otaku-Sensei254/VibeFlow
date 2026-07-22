@@ -229,8 +229,7 @@ export default function CreateCurrent() {
   const handlePublish = async () => {
     if (!previewUrl || publishing) return;
     setPublishing(true);
-    showToast({ type: "success", title: "Publishing...", message: "Your current is being uploaded.", duration: 3000 });
-    navigate(-1);
+    showToast({ type: "info", title: "Publishing...", message: "Your current is being uploaded.", duration: 10000 });
     try {
       const resp = await fetch(previewUrl);
       const blob = await resp.blob();
@@ -269,16 +268,15 @@ export default function CreateCurrent() {
       });
 
       showToast({ type: "success", title: "Posted!", message: "Your current is now live.", duration: 5000 });
+      navigate(-1);
     } catch {
       showToast({ type: "error", title: "Upload failed", message: "Something went wrong.", duration: 5000 });
+      setPublishing(false);
     }
-    setPublishing(false);
   };
 
   const handleSaveDraft = async () => {
     if (!previewUrl) return;
-    showToast({ type: "success", title: "Draft saved", message: "Your current has been saved as a draft.", duration: 3000 });
-    navigate(-1);
     try {
       const resp = await fetch(previewUrl);
       const blob = await resp.blob();
@@ -294,6 +292,8 @@ export default function CreateCurrent() {
           status: "processing",
         },
       });
+      showToast({ type: "success", title: "Draft saved", message: "Your current has been saved as a draft.", duration: 3000 });
+      navigate(-1);
     } catch {}
   };
 

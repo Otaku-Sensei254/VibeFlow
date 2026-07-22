@@ -12,9 +12,7 @@ export default function useVideoAutoplay(videoEl, { threshold = 0.6 } = {}) {
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
         if (entry.isIntersecting) {
-          el.play().catch((err) => {
-            if (err.name !== "AbortError") throw err;
-          });
+          el.play().catch(() => {});
         } else {
           el.pause();
         }

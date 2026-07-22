@@ -26,12 +26,20 @@ function VideoSlide({ src, isVisible }) {
     return () => observerRef.current?.disconnect();
   }, [isVisible]);
 
+  if (!src) {
+    return (
+      <div className="w-full max-h-[32rem] flex items-center justify-center bg-black/5 dark:bg-black/20 rounded-xl">
+        <span className="text-xs text-gray-400">No video</span>
+      </div>
+    );
+  }
+
   return (
     <CustomVideoPlayer
       ref={playerRef}
       src={src}
       useAutoplay={false}
-      className="w-full max-h-[32rem] object-contain bg-black/5 dark:bg-black/20"
+      className="w-full max-h-[32rem] bg-black/5 dark:bg-black/20"
     />
   );
 }
