@@ -1,4 +1,5 @@
 import { Socket } from "phoenix";
+import { transformRelativeUrls } from "./media";
 
 // Determine the correct WebSocket URL based on the environment
 const getSocketUrl = () => {
@@ -112,7 +113,7 @@ export function joinChannel(topic, callbacks = {}) {
 
   const channel = socket.channel(topic);
   Object.entries(callbacks).forEach(([event, handler]) => {
-    channel.on(event, handler);
+    channel.on(event, (payload) => handler(transformRelativeUrls(payload)));
   });
   channel.join()
     .receive("ok", () => {})
@@ -128,7 +129,7 @@ export function leaveChannel(topic) {
 
 export function onChannel(topic, event, handler) {
   if (channels[topic]) {
-    channels[topic].on(event, handler);
+    channels[topic].on(event, (payload) => handler(transformRelativeUrls(payload)));
   }
 }
 
