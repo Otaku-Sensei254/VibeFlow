@@ -106,6 +106,7 @@ export default function CurrentsFeed() {
     setCommentTarget(post);
   };
 
+  
   const handleShare = (post) => {
     if (navigator.share) {
       navigator.share({ url: `${window.location.origin}/posts/${post.uuid}` }).catch(() => {});
