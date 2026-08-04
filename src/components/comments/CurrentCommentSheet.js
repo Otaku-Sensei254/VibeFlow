@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FiX } from "react-icons/fi";
 import VideoPlayer from "../VideoPlayer";
