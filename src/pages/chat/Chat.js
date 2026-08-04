@@ -1017,6 +1017,7 @@ export default function Chat() {
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-semibold truncate">
                           {conv.type === "direct" ? conv.other_user?.username || "Unknown" : conv.name || "Message in a Bottle"}
+                          
                         </span>
                         {conv.type !== "direct" && <Icon size={12} className="text-gray-400 shrink-0" />}
                       </div>

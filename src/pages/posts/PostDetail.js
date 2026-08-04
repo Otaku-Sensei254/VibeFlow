@@ -440,6 +440,9 @@ export default function PostDetail() {
           </div>
         </div>
 
+
+
+
         {/* Comments Section */}
         <div className="bg-white dark:bg-gray-900 lg:rounded-3xl lg:shadow-lg lg:border border-gray-100 dark:border-gray-800 overflow-hidden mt-4 lg:mt-6">
           <CommentSection uuid={uuid} user={user} />
