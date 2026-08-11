@@ -106,7 +106,7 @@ export default function CurrentsFeed() {
     setCommentTarget(post);
   };
 
-  
+
   const handleShare = (post) => {
     if (navigator.share) {
       navigator.share({ url: `${window.location.origin}/posts/${post.uuid}` }).catch(() => {});
@@ -223,7 +223,7 @@ export default function CurrentsFeed() {
 
       {/* Mute toggle */}
       <button onClick={() => setMuted(!muted)}
-        className="absolute top-6 right-4 z-20 text-white/50 hover:text-white p-2 bg-white/10 backdrop-blur-md rounded-full transition-all">
+        className="absolute top-6 right-4 z-20 text-white/50 hover:text-white p-2 bg-white/10 backdrop-blur-md rounded-full transition-all ">
         {muted ? <FiVolumeX size={16} /> : <FiVolume2 size={16} />}
       </button>
 

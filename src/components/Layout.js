@@ -71,6 +71,7 @@ export default function Layout() {
     ? [
         { to: "/feed", label: "Feed", icon: FiGrid },
         { to: "/currents", label: "Currents", icon: FiPlayCircle },
+        { to: "/invite", label: "Invite", icon: FiGift },
         { to: "/chat", label: "Chat", icon: FiMessageCircle },
         { to: "/notifications", label: "Alerts", icon: FiBell },
       ]

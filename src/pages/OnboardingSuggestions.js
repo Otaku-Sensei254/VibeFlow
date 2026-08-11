@@ -35,7 +35,7 @@ export default function OnboardingSuggestions() {
   };
 
   const handleSkip = () => {
-    navigate("/feed", { replace: true });
+    navigate("/currents", { replace: true });
   };
 
   return (
