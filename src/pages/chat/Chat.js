@@ -15,7 +15,7 @@ import {
   FiMessageCircle, FiAnchor, FiSmile, FiMic, FiStopCircle,
   FiImage, FiX, FiPlay, FiPause, FiSettings, FiPhone,
   FiPhoneOff, FiVolume2, FiTrash2, FiCheck, FiCheckCircle,
-  FiMoreHorizontal, FiEdit3, FiStar, FiCornerUpLeft, FiChevronDown, FiMusic
+  FiMoreHorizontal, FiEdit3, FiStar, FiCornerUpLeft, FiChevronDown,
 } from "react-icons/fi";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
@@ -585,7 +585,7 @@ export default function Chat() {
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
+  const [setSearchResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
   const [showEmoji, setShowEmoji] = useState(false);
@@ -875,15 +875,15 @@ export default function Chat() {
   };
 
   // ── Start conversation ──
-  const startConversation = async (username) => {
-    try {
-      const res = await api.post(`/chat/start/${username}`);
-      setSearchQuery("");
-      setSearchResults([]);
-      loadConversations();
-      navigate(`/chat/${res.data.data.conversation.uuid}`);
-    } catch { }
-  };
+  // const startConversation = async (username) => {
+  //   try {
+  //     const res = await api.post(`/chat/start/${username}`);
+  //     setSearchQuery("");
+  //     setSearchResults([]);
+  //     loadConversations();
+  //     navigate(`/chat/${res.data.data.conversation.uuid}`);
+  //   } catch { }
+  // };
 
   // ── New chat actions / modals ──
   const handleNewChatSelect = (action) => {

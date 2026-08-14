@@ -5,7 +5,6 @@ import CurrentCommentSheet from "../../components/comments/CurrentCommentSheet";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../utils/api";
 import VideoPlayer from "../../components/VideoPlayer";
-import { useFollow } from "../../context/FollowContext";
 import verified from "../../components/images/vibeflow_verified2.png";
 
 function formatCount(n) {

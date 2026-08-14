@@ -26,7 +26,7 @@ export default function VideoPlayer({
   const [isLoading, setIsLoading] = useState(true);
 
 // Custom hook for visibility-based autoplay
-  const isVisible = useVideoAutoplay(videoRef, { threshold: 0.6 });
+  useVideoAutoplay(videoRef, { threshold: 0.6 });
 
   // Event listeners for video state
   useEffect(() => {
