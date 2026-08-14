@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
+import Verified from "../components/images/vibeflow_verified2.png";
 import { FiCheck, FiUserPlus, FiSkipForward, FiLoader } from "react-icons/fi";
 
 export default function OnboardingSuggestions() {
@@ -13,7 +14,7 @@ export default function OnboardingSuggestions() {
   useEffect(() => {
     api.get("/users/suggestions", { params: { limit: 8 } }).then((res) => {
       setUsers(res.data.data?.users || []);
-    }).catch(() => {}).finally(() => setLoading(false));
+    }).catch(() => { }).finally(() => setLoading(false));
   }, []);
 
   const toggleFollow = async (username) => {
@@ -29,7 +30,7 @@ export default function OnboardingSuggestions() {
     if (following.size > 0) {
       try {
         await api.post("/users/batch-follow", { usernames: Array.from(following) });
-      } catch {}
+      } catch { }
     }
     navigate("/feed", { replace: true });
   };
@@ -82,20 +83,26 @@ export default function OnboardingSuggestions() {
                     className="w-10 h-10 rounded-full object-cover"
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
-                      {u.username}
-                    </p>
+                    <div className="flex items-center gap-1">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                        {u.username}
+                      </p>
+                      {u.is_verified === true && (
+                        <img src={Verified} alt="Verified" className="w-5 h-5" />
+                      )}
+
+                    </div>
+
                     {u.bio && (
                       <p className="text-xs text-gray-500 truncate">{u.bio}</p>
                     )}
                   </div>
                   <button
                     onClick={() => toggleFollow(u.username)}
-                    className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
-                      following.has(u.username)
-                        ? "bg-tide-100 dark:bg-tide-900/30 text-tide-700 dark:text-tide-300"
-                        : "bg-tide-600 text-white hover:bg-tide-700"
-                    }`}
+                    className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${following.has(u.username)
+                      ? "bg-tide-100 dark:bg-tide-900/30 text-tide-700 dark:text-tide-300"
+                      : "bg-tide-600 text-white hover:bg-tide-700"
+                      }`}
                   >
                     {following.has(u.username) ? (
                       <><FiCheck size={14} /> Following</>

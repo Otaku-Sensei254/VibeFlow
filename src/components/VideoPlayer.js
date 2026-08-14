@@ -25,18 +25,8 @@ export default function VideoPlayer({
   const [currentTime, setCurrentTime] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Custom hook for visibility-based autoplay
+// Custom hook for visibility-based autoplay
   const isVisible = useVideoAutoplay(videoRef, { threshold: 0.6 });
-
-  // Control video based on visibility or manual play/pause
-  useEffect(() => {
-    if (!videoRef.current) return;
-    if (isVisible && autoPlay) {
-      videoRef.current.play().catch(() => {});
-    } else if (!isVisible) {
-      videoRef.current.pause();
-    }
-  }, [isVisible, autoPlay]);
 
   // Event listeners for video state
   useEffect(() => {
@@ -64,6 +54,13 @@ export default function VideoPlayer({
     };
   }, []);
 
+  // Keep video.muted in sync with state (handles any external mutations)
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = isMuted;
+    }
+  }, [isMuted]);
+
   const togglePlayPause = (e) => {
     if (e) e.stopPropagation();
     if (!videoRef.current) return;
@@ -78,8 +75,9 @@ export default function VideoPlayer({
   const toggleMute = (e) => {
     e.stopPropagation();
     if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
+      const newMuted = !isMuted;
+      videoRef.current.muted = newMuted;
+      setIsMuted(newMuted);
     }
   };
 
@@ -125,8 +123,7 @@ export default function VideoPlayer({
       {/* Play icon overlay (only when paused) */}
       {!isPlaying && !isLoading && (
         <div
-          className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity"
-          onClick={togglePlayPause}
+          className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
         >
           <FiPlay className="text-white" size={48} />
         </div>
@@ -135,7 +132,7 @@ export default function VideoPlayer({
       {/* Mute button */}
       <button
         onClick={toggleMute}
-        className="absolute top-3 right-3 p-2 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-all"
+        className="absolute top-3 right-3 z-20 p-2 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-all pointer-events-auto"
         aria-label={isMuted ? "Unmute" : "Mute"}
       >
         {isMuted ? <FiVolumeX size={20} /> : <FiVolume2 size={20} />}

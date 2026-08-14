@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiHeart, FiMessageCircle, FiRepeat, FiBookmark, FiMoreHorizontal, FiSend, FiX, FiSearch, FiUserPlus, FiUserCheck, FiLoader } from "react-icons/fi";
+import { FaUser } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 import { useFollow } from "../context/FollowContext";
 import { joinChannel, onChannel } from "../utils/realtime";
@@ -214,12 +215,24 @@ export default function PostCard({ post, onLike: externalOnLike }) {
         <div className="p-4 sm:p-5">
           <div className="flex items-center gap-3 mb-3">
             <Link to={`/profile/${post.user?.username}`} className="shrink-0">
-                  <div className="relative">
-                <img
-                  src={post.user?.avatar_url || `https://ui-avatars.com/api/?name=${post.user?.username || "?"}&background=6366F1&color=fff&bold=true`}
-                  alt={post.user?.username}
-                  className="w-10 h-10 rounded-full object-cover ring-2 ring-white dark:ring-gray-800"
-                />
+              <div className="relative">
+                {post.user?.avatar_url ? (
+                  <img
+                    src={post.user.avatar_url}
+                    alt={post.user?.username}
+                    className="w-10 h-10 rounded-full object-cover ring-2 ring-white dark:ring-gray-800"
+                  />
+                ) : post.user?.username ? (
+                  <img
+                    src={`https://ui-avatars.com/api/?name=${post.user.username}&background=6366F1&color=fff&bold=true`}
+                    alt={post.user.username}
+                    className="w-10 h-10 rounded-full object-cover ring-2 ring-white dark:ring-gray-800"
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-indigo-500 ring-2 ring-white dark:ring-gray-800 flex items-center justify-center">
+                    <FaUser className="text-white" size={20} />
+                  </div>
+                )}
               </div>
             </Link>
             <div className="flex-1 min-w-0">
@@ -417,9 +430,17 @@ export default function PostCard({ post, onLike: externalOnLike }) {
                         ? "bg-tide-50 dark:bg-tide-900/20 ring-1 ring-tide-300 dark:ring-tide-700"
                         : "hover:bg-gray-50 dark:hover:bg-zinc-800"
                     }`}
-                  >
-                    <img src={u.avatar_url || `https://ui-avatars.com/api/?name=${u.username}&background=6366F1&color=fff`} alt="" className="w-9 h-9 rounded-full object-cover" />
-                    <div className="flex-1 text-left">
+                   >
+                     {u.avatar_url ? (
+                       <img src={u.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover" />
+                     ) : u.username ? (
+                       <img src={`https://ui-avatars.com/api/?name=${u.username}&background=6366F1&color=fff`} alt="" className="w-9 h-9 rounded-full object-cover" />
+                     ) : (
+                       <div className="w-9 h-9 rounded-full bg-indigo-500 flex items-center justify-center">
+                         <FaUser className="text-white" size={16} />
+                       </div>
+                     )}
+                     <div className="flex-1 text-left">
                       <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{u.username}</p>
                       {u.bio && <p className="text-xs text-gray-500 line-clamp-1">{u.bio}</p>}
                     </div>

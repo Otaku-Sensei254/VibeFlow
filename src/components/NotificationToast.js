@@ -105,6 +105,18 @@ export default function NotificationToast() {
                     {n.linkText}
                   </Link>
                 )}
+                {n.action && n.actionText && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.dispatchEvent(new CustomEvent("app:toast-action", { detail: { action: n.action, id: n.id } }));
+                      dismiss(n.id);
+                    }}
+                    className="text-xs font-medium text-tide-600 dark:text-tide-400 hover:underline mt-1 inline-block"
+                  >
+                    {n.actionText}
+                  </button>
+                )}
               </div>
               <button
                 onClick={(e) => { e.stopPropagation(); dismiss(n.id); }}

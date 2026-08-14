@@ -1,18 +1,26 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useTheme } from "../../context/ThemeContext";
+import { USERNAME_STYLES, DARK_USERNAME_STYLES } from "../../constants/usernameStyles";
 import api from "../../utils/api";
 import { joinChannel, leaveChannel, onChannel } from "../../utils/realtime";
+import { showToast } from "../../utils/toast";
 import CustomVideoPlayer from "../../components/CustomVideoPlayer";
+import { StartChatModal, DirectChatModal, GroupChatModal, BottleModal } from "./NewChatModals";
+import { GiBigWave } from "react-icons/gi";
+import { TbMessage2Plus } from "react-icons/tb";
 import {
   FiSend, FiSearch, FiArrowLeft, FiUser, FiUsers,
   FiMessageCircle, FiAnchor, FiSmile, FiMic, FiStopCircle,
   FiImage, FiX, FiPlay, FiPause, FiSettings, FiPhone,
   FiPhoneOff, FiVolume2, FiTrash2, FiCheck, FiCheckCircle,
-  FiMoreHorizontal, FiEdit3, FiStar, FiCornerUpLeft
+  FiMoreHorizontal, FiEdit3, FiStar, FiCornerUpLeft, FiChevronDown, FiMusic
 } from "react-icons/fi";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
+import verified from "../../components/images/vibeflow_verified2.png"; 
+
 
 const TABS = [
   { key: "all", label: "All", icon: FiMessageCircle },
@@ -76,6 +84,44 @@ function getMediaType(mime) {
   return "file";
 }
 
+export function buildDummyDrifts(currentUser = null) {
+  const now = Date.now();
+  const currentUserDrift = currentUser
+    ? {
+      id: `drift-me-${currentUser.id || "current"}`,
+      user_id: currentUser.id || "me",
+      username: currentUser.username || "You",
+      avatar_url: currentUser.avatar_url || null,
+      content: "Feeling off today...",
+      type: "text",
+      created_at: new Date(now).toISOString(),
+      isCurrentUser: true,
+    }
+    : null;
+
+  const friends = [
+    { username: "alex_", avatar_url: null, content: "Nyi weni mko in love kwa..." },
+    { username: "sarah_k", avatar_url: null, content: "Do what u gotta do" },
+    { username: "mike_d", avatar_url: null, content: "Him n I" },
+    { username: "jessica_l", avatar_url: null, content: "Making the most of today" },
+    { username: "chris_p", avatar_url: null, content: "Weekend mode activated" },
+    { username: "nina_", avatar_url: null, content: "Just vibing right now" },
+  ];
+
+  const mappedFriends = friends.map((friend, index) => ({
+    id: `drift-${friend.username}-${index}-${now}`,
+    user_id: 100 + index,
+    username: friend.username,
+    avatar_url: friend.avatar_url,
+    content: friend.content,
+    type: "text",
+    created_at: new Date(now - (index + 1) * 60 * 60 * 1000).toISOString(),
+    isCurrentUser: false,
+  }));
+
+  return currentUserDrift ? [currentUserDrift, ...mappedFriends] : mappedFriends;
+}
+
 function AvatarWithStatus({ src, username, size = "w-10 h-10", online = false }) {
   return (
     <div className={`${size} relative shrink-0`}>
@@ -132,7 +178,7 @@ function WavePlayer({ url, sentByMe }) {
   const toggle = () => {
     if (!audioRef.current) return;
     if (playing) { audioRef.current.pause(); }
-    else { audioRef.current.play().catch(() => {}); }
+    else { audioRef.current.play().catch(() => { }); }
   };
 
   const onTimeUpdate = () => {
@@ -491,11 +537,48 @@ function VoiceCallModal({ onClose, otherUser }) {
   );
 }
 
+// ─── Switch Account Modal ─────────────────────────────────────
+function AccountsModal({ user, onClose }) {
+  return (
+    <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm" onClick={onClose}>
+      <div className="w-full max-w-sm rounded-3xl bg-white p-5 shadow-2xl dark:bg-zinc-900" onClick={(e) => e.stopPropagation()}>
+        <div className="mb-4 flex items-start justify-between gap-4">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Switch account</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Accounts linked to your email</p>
+          </div>
+          <button onClick={onClose} className="rounded-full p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-zinc-800 dark:hover:text-gray-200">
+            <FiX size={20} />
+          </button>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center gap-3 rounded-2xl border border-gray-200 px-3 py-3 dark:border-zinc-700">
+            <AvatarWithStatus src={user?.avatar_url} username={user?.username} size="w-10 h-10" />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-gray-900 dark:text-gray-100">{user?.username}</p>
+              <p className="truncate text-xs text-gray-500 dark:text-gray-400">{user?.email}</p>
+            </div>
+            <span className="shrink-0 rounded-full bg-tide-100 px-2 py-0.5 text-[10px] font-bold text-tide-700 dark:bg-tide-900/40 dark:text-tide-300">
+              Current
+            </span>
+          </div>
+
+          <p className="rounded-2xl border border-dashed border-gray-200 px-4 py-4 text-center text-xs text-gray-500 dark:border-zinc-700 dark:text-gray-400">
+            Creation of multiple accounts coming soon.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Chat Component ──────────────────────────────────────
 export default function Chat() {
   const { uuid } = useParams();
   const navigate = useNavigate();
   const { user, onlineUsers, sidebarRefresh, showPresence } = useAuth();
+  const { theme } = useTheme();
 
   const [conversations, setConversations] = useState([]);
   const [activeConvo, setActiveConvo] = useState(null);
@@ -510,12 +593,18 @@ export default function Chat() {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [showCall, setShowCall] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showStartModal, setShowStartModal] = useState(false);
+  const [showDirectModal, setShowDirectModal] = useState(false);
+  const [showGroupModal, setShowGroupModal] = useState(false);
+  const [showBottleModal, setShowBottleModal] = useState(false);
+  const [showAccountsModal, setShowAccountsModal] = useState(false);
   const [myMessageSkin, setMyMessageSkin] = useState("default");
   const [otherUserMessageSkin, setOtherUserMessageSkin] = useState("default");
   const [previewUrl, setPreviewUrl] = useState(null);
   const [replyingTo, setReplyingTo] = useState(null);
   const [starredMessages, setStarredMessages] = useState(new Set());
   const [openMenuId, setOpenMenuId] = useState(null);
+  const [drifts, setDrifts] = useState([]);
 
   // Audio recording state
   const [recording, setRecording] = useState(false);
@@ -539,7 +628,7 @@ export default function Chat() {
 
   // ── Fetch unread counts ──
   const fetchCounts = useCallback(async () => {
-    try { await api.get("/chat/unread-count"); } catch {}
+    try { await api.get("/chat/unread-count"); } catch { }
   }, []);
 
   // ── Load conversations ──
@@ -547,7 +636,7 @@ export default function Chat() {
     try {
       const res = await api.get("/chat/conversations");
       setConversations(res.data.data.conversations);
-    } catch {}
+    } catch { }
     setLoading(false);
     fetchCounts();
   }, [fetchCounts]);
@@ -596,7 +685,7 @@ export default function Chat() {
         return [...prev, payload];
       });
       if (payload.user_id && payload.user_id !== user?.id) {
-        api.post(`/chat/conversations/${conv.uuid}/read`).catch(() => {});
+        api.post(`/chat/conversations/${conv.uuid}/read`).catch(() => { });
       }
     });
 
@@ -630,7 +719,7 @@ export default function Chat() {
       ]);
       setMessages(msgRes.data.data.messages);
       fetchCounts();
-    } catch {}
+    } catch { }
   }, [fetchCounts, user?.id]);
 
   // ── Sync URL param to active conversation ──
@@ -661,6 +750,14 @@ export default function Chat() {
     setMyMessageSkin(activeConvo?.message_skin || "default");
     setOtherUserMessageSkin(activeConvo?.other_user_message_skin || "default");
   }, [activeConvo, setMyMessageSkin, setOtherUserMessageSkin]);
+
+  useEffect(() => {
+    setDrifts(buildDummyDrifts(user));
+    const interval = setInterval(() => {
+      setDrifts(buildDummyDrifts(user));
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   // ── Close emoji picker / menu on outside click ──
   useEffect(() => {
@@ -710,7 +807,7 @@ export default function Chat() {
       if (textareaRef.current) {
         textareaRef.current.style.height = "auto";
       }
-    } catch {}
+    } catch { }
     sendingRef.current = false;
   };
 
@@ -737,7 +834,7 @@ export default function Chat() {
       await api.delete(`/chat/conversations/${activeConvo.uuid}/messages/${msg.id}`);
       setMessages((prev) => prev.filter((m) => m.id !== msg.id));
       if (replyingTo?.id === msg.id) setReplyingTo(null);
-    } catch {}
+    } catch { }
   };
 
   // ── Update skin ──
@@ -746,7 +843,7 @@ export default function Chat() {
     try {
       await api.put(`/chat/conversations/${activeConvo.uuid}/skin`, { skin });
       setMyMessageSkin(skin);
-    } catch {}
+    } catch { }
   };
 
   // ── Edit message ──
@@ -754,7 +851,7 @@ export default function Chat() {
     if (!activeConvo || msg.user_id !== user?.id) return;
     try {
       await api.put(`/chat/conversations/${activeConvo.uuid}/messages/${msg.id}`, { content: newContent });
-    } catch {}
+    } catch { }
   };
 
   // ── Star / Unstar message ──
@@ -774,7 +871,7 @@ export default function Chat() {
     try {
       const res = await api.get("/users/search", { params: { q } });
       setSearchResults(res.data.data.users);
-    } catch {}
+    } catch { }
   };
 
   // ── Start conversation ──
@@ -785,7 +882,53 @@ export default function Chat() {
       setSearchResults([]);
       loadConversations();
       navigate(`/chat/${res.data.data.conversation.uuid}`);
-    } catch {}
+    } catch { }
+  };
+
+  // ── New chat actions / modals ──
+  const handleNewChatSelect = (action) => {
+    setShowStartModal(false);
+    if (action === "direct") setShowDirectModal(true);
+    else if (action === "group") setShowGroupModal(true);
+    else if (action === "bottle") setShowBottleModal(true);
+  };
+
+  const handleStartDirectChat = async (username) => {
+    try {
+      const res = await api.post(`/chat/start/${username}`);
+      setShowDirectModal(false);
+      loadConversations();
+      navigate(`/chat/${res.data.data.conversation.uuid}`);
+    } catch (err) {
+      const msg = err.response?.data?.error || "Failed to start chat";
+      showToast({ type: "error", title: "Couldn't start chat", message: msg });
+    }
+  };
+
+  const handleCreateGroup = async (payload) => {
+    try {
+      const res = await api.post(`/chat/groups`, payload);
+      setShowGroupModal(false);
+      loadConversations();
+      showToast({ type: "success", title: "Group created", message: `Group "${payload.group_name}" is ready!` });
+      navigate(`/chat/${res.data.data.conversation.uuid}`);
+    } catch (err) {
+      const msg = err.response?.data?.error || "Failed to create group";
+      showToast({ type: "error", title: "Couldn't create group", message: msg });
+    }
+  };
+
+  const handleThrowBottle = async (payload) => {
+    try {
+      const res = await api.post(`/chat/bottles`, { bottle: payload });
+      setShowBottleModal(false);
+      loadConversations();
+      showToast({ type: "success", title: "Bottle thrown", message: "Your bottle is out at sea." });
+      navigate(`/chat/${res.data.data.conversation.uuid}`);
+    } catch (err) {
+      const msg = err.response?.data?.error || "Couldn't throw your bottle";
+      showToast({ type: "error", title: "Uh oh", message: msg });
+    }
   };
 
   // ── Emoji insert ──
@@ -811,7 +954,7 @@ export default function Chat() {
         })
       );
       setUploadedFiles((prev) => [...prev, ...results.filter(Boolean)]);
-    } catch {}
+    } catch { }
     setUploading(false);
     e.target.value = "";
   };
@@ -866,7 +1009,7 @@ export default function Chat() {
             setMessages((prev) => [...prev, msgRes.data.data.message]);
             setReplyingTo(null);
           }
-        } catch {}
+        } catch { }
         setUploading(false);
         cleanupRecording();
       };
@@ -927,48 +1070,107 @@ export default function Chat() {
   const showSidebar = !uuid;
   const showChat = !!uuid;
 
+  const glowOwned = !!user?.glow;
+  const usernameStyleKey =
+    glowOwned || !!user?.username_style ? user?.username_style || "neon-green" : "none";
+  const usernameStyleMap = theme === "dark" ? DARK_USERNAME_STYLES : USERNAME_STYLES;
+  const usernameStyle = usernameStyleMap[usernameStyleKey] || usernameStyleMap["none"] || {};
+  const filteredDrifts = drifts.filter((d) => Date.now() - new Date(d.created_at).getTime() < 24 * 60 * 60 * 1000);
+
   return (
-    <div className="flex h-[calc(100vh-56px)] overflow-hidden bg-white dark:bg-gray-900">
+    <div className="flex h-dvh overflow-hidden bg-white dark:bg-gray-900">
       {/* ─── Sidebar ─── */}
       <div className={`${showSidebar ? "flex" : "hidden"} w-full md:flex md:w-80 lg:w-96 flex-col bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700`}>
         {/* Search */}
         <div className="p-3 border-b border-gray-200 dark:border-gray-700 space-y-2">
-          <div className="relative">
-            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search users..."
-              value={searchQuery}
-              onChange={(e) => searchUsers(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-tide-500 outline-none"
-            />
+          <div className="flex items-center justify-between gap-2">
+            <button
+              onClick={() => setShowAccountsModal(true)}
+              title="Switch account"
+              className="flex min-w-0 items-center gap-2 text-left"
+            >
+
+              <span className="flex min-w-0 items-center gap-1">
+                <span
+                  className="truncate text-lg font-semibold text-gray-900 dark:text-gray-100"
+                  style={usernameStyle}
+                >
+                  {user.username}
+                </span>
+                {user.is_verified && (
+                  <img src={verified} alt="Verified" title="Verified user" className="inline h-4 w-4 shrink-0 -mt-0.5" />
+                )}
+              </span>
+              <FiChevronDown size={14} className="shrink-0 text-gray-400" />
+            </button>
+            <button
+              onClick={() => setShowStartModal(true)}
+              title="Start a new chat"
+              className="shrink-0 p-2 bg-tide-600 text-white rounded-full hover:bg-tide-700 transition-colors shadow-sm"
+            >
+              <TbMessage2Plus size={18} />
+            </button>
           </div>
-          {searchResults.length > 0 && (
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg max-h-48 overflow-y-auto scrollbar-hide shadow-lg">
-              {searchResults.map((u) => (
-                <button key={u.id} onClick={() => startConversation(u.username)} className="flex items-center gap-3 p-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 w-full text-left">
-                  <img src={u.avatar_url || `https://ui-avatars.com/api/?name=${u.username}&background=0d9488&color=fff`} alt="" className="w-8 h-8 rounded-full" />
-                  <span className="text-sm font-medium">{u.username}</span>
-                </button>
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search users..."
+                value={searchQuery}
+                onChange={(e) => searchUsers(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-tide-500 outline-none"
+              />
+            </div>
+          </div>
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
+            {/* <div className="mb-2 flex items-center justify-between px-1">
+               <h3 className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">Drifts</h3>
+               <span className="relative flex h-2 w-2">
+                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+                 <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+               </span>
+             </div> */}
+
+            <div className="flex gap-3 overflow-x-auto pb-2 pl-1 pr-1 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
+              {filteredDrifts.map((drift) => (
+                <div key={drift.id} className="flex min-w-[116px] max-w-[116px] shrink-0 flex-col items-center">
+                  <div className="relative mb-2 w-full rounded-[24px] border border-gray-200 bg-white px-2.5 py-2 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800">
+
+                    <div className="absolute -right-1.5 top-2 h-3.5 w-2 rounded-full border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800" />
+                    <p className="relative z-10 break-words text-[11px] leading-tight text-gray-900 dark:text-gray-100">
+                      {drift.content}
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <img
+                      src={drift.avatar_url || `https://ui-avatars.com/api/?name=${drift.username}&background=${drift.isCurrentUser ? '6366F1' : '0d9488'}&color=fff`}
+                      alt={drift.username}
+                      className="h-11 w-11 rounded-full border-2 border-white object-cover shadow-md dark:border-gray-700"
+                    />
+                    <span className="text-[10px] font-medium text-gray-600 dark:text-gray-300">
+                      {drift.isCurrentUser ? "You" : drift.username}
+                    </span>
+                  </div>
+                </div>
               ))}
             </div>
-          )}
+          </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-0.5 px-2 pt-3 pb-2 border-b border-gray-200 dark:border-gray-700 overflow-x-auto scrollbar-hide">
+        <div className="flex gap-6 px-2 pt-3 pb-2 border-b border-gray-200 dark:border-gray-700 overflow-x-auto scrollbar-hide">
           {TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.key;
             return (
               <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-                className={`flex items-center gap-1 px-2 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
-                  isActive
-                    ? tab.key === "bottles"
-                      ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300"
-                      : "bg-tide-100 dark:bg-tide-900/30 text-tide-700 dark:text-tide-300"
-                    : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
-                }`}
+                className={`flex items-center gap-1 px-2 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${isActive
+                  ? tab.key === "bottles"
+                    ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300"
+                    : "bg-tide-100 dark:bg-tide-900/30 text-tide-700 dark:text-tide-300"
+                  : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  }`}
               >
                 <Icon size={14} /> {tab.label}
               </button>
@@ -1002,22 +1204,21 @@ export default function Chat() {
               )}
             </div>
           ) : (
-            <div className="divide-y divide-gray-100 dark:divide-gray-800">
+            <div className="">
               {filteredConvos.map((conv) => {
                 const Icon = CONVO_ICONS[conv.type] || FiMessageCircle;
                 const isSelected = activeConvo?.uuid === conv.uuid;
                 return (
                   <button key={conv.uuid} onClick={() => handleSelectConvo(conv)}
-                    className={`w-full flex items-center gap-3 px-3 py-3.5 hover:bg-gray-50 dark:hover:bg-gray-800 text-left transition-colors ${
-                      isSelected ? "bg-tide-50 dark:bg-tide-900/20 md:border-l-2 md:border-tide-500" : ""
-                    }`}
+                    className={`w-full flex items-center gap-3 px-3 py-3.5 hover:bg-gray-50 dark:hover:bg-gray-800 text-left transition-colors ${isSelected ? "bg-tide-50 dark:bg-tide-900/20 md:border-l-2 md:border-tide-500" : ""
+                      }`}
                   >
                     <ConversationAvatar conv={conv} online={(conv.type === "direct" || conv.type === "bottle") && !!onlineUsers[String(conv.other_user?.id)] && showPresence} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-semibold truncate">
                           {conv.type === "direct" ? conv.other_user?.username || "Unknown" : conv.name || "Message in a Bottle"}
-                          
+
                         </span>
                         {conv.type !== "direct" && <Icon size={12} className="text-gray-400 shrink-0" />}
                       </div>
@@ -1037,6 +1238,7 @@ export default function Chat() {
 
       {/* ─── Main Panel ─── */}
       <div className={`${showChat ? "flex" : "hidden"} flex-1 md:flex flex-col bg-white dark:bg-gray-900 min-w-0`}>
+
         {activeConvo ? (
           <>
             {/* Header */}
@@ -1065,14 +1267,14 @@ export default function Chat() {
                     <FiPhone size={18} />
                   </button>
                 )}
-                  <button onClick={() => setShowSettings(true)}
-                    className="p-2 text-gray-500 hover:text-tide-600 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                    title="Chat settings"
-                  >
-                    <FiSettings size={18} />
-                  </button>
-                </div>
+                <button onClick={() => setShowSettings(true)}
+                  className="p-2 text-gray-500 hover:text-tide-600 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  title="Chat settings"
+                >
+                  <FiSettings size={18} />
+                </button>
               </div>
+            </div>
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto scrollbar-hide px-3 py-3 space-y-2">
@@ -1248,7 +1450,22 @@ export default function Chat() {
               </form>
             </div>
           </>
-        ) : null}
+        ) : <div className="flex items-center justify-center h-full text-gray-400">
+          <div className="flex flex-col items-center justify-center">
+            <GiBigWave size={60} className="mb-2 opacity-50 dark:text-white" />
+            <h1 className="text-base font-medium text-gray-500 text-center">
+              Send messages to get the Vibe Flowing
+            </h1>
+            <button
+              onClick={() => setShowStartModal(true)}
+              className="flex items-center justify-center rounded-lg mt-4 py-2 px-4 bg-tide-600 text-white hover:bg-tide-700 transition-colors"
+            >
+              <span>Send Message</span>
+            </button>
+          </div>
+
+        </div>
+        }
       </div>
 
       {/* Voice Call Modal */}
@@ -1280,6 +1497,21 @@ export default function Chat() {
         currentSkin={myMessageSkin}
         onSelect={updateSkin}
       />
+
+      {/* New chat modals */}
+      {showAccountsModal && <AccountsModal user={user} onClose={() => setShowAccountsModal(false)} />}
+      {showStartModal && (
+        <StartChatModal onClose={() => setShowStartModal(false)} onSelect={handleNewChatSelect} />
+      )}
+      {showDirectModal && (
+        <DirectChatModal onClose={() => setShowDirectModal(false)} onStart={handleStartDirectChat} />
+      )}
+      {showGroupModal && (
+        <GroupChatModal onClose={() => setShowGroupModal(false)} onCreate={handleCreateGroup} />
+      )}
+      {showBottleModal && (
+        <BottleModal onClose={() => setShowBottleModal(false)} onThrow={handleThrowBottle} />
+      )}
     </div>
   );
 }

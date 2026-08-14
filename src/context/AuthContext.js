@@ -37,16 +37,28 @@ export function AuthProvider({ children }) {
     if (!user) return;
     const today = new Date().toDateString();
     const lastPing = localStorage.getItem("vibeflow_last_ping");
-    if (lastPing !== today) {
+    const needsPing = lastPing !== today;
+
+    if (needsPing) {
       api.post("/users/ping").then(() => {
         localStorage.setItem("vibeflow_last_ping", today);
       }).catch(() => {});
     }
+
     api.get("/users/streak").then((res) => {
       if (res.data.data) {
         const s = { current: res.data.data.current_streak || 0, longest: res.data.data.longest_streak || 0 };
         setStreak(s);
         localStorage.setItem("vibeflow_streak", JSON.stringify(s));
+        if (needsPing && s.current >= 3) {
+          showToast({
+            title: "Daily ping",
+            message: "Keep your streak alive 🔥",
+            duration: 10000,
+            action: "streak-ping",
+            actionText: "Ping now"
+          });
+        }
       }
     }).catch(() => {});
   }, [user]);
@@ -189,9 +201,27 @@ export function AuthProvider({ children }) {
     localStorage.setItem("user", JSON.stringify(u));
   };
 
+  const pingUser = useCallback(async () => {
+    try {
+      await api.post("/users/ping");
+      localStorage.setItem("vibeflow_last_ping", new Date().toDateString());
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    const handler = (e) => {
+      if (e.detail?.action === "streak-ping") {
+        pingUser();
+      }
+    };
+    window.addEventListener("app:toast-action", handler);
+    return () => window.removeEventListener("app:toast-action", handler);
+  }, [user, pingUser]);
+
   return (
     <AuthContext.Provider
-      value={{ user, loading, login, register, logout, updateUser, notificationCount, chatUnreadCount, fetchCounts, onlineUsers, connectionStatus, sidebarRefresh, showPresence, setShowPresence, streak }}
+      value={{ user, loading, login, register, logout, updateUser, notificationCount, chatUnreadCount, fetchCounts, onlineUsers, connectionStatus, sidebarRefresh, showPresence, setShowPresence, streak, pingUser }}
     >
       {children}
     </AuthContext.Provider>

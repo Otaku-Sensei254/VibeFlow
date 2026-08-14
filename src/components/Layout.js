@@ -71,7 +71,6 @@ export default function Layout() {
     ? [
         { to: "/feed", label: "Feed", icon: FiGrid },
         { to: "/currents", label: "Currents", icon: FiPlayCircle },
-        { to: "/invite", label: "Invite", icon: FiGift },
         { to: "/chat", label: "Chat", icon: FiMessageCircle },
         { to: "/notifications", label: "Alerts", icon: FiBell },
       ]
@@ -97,8 +96,8 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      {location.pathname !== "/" && !location.pathname.startsWith("/currents") && (
-      <nav className="fixed top-0 z-50 w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur border-b border-gray-200 dark:border-gray-700">
+{location.pathname !== "/" && !location.pathname.startsWith("/currents") && (
+  <nav className={`fixed top-0 z-50 w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur border-b border-gray-200 dark:border-gray-700 ${location.pathname.startsWith("/chat") ? "hidden md:block" : ""}`}>
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2 shrink-0 md:gap-0">
             <Link to={user ? "/feed" : "/"} className="hidden md:flex items-center gap-2">
@@ -429,7 +428,7 @@ export default function Layout() {
       <NotificationToast />
       <CookieConsent />
 
-      <main className={`${location.pathname === "/" || location.pathname.startsWith("/currents") ? "pt-0" : "pt-14"} ${location.pathname === "/" || location.pathname.startsWith("/currents") ? "h-dvh overflow-hidden" : ""} ${location.pathname === "/" || location.pathname.startsWith("/waves/") || location.pathname.match(/^\/chat\/[^/]+$/) || location.pathname === "/currents/new" ? "" : "pb-16"} md:pb-0`}>
+      <main className={`${location.pathname.startsWith("/chat") ? "pt-0 md:pt-14" : location.pathname === "/" || location.pathname.startsWith("/currents") ? "pt-0" : "pt-14"} ${location.pathname === "/" || location.pathname.startsWith("/currents") ? "h-dvh overflow-hidden" : ""} ${location.pathname === "/" || location.pathname.startsWith("/waves/") || location.pathname.startsWith("/chat") || location.pathname === "/currents/new" ? "" : "pb-16"} md:pb-0`}>
         <Outlet />
       </main>
 

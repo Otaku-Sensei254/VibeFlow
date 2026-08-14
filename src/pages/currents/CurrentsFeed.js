@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FiHeart, FiMessageCircle, FiShare2, FiVolume2, FiVolumeX, FiCamera } from "react-icons/fi";
+import { FiHeart, FiMessageCircle, FiShare2, FiCamera } from "react-icons/fi";
 import CurrentCommentSheet from "../../components/comments/CurrentCommentSheet";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../utils/api";
 import VideoPlayer from "../../components/VideoPlayer";
+import { useFollow } from "../../context/FollowContext";
+import verified from "../../components/images/vibeflow_verified2.png";
 
 function formatCount(n) {
   if (!n) return "0";
@@ -33,10 +35,17 @@ export default function CurrentsFeed() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [muted, setMuted] = useState(true);
+  // const { followedUsers, setFollowing: setFollowState } = useFollow();
+
   const [liking, setLiking] = useState(false);
   const [commentTarget, setCommentTarget] = useState(null);
   const containerRef = useRef(null);
+  // const [following, setFollowing] = useState([]);
+
+  // const [followLoading, setFollowLoading] = useState(false);
+
+  // const isFollowing = authorId ? (followedUsers[authorId] !== undefined ? followedUsers[authorId] : false) : false;
+
 
   const fetchCurrents = useCallback(async (pageNum, append = false) => {
     try {
@@ -46,7 +55,7 @@ export default function CurrentsFeed() {
       const newPosts = res.data.data?.posts || [];
       setPosts((prev) => append ? [...prev, ...newPosts] : newPosts);
       setHasMore(newPosts.length === 10);
-    } catch {}
+    } catch { }
     setLoading(false);
   }, [tab]);
 
@@ -109,14 +118,17 @@ export default function CurrentsFeed() {
 
   const handleShare = (post) => {
     if (navigator.share) {
-      navigator.share({ url: `${window.location.origin}/posts/${post.uuid}` }).catch(() => {});
+      navigator.share({ url: `${window.location.origin}/posts/${post.uuid}` }).catch(() => { });
     }
   };
 
-  const getFirstVideoUrl = (post) => {
-    if (!post.media_files?.length) return "";
+  const getFirstMedia = (post) => {
+    if (!post.media_files?.length) return null;
     const vid = post.media_files.find((m) => m.type === "video");
-    return vid?.url || "";
+    if (vid) return { type: "video", url: vid.url };
+    const img = post.media_files.find((m) => m.type === "image");
+    if (img) return { type: "image", url: img.url };
+    return null;
   };
 
   return (
@@ -160,18 +172,25 @@ export default function CurrentsFeed() {
         ) : posts.map((post, idx) => (
           <div key={post.uuid || idx} data-index={idx}
             className="relative w-full h-full snap-start flex-shrink-0 bg-black">
-            {/* Video Player */}
-            {getFirstVideoUrl(post) ? (
-              <VideoPlayer
-                src={getFirstVideoUrl(post)}
-                muted={muted}
-                autoPlay={true}
-                loop={true}
-                playsInline={true}
-                className="absolute inset-0 w-full h-full"
-              />
+            {/* Media Player */}
+            {getFirstMedia(post) ? (
+              getFirstMedia(post).type === "video" ? (
+                <VideoPlayer
+                  src={getFirstMedia(post).url}
+                  autoPlay={true}
+                  loop={true}
+                  playsInline={true}
+                  className="absolute inset-0 w-full h-full"
+                />
+              ) : (
+                <img
+                  src={getFirstMedia(post).url}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              )
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center text-white/40 text-sm">No video</div>
+              <div className="absolute inset-0 flex items-center justify-center text-white/40 text-sm">No media</div>
             )}
 
             {/* Gradient overlays */}
@@ -206,10 +225,22 @@ export default function CurrentsFeed() {
 
             {/* Bottom caption block */}
             <div className="absolute bottom-6 left-4 right-16 z-10">
-              <Link to={`/profile/${post.user?.username}`}
-                className="text-white font-semibold text-sm hover:underline inline-block mb-1">
-                @{post.user?.username}
-              </Link>
+              <div className="flex items-center gap-2 mb-1">
+
+                <img src={post.user?.avatar_url || `https://ui-avatars.com/api/?name=${post.user?.username || "?"}&background=6366F1&color=fff`}
+                  alt="" className="w-6 h-6 rounded-full object-cover ring-2 ring-white/30" />
+
+
+                <Link to={`/profile/${post.user?.username}`}
+                  className=" flex flex-row text-white font-semibold text-sm hover:underline  mb-1">
+                  {post.user?.username}
+
+                  {user.is_verified ? (
+                    <img src={verified} alt="Verified" className="w-4 h-4 ml-1" />
+                  ) : null}
+                </Link>
+
+              </div>
               <p className="text-white/70 text-xs leading-relaxed line-clamp-2">
                 {post.content || post.title}
               </p>
@@ -220,12 +251,6 @@ export default function CurrentsFeed() {
           </div>
         ))}
       </div>
-
-      {/* Mute toggle */}
-      <button onClick={() => setMuted(!muted)}
-        className="absolute top-6 right-4 z-20 text-white/50 hover:text-white p-2 bg-white/10 backdrop-blur-md rounded-full transition-all ">
-        {muted ? <FiVolumeX size={16} /> : <FiVolume2 size={16} />}
-      </button>
 
       {/* Comment sheet overlay */}
       {commentTarget && (
