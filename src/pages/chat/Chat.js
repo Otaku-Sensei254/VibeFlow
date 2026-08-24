@@ -1132,10 +1132,10 @@ export default function Chat() {
                </span>
              </div> */}
 
-            <div className="flex gap-3 overflow-x-auto pb-2 pl-1 pr-1 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
+            <div className="  flex overflow-x-auto pb-2 pl-1 pr-1 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
               {filteredDrifts.map((drift) => (
-                <div key={drift.id} className="flex min-w-[116px] max-w-[116px] shrink-0 flex-col items-center">
-                  <div className="relative mb-2 w-full rounded-[24px] border border-gray-200 bg-white px-2.5 py-2 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                <div key={drift.id} className=" flex min-w-[120px] max-w-[116px] shrink-0 flex-col items-center">
+                  <div className="relative mb-2 w-auto rounded-[24px] border border-gray-200 bg-white px-2.5 py-2 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800">
 
                     <div className="absolute -right-1.5 top-2 h-3.5 w-2 rounded-full border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800" />
                     <p className="relative z-10 break-words text-[11px] leading-tight text-gray-900 dark:text-gray-100">
@@ -1179,7 +1179,7 @@ export default function Chat() {
         </div>
 
         {/* Conversation list */}
-        <div className="flex-1 overflow-y-auto scrollbar-hide">
+        <div className=" divide-y flex-1 overflow-y-auto scrollbar-hide">
           {loading ? (
             <div className="flex justify-center py-8">
               <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-tide-500" />
