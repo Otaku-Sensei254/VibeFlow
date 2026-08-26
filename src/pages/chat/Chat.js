@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { motion } from "framer-motion";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
 import { USERNAME_STYLES, DARK_USERNAME_STYLES } from "../../constants/usernameStyles";
 import api from "../../utils/api";
+import { driftApi } from "../../utils/api";
 import { joinChannel, leaveChannel, onChannel } from "../../utils/realtime";
 import { showToast } from "../../utils/toast";
 import CustomVideoPlayer from "../../components/CustomVideoPlayer";
 import { StartChatModal, DirectChatModal, GroupChatModal, BottleModal } from "./NewChatModals";
+import DriftModal from "../../components/DriftModal";
 import { GiBigWave } from "react-icons/gi";
 import { TbMessage2Plus } from "react-icons/tb";
 import {
@@ -19,7 +22,7 @@ import {
 } from "react-icons/fi";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
-import verified from "../../components/images/vibeflow_verified2.png"; 
+import verified from "../../components/images/vibeflow_verified2.png";
 
 
 const TABS = [
@@ -605,6 +608,9 @@ export default function Chat() {
   const [starredMessages, setStarredMessages] = useState(new Set());
   const [openMenuId, setOpenMenuId] = useState(null);
   const [drifts, setDrifts] = useState([]);
+  const [selectedDrift, setSelectedDrift] = useState(null);
+  const [showCreateDrift, setShowCreateDrift] = useState(false);
+  const [newDriftText, setNewDriftText] = useState('');
 
   // Audio recording state
   const [recording, setRecording] = useState(false);
@@ -752,10 +758,18 @@ export default function Chat() {
   }, [activeConvo, setMyMessageSkin, setOtherUserMessageSkin]);
 
   useEffect(() => {
-    setDrifts(buildDummyDrifts(user));
-    const interval = setInterval(() => {
-      setDrifts(buildDummyDrifts(user));
-    }, 30000);
+    const fetchDrifts = async () => {
+      try {
+        const response = await driftApi.getFeed();
+        setDrifts(response);
+      } catch (error) {
+        console.error('Failed to fetch drifts:', error);
+        setDrifts(buildDummyDrifts(user)); // fallback to dummy data on error
+      }
+    };
+
+    fetchDrifts();
+    const interval = setInterval(fetchDrifts, 30000);
     return () => clearInterval(interval);
   }, [user]);
 
@@ -1075,7 +1089,32 @@ export default function Chat() {
     glowOwned || !!user?.username_style ? user?.username_style || "neon-green" : "none";
   const usernameStyleMap = theme === "dark" ? DARK_USERNAME_STYLES : USERNAME_STYLES;
   const usernameStyle = usernameStyleMap[usernameStyleKey] || usernameStyleMap["none"] || {};
-  const filteredDrifts = drifts.filter((d) => Date.now() - new Date(d.created_at).getTime() < 24 * 60 * 60 * 1000);
+  const filteredDrifts = drifts
+    .filter((d) => Date.now() - new Date(d.inserted_at).getTime() < 24 * 60 * 60 * 1000)
+    .sort((a, b) => {
+      // Logged-in user's drift always first
+      const aIsCurrentUser = a.user?.id === user?.id;
+      const bIsCurrentUser = b.user?.id === user?.id;
+      if (aIsCurrentUser && !bIsCurrentUser) return -1;
+      if (!aIsCurrentUser && bIsCurrentUser) return 1;
+      // Then sort by inserted_at descending (most recent first)
+      return new Date(b.inserted_at).getTime() - new Date(a.inserted_at).getTime();
+    });
+  
+  const handleCreateDrift = async () => {
+    if (!newDriftText.trim()) return;
+    try {
+      const created = await driftApi.create({ note: newDriftText.trim() });
+      setDrifts(prev => [created, ...prev]);
+      setShowCreateDrift(false);
+      setNewDriftText('');
+      setSelectedDrift(created);
+    } catch (error) {
+      console.error('Failed to create drift:', error);
+    }
+  };
+
+  const currentUserHasDrift = filteredDrifts.some(d => d.user?.id === user?.id);
 
   return (
     <div className="flex h-dvh overflow-hidden bg-white dark:bg-gray-900">
@@ -1124,32 +1163,55 @@ export default function Chat() {
             </div>
           </div>
           <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
-            {/* <div className="mb-2 flex items-center justify-between px-1">
-               <h3 className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">Drifts</h3>
-               <span className="relative flex h-2 w-2">
-                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
-                 <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
-               </span>
-             </div> */}
+            <div className="mb-2 flex items-center justify-between px-1">
+              <h3 className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">Drifts</h3>
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+              </span>
+            </div>
 
             <div className="  flex overflow-x-auto pb-2 pl-1 pr-1 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
-              {filteredDrifts.map((drift) => (
-                <div key={drift.id} className=" flex min-w-[120px] max-w-[116px] shrink-0 flex-col items-center">
-                  <div className="relative mb-2 w-auto rounded-[24px] border border-gray-200 bg-white px-2.5 py-2 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800">
-
-                    <div className="absolute -right-1.5 top-2 h-3.5 w-2 rounded-full border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800" />
-                    <p className="relative z-10 break-words text-[11px] leading-tight text-gray-900 dark:text-gray-100">
-                      {drift.content}
+              {!currentUserHasDrift && (
+                <div 
+                  className="flex min-w-[120px] max-w-[116px] shrink-0 flex-col items-center cursor-pointer"
+                  onClick={() => setShowCreateDrift(true)}
+                >
+                  <div className="relative mb-2 w-auto rounded-[24px] border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2.5 py-2 text-center shadow-sm flex items-center justify-center">
+                    <p className="text-[11px] leading-tight text-gray-500 dark:text-gray-400">
+                      Drop a thought
                     </p>
                   </div>
                   <div className="flex flex-col items-center gap-1">
                     <img
-                      src={drift.avatar_url || `https://ui-avatars.com/api/?name=${drift.username}&background=${drift.isCurrentUser ? '6366F1' : '0d9488'}&color=fff`}
-                      alt={drift.username}
+                      src={user?.avatar_url || `https://ui-avatars.com/api/?name=${user?.username || 'You'}&background=6366F1&color=fff`}
+                      alt={user?.username || 'You'}
                       className="h-11 w-11 rounded-full border-2 border-white object-cover shadow-md dark:border-gray-700"
                     />
                     <span className="text-[10px] font-medium text-gray-600 dark:text-gray-300">
-                      {drift.isCurrentUser ? "You" : drift.username}
+                      You
+                    </span>
+                  </div>
+                </div>
+              )}
+              
+              {filteredDrifts.map((drift) => (
+                <div key={drift.id} className=" flex min-w-[120px] max-w-[116px] shrink-0 flex-col items-center cursor-pointer" onClick={() => setSelectedDrift(drift)}>
+                  <div className="relative mb-2 w-auto rounded-[24px] border border-gray-200 bg-white px-2.5 py-2 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800">
+
+                    <div className="absolute -right-1.5 top-2 h-3.5 w-2 rounded-full border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800" />
+                    <p className="relative z-10 break-words text-[11px] leading-tight text-gray-900 dark:text-gray-100">
+                      {drift.note}
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <img
+                      src={drift.user?.avatar_url || `https://ui-avatars.com/api/?name=${drift.user?.username || 'Anonymous'}&background=${drift.user?.id === user?.id ? '6366F1' : '0d9488'}&color=fff`}
+                      alt={drift.user?.username || 'Anonymous'}
+                      className="h-11 w-11 rounded-full border-2 border-white object-cover shadow-md dark:border-gray-700"
+                    />
+                    <span className="text-[10px] font-medium text-gray-600 dark:text-gray-300">
+                      {drift.user?.id === user?.id ? "You" : (drift.user?.username || 'Anonymous')}
                     </span>
                   </div>
                 </div>
@@ -1497,6 +1559,107 @@ export default function Chat() {
         currentSkin={myMessageSkin}
         onSelect={updateSkin}
       />
+
+      {/* Drift Modal */}
+      <DriftModal
+        drift={selectedDrift}
+        isOpen={!!selectedDrift}
+        onClose={() => setSelectedDrift(null)}
+        onReact={async (driftId, emoji) => {
+          try {
+            await driftApi.react(driftId, emoji);
+            const updated = await driftApi.get(driftId);
+            setDrifts(prev => prev.map(d => d.id === driftId ? updated : d));
+            setSelectedDrift(updated);
+          } catch (error) {
+            console.error('Failed to react to drift:', error);
+          }
+        }}
+        onReply={async (driftId, content) => {
+          try {
+            const updated = await driftApi.reply(driftId, content);
+            setDrifts(prev => prev.map(d => d.id === driftId ? updated : d));
+            setSelectedDrift(updated);
+          } catch (error) {
+            console.error('Failed to reply to drift:', error);
+          }
+        }}
+        onDelete={async (driftId) => {
+          try {
+            await api.delete(`/drifts/${driftId}`);
+            setDrifts(prev => prev.filter(d => d.id !== driftId));
+          } catch (error) {
+            console.error('Failed to delete drift:', error);
+            throw error;
+          }
+        }}
+        onEdit={async (driftId, newNote) => {
+          try {
+            await api.put(`/drifts/${driftId}`, { drift: { note: newNote } });
+            const updated = await driftApi.get(driftId);
+            setDrifts(prev => prev.map(d => d.id === driftId ? updated : d));
+            setSelectedDrift(updated);
+          } catch (error) {
+            console.error('Failed to edit drift:', error);
+            throw error;
+          }
+        }}
+        currentUser={user}
+      />
+
+      {/* Create Drift Modal */}
+      {showCreateDrift && (
+        <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="w-full max-w-xl rounded-3xl bg-white dark:bg-gray-800 shadow-2xl"
+          >
+            <div className="p-5">
+              <div className="mb-4 flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Create Drift</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Share your current vibe with the world</p>
+                </div>
+                <button
+                  onClick={() => setShowCreateDrift(false)}
+                  className="rounded-full p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+                >
+                  <FiX size={20} />
+                </button>
+              </div>
+              
+              <textarea
+                value={newDriftText}
+                onChange={(e) => setNewDriftText(e.target.value)}
+                placeholder="What's on your mind?"
+                className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-4 py-3 text-sm text-gray-900 dark:text-gray-200 outline-none transition focus:border-tide-500 focus:ring-2 focus:ring-tide-500"
+                rows={3}
+                autoFocus
+              />
+              
+              <div className="mt-4 flex gap-2">
+                <button
+                  onClick={() => setShowCreateDrift(false)}
+                  className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreateDrift}
+                  disabled={!newDriftText.trim()}
+                  className="flex-1 px-4 py-2 bg-tide-600 text-white rounded-xl hover:bg-tide-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                >
+                  <FiSend size={16} />
+                  Share Drift
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       {/* New chat modals */}
       {showAccountsModal && <AccountsModal user={user} onClose={() => setShowAccountsModal(false)} />}

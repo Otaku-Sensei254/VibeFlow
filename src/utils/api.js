@@ -33,4 +33,16 @@ api.interceptors.response.use(
   }
 );
 
+// Drift API
+export const driftApi = {
+  getFeed: () => api.get("/drifts").then((r) => r.data.data.drifts),
+  get: (id) => api.get(`/drifts/${id}`).then((r) => r.data.data.drift),
+  create: (data) => api.post("/drifts", { drift: data }).then((r) => r.data.data.drift),
+  react: (id, emoji) => api.post(`/drifts/${id}/react`, { emoji }).then((r) => r.data.data.drift),
+  removeReaction: (id, emoji) => api.delete(`/drifts/${id}/react`, { data: { emoji } }).then((r) => r.data.data.drift),
+  reply: (id, content) => api.post(`/drifts/${id}/reply`, { reply: { content } }).then((r) => r.data.data.drift),
+  delete: (id) => api.delete(`/drifts/${id}`).then((r) => r.data.data),
+  update: (id, data) => api.put(`/drifts/${id}`, { drift: data }).then((r) => r.data.data.drift),
+};
+
 export default api;
