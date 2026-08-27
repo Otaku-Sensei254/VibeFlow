@@ -1101,6 +1101,7 @@ export default function Chat() {
       return new Date(b.inserted_at).getTime() - new Date(a.inserted_at).getTime();
     });
   
+  
   const handleCreateDrift = async () => {
     if (!newDriftText.trim()) return;
     try {
@@ -1111,6 +1112,11 @@ export default function Chat() {
       setSelectedDrift(created);
     } catch (error) {
       console.error('Failed to create drift:', error);
+      showToast({
+        title: "Error",
+        message: "Failed to create drift. Please try again.",
+        type: "error"
+      });
     }
   };
 
