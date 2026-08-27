@@ -37,6 +37,7 @@ import AdminLayout from "./pages/admin/AdminLayout";
 import CreatorHub from "./pages/creator/CreatorHub";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
+import AdminCommunicatoinsHub from './pages/admin/AdminCommunicationsHub'
 
 const FALLBACK_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect fill='%23e5e7eb' width='40' height='40'/%3E%3Ctext x='20' y='26' text-anchor='middle' fill='%239ca3af' font-size='18' font-family='sans-serif'%3E?%3C/text%3E%3C/svg%3E";
 
@@ -145,6 +146,7 @@ export default function App() {
               <Route path="users" element={<AdminUsers />} />
               <Route path="verifications" element={<AdminVerifications />} />
               <Route path="roles" element={<AdminRoles />} />
+              <Route path="communications-hub" element={<AdminCommunicatoinsHub/>} />
             </Route>
           </Route>
         </Routes>
