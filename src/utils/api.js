@@ -45,4 +45,10 @@ export const driftApi = {
   update: (id, data) => api.put(`/drifts/${id}`, { drift: data }).then((r) => r.data.data.drift),
 };
 
+// Admin API
+export const adminApi = {
+  sendBroadcastEmail: (data) => api.post("/admin/broadcast-email", data).then((r) => r.data.data),
+  stats: () => api.get("/admin/stats").then((r) => r.data.data),
+};
+
 export default api;
