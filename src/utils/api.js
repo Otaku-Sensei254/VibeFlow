@@ -51,4 +51,9 @@ export const adminApi = {
   stats: () => api.get("/admin/stats").then((r) => r.data.data),
 };
 
+// Auth API
+export const authApi = {
+  resendConfirmation: (email) => api.post("/auth/resend-confirmation", { email }).then((r) => r.data.data),
+};
+
 export default api;

@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import api from "../../utils/api";
+import api, { authApi } from "../../utils/api";
 import { useAuth } from "../../context/AuthContext";
 import { useFollow } from "../../context/FollowContext";
 import { useTheme } from "../../context/ThemeContext";
 import {
   FiGrid, FiHeart, FiMessageCircle, FiPlay, FiBookmark, FiX,
-  FiCalendar, FiUsers, FiUserCheck, FiCamera, FiSend, FiShield, FiLoader
+  FiCalendar, FiUsers, FiUserCheck, FiCamera, FiSend, FiShield, FiLoader, FiMail
 } from "react-icons/fi";
 import { GiBigWave } from "react-icons/gi";
 import { USERNAME_STYLES, DARK_USERNAME_STYLES } from "../../constants/usernameStyles";
@@ -148,6 +148,7 @@ export default function UserProfile() {
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
   const [messaging, setMessaging] = useState(false);
+  const [resendingConfirmation, setResendingConfirmation] = useState(false);
 
   const loadProfile = useCallback(async () => {
     setLoading(true);
@@ -192,6 +193,18 @@ export default function UserProfile() {
       const res = await api.get("/users/social-accounts");
       setSocialAccounts(res.data.data?.accounts || []);
     } catch {}
+  };
+
+  const handleResendConfirmation = async (email) => {
+    if (!email) return;
+    setResendingConfirmation(true);
+    try {
+      await authApi.resendConfirmation(email);
+      showToast({ type: "success", title: "Email Sent!", message: "Confirmation email sent! Check your inbox." });
+    } catch (err) {
+      showToast({ type: "error", title: "Failed", message: "Could not send confirmation email. Please try again." });
+    }
+    setResendingConfirmation(false);
   };
 
   const profileUserId = profile?.user?.id;
@@ -369,6 +382,36 @@ export default function UserProfile() {
               </span>
             )}
           </div>
+
+          {/* Email Confirmation Prompt */}
+          {isOwn && !u.confirmed_at && u.email && (
+            <div className="p-3 bg-blue-50/80 dark:bg-blue-900/15 backdrop-blur-sm rounded-2xl border border-blue-200/50 dark:border-blue-800/50 flex items-start gap-3 mb-5">
+              <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0 mt-0.5">
+                <FiMail size={14} className="text-blue-600 dark:text-blue-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-blue-800 dark:text-blue-200 font-medium">Confirm your email</p>
+                <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">Get VibeFlow updates and announcements in your inbox</p>
+                <button
+                  onClick={() => handleResendConfirmation(u.email)}
+                  disabled={resendingConfirmation}
+                  className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {resendingConfirmation ? (
+                    <>
+                      <svg className="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Sending...
+                    </>
+                  ) : (
+                    'Resend Confirmation Email'
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Social Accounts */}
           {socialAccounts.length > 0 && (
