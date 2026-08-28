@@ -7,7 +7,7 @@ export default function Invite() {
   const { user } = useAuth();
   const [copied, setCopied] = useState(false);
 
-  const inviteLink = `${window.location.origin}/invite/${user?.username || ""}`;
+  const inviteLink = `${window.location.origin}/invite/${user?.invite_code || ""}`;
 
   const handleCopy = async () => {
     try {
@@ -94,4 +94,4 @@ export default function Invite() {
       </div>
     </div>
   );
-}
+}       
