@@ -142,7 +142,7 @@ function AvatarWithStatus({ src, username, size = "w-10 h-10", online = false })
   );
 }
 
-function ConversationAvatar({ conv, size = "w-10 h-10", online = false }) {
+function ConversationAvatar({ conv, size = "w-10 h-10", online = false, isFound }) {
   if (conv.type === "group") {
     return (
       <div className={`${size} rounded-full bg-gradient-to-br from-tide-400 to-flow-500 flex items-center justify-center text-white font-bold text-sm shrink-0`}>
@@ -150,7 +150,7 @@ function ConversationAvatar({ conv, size = "w-10 h-10", online = false }) {
       </div>
     );
   }
-  if (conv.type === "bottle") {
+  if (conv.type === "bottle" && !isFound) {
     return (
       <div className={`${size} rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-sm shrink-0 relative`}>
         <FiAnchor size={size === "w-10 h-10" ? 18 : 14} />
@@ -347,6 +347,10 @@ function MessageBubble({ msg, isMe, skin = "default", onImageClick, onReply, onD
   const [editing, setEditing] = useState(false);
   const [editText, setEditText] = useState("");
 
+  const isBottle = msg.is_bottle;
+  const isFound = msg.is_found;
+  const isAnonymous = isBottle && !isFound && !isMe;
+
   const skinStyles = SKIN_CLASSES[skin] || SKIN_CLASSES.default;
   const bubbleExtra = SKIN_BUBBLE_CLASSES[skin] || SKIN_BUBBLE_CLASSES.default;
   const bubbleSkin = isMe ? skinStyles.sent : skinStyles.received;
@@ -370,11 +374,17 @@ function MessageBubble({ msg, isMe, skin = "default", onImageClick, onReply, onD
     <div className="group flex items-end gap-1.5 relative">
       {/* Received avatar */}
       {!isMe && (
-        <img
-          src={msg.user?.avatar_url || `https://ui-avatars.com/api/?name=${msg.user?.username || "U"}&background=0d9488&color=fff`}
-          alt=""
-          className="w-5 h-5 rounded-full mb-1 shrink-0"
-        />
+        isAnonymous ? (
+          <div className="w-5 h-5 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-[10px] font-bold mb-1 shrink-0">
+            <FiAnchor size={10} />
+          </div>
+        ) : (
+          <img
+            src={msg.user?.avatar_url || `https://ui-avatars.com/api/?name=${msg.user?.username || "U"}&background=0d9488&color=fff`}
+            alt=""
+            className="w-5 h-5 rounded-full mb-1 shrink-0"
+          />
+        )
       )}
 
       <div className={`flex flex-col max-w-[80%] md:max-w-[70%] ${isMe ? "items-end ml-auto" : "items-start"}`}>
@@ -718,12 +728,40 @@ export default function Chat() {
       );
     });
 
+    // Listen for bottle found broadcast
+    onChannel(topic, "bottle_found", (payload) => {
+      setMessages((prev) => {
+        const updated = prev.map((m) =>
+          m.id === payload.message_id ? { ...m, is_found: true } : m
+        );
+        // Reload full message list to reflect the reveal
+        api.get(`/chat/conversations/${conv.uuid}/messages`).then((res) => {
+          setMessages(res.data.data.messages);
+        }).catch(() => {});
+        return updated;
+      });
+    });
+
     try {
       const [msgRes] = await Promise.all([
         api.get(`/chat/conversations/${conv.uuid}/messages`),
         api.post(`/chat/conversations/${conv.uuid}/read`),
       ]);
       setMessages(msgRes.data.data.messages);
+
+      // If this is a bottle conversation and current user is not the sender,
+      // trigger bottle reveal
+      if (conv.type === "bottle") {
+        const hasUnfoundBottle = msgRes.data.data.messages.some(
+          (m) => m.is_bottle && !m.is_found && m.user_id !== user?.id
+        );
+        if (hasUnfoundBottle) {
+          api.post(`/chat/conversations/${conv.uuid}/reveal-bottle`).then((res) => {
+            setMessages(res.data.data.messages);
+          }).catch(() => {});
+        }
+      }
+
       fetchCounts();
     } catch { }
   }, [fetchCounts, user?.id]);
@@ -1075,8 +1113,15 @@ export default function Chat() {
 
   const activeConvoDisplayName = activeConvo
     ? activeConvo.type === "direct"
-      ? activeConvo.other_user?.username
-      : activeConvo.name || "Message in a Bottle"
+      ? activeConvo.other_user?.username || "Unknown"
+      : activeConvo.type === "bottle"
+        ? (() => {
+            const found = messages.some((m) => m.is_bottle && m.is_found);
+            return found && activeConvo.other_user?.username
+              ? activeConvo.other_user.username
+              : "Message in a Bottle";
+          })()
+        : activeConvo.name || "Unknown"
     : "";
 
   const isDirectChat = activeConvo?.type === "direct" || activeConvo?.type === "bottle";
@@ -1195,7 +1240,7 @@ export default function Chat() {
                       className="h-11 w-11 rounded-full border-2 border-white object-cover shadow-md dark:border-gray-700"
                     />
                     <span className="text-[10px] font-medium text-gray-600 dark:text-gray-300">
-                      You
+                      Your Drift
                     </span>
                   </div>
                 </div>
@@ -1314,7 +1359,7 @@ export default function Chat() {
               <button onClick={handleBack} className="md:hidden p-1.5 text-gray-500 hover:text-tide-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
                 <FiArrowLeft size={20} />
               </button>
-              <ConversationAvatar conv={activeConvo} size="w-9 h-9 md:w-9 md:h-9" online={otherUserOnline} />
+              <ConversationAvatar conv={activeConvo} size="w-9 h-9 md:w-9 md:h-9" online={otherUserOnline} isFound={activeConvo?.type === "bottle" ? messages.some((m) => m.is_bottle && m.is_found) : undefined} />
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-sm truncate">{activeConvoDisplayName}</p>
                 {otherUserOnline ? (
