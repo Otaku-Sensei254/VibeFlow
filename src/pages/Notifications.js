@@ -8,10 +8,10 @@ import { FiHeart, FiMessageCircle, FiRepeat, FiUserPlus, FiAtSign, FiFileText, F
 const NOTIF_ICONS = {
   like: { icon: FiHeart, color: "text-coral-500", bg: "bg-coral-50 dark:bg-coral-900/20" },
   comment: { icon: FiMessageCircle, color: "text-tide-500", bg: "bg-tide-50 dark:bg-tide-900/20" },
-  follow: { icon: FiUserPlus, color: "text-green-500", bg: "bg-green-50 dark:bg-green-900/20" },
-  repost: { icon: FiRepeat, color: "text-green-500", bg: "bg-green-50 dark:bg-green-900/20" },
+  follow: { icon: FiUserPlus, color: "text-tide-500", bg: "bg-tide-50 dark:bg-tide-900/20" },
+  repost: { icon: FiRepeat, color: "text-flow-500", bg: "bg-flow-50 dark:bg-flow-900/20" },
   mention: { icon: FiAtSign, color: "text-flow-500", bg: "bg-flow-50 dark:bg-flow-900/20" },
-  new_post: { icon: FiFileText, color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-900/20" },
+  new_post: { icon: FiFileText, color: "text-tide-500", bg: "bg-tide-50 dark:bg-tide-900/20" },
 };
 
 function getIcon(type) {
@@ -165,7 +165,7 @@ export default function Notifications() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-0.5">
                   <img
-                    src={n.actor?.avatar_url || `https://ui-avatars.com/api/?name=${n.actor?.username || "?"}&background=6366F1&color=fff&bold=true`}
+                    src={n.actor?.avatar_url || `https://ui-avatars.com/api/?name=${n.actor?.username || "?"}&background=0d9488&color=fff&bold=true`}
                     alt=""
                     className="w-5 h-5 rounded-full shrink-0"
                   />

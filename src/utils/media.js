@@ -1,4 +1,4 @@
-const apiHost = (process.env.REACT_APP_API_URL || "http://localhost:4001/api/v1").replace("/api/v1", "");
+const apiHost = (process.env.REACT_APP_API_URL || "http://localhost:4000/api/v1").replace("/api/v1", "");
 
 function isPlainObject(o) {
   if (typeof o !== 'object' || o === null) return false;

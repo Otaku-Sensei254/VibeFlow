@@ -91,7 +91,7 @@ function SearchBar() {
                   className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition"
                 >
                   <img
-                    src={u.avatar_url || `https://ui-avatars.com/api/?name=${u.username}&background=6366F1&color=fff`}
+                    src={u.avatar_url || `https://ui-avatars.com/api/?name=${u.username}&background=0d9488&color=fff`}
                     alt=""
                     className="w-9 h-9 rounded-full object-cover"
                   />
@@ -115,7 +115,7 @@ function SearchBar() {
                   className="flex items-start gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition"
                 >
                   <img
-                    src={p.user?.avatar_url || `https://ui-avatars.com/api/?name=${p.user?.username || "U"}&background=6366F1&color=fff`}
+                    src={p.user?.avatar_url || `https://ui-avatars.com/api/?name=${p.user?.username || "U"}&background=0d9488&color=fff`}
                     alt=""
                     className="w-8 h-8 mt-0.5 rounded-full object-cover shrink-0"
                   />
@@ -248,7 +248,7 @@ export default function Feed() {
       <div className="flex gap-6 pt-4 sm:pt-6">
         {/* Left Sidebar - Categories */}
         <aside className="hidden lg:block w-56 shrink-0">
-          <div className="sticky top-28 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="sticky top-28 bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
               <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Categories</h3>
             </div>
@@ -298,7 +298,7 @@ export default function Feed() {
                 >
                   <div className="relative w-14 h-14 rounded-full border-2 border-dashed border-flow-400 p-0.5 flex items-center justify-center">
                     <img
-                      src={user.avatar_url || `https://ui-avatars.com/api/?name=${user.username}&background=6366F1&color=fff`}
+                      src={user.avatar_url || `https://ui-avatars.com/api/?name=${user.username}&background=0d9488&color=fff`}
                       alt={user.username}
                       className="w-full h-full rounded-full object-cover opacity-60"
                     />
@@ -329,7 +329,7 @@ export default function Feed() {
                       <div className={group.has_unseen ? "bg-white dark:bg-gray-900 rounded-full p-[2px]" : ""}>
                         <div className="w-[52px] h-[52px] rounded-full bg-white dark:bg-gray-900 p-[2px]">
                           <img
-                            src={group.user.avatar_url || `https://ui-avatars.com/api/?name=${group.user.username}&background=6366F1&color=fff`}
+                            src={group.user.avatar_url || `https://ui-avatars.com/api/?name=${group.user.username}&background=0d9488&color=fff`}
                             alt={group.user.username}
                             className="w-full h-full rounded-full object-cover"
                           />
@@ -356,40 +356,43 @@ export default function Feed() {
             </div>
           </div>
 
-          {/* Search bar - matches feed width */}
-          <div className="sticky top-14 z-10 pb-3 bg-white dark:bg-gray-900">
-            <SearchBar />
-          </div>
+          {/* Sticky bar — Search + Mobile Categories combined */}
+          <div className="sticky top-14 z-10 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-sm border-b border-transparent dark:border-zinc-800/60 pb-2 pt-1">
+            {/* Search */}
+            <div className="mb-2">
+              <SearchBar />
+            </div>
 
-          {/* Mobile Categories */}
-          <div className="flex gap-2 mb-5 overflow-x-auto pb-2 scrollbar-hide lg:hidden">
-            <button
-              onClick={() => setCategory("")}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 shrink-0 ${
-                !category
-                  ? "bg-gradient-to-r from-tide-600 to-flow-600 text-white shadow-md shadow-tide-200 dark:shadow-tide-900/30"
-                  : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
-              }`}
-            >
-              All
-            </button>
-            {CATEGORIES.map((c) => (
+            {/* Mobile category pills — hidden on lg+ where sidebar handles it */}
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide lg:hidden">
               <button
-                key={c}
-                onClick={() => setCategory(c)}
+                onClick={() => setCategory("")}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 shrink-0 ${
-                  category === c
+                  !category
                     ? "bg-gradient-to-r from-tide-600 to-flow-600 text-white shadow-md shadow-tide-200 dark:shadow-tide-900/30"
-                    : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
+                    : "bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-zinc-700"
                 }`}
               >
-                {c}
+                All
               </button>
-            ))}
+              {CATEGORIES.map((c) => (
+                <button
+                  key={c}
+                  onClick={() => setCategory(c)}
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 shrink-0 ${
+                    category === c
+                      ? "bg-gradient-to-r from-tide-600 to-flow-600 text-white shadow-md shadow-tide-200 dark:shadow-tide-900/30"
+                      : "bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-zinc-700"
+                  }`}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Posts */}
-          <div className="space-y-4 sm:space-y-5">
+          <div className="space-y-4 sm:space-y-5 mt-4">
             {posts.map((post, i) => (
               <div
                 key={post.uuid || i}
@@ -456,7 +459,7 @@ export default function Feed() {
         <aside className="hidden xl:block w-72 shrink-0">
           <div className="sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto space-y-5 scrollbar-hide">
             {/* Trending Posts */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
               <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex items-center gap-2">
                 <FiTrendingUp className="text-tide-600" size={16} />
                 <h3 className="text-sm font-semibold">Trending</h3>
@@ -494,7 +497,7 @@ export default function Feed() {
 
             {/* Top Category */}
             {topCategory && (
-              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
                   <h3 className="text-sm font-semibold">Most Active Category</h3>
                 </div>
@@ -516,7 +519,7 @@ export default function Feed() {
 
             {/* Suggested Users */}
             {suggestions.users.length > 0 && (
-              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex items-center gap-2">
                   <FiUsers className="text-tide-600" size={16} />
                   <h3 className="text-sm font-semibold">Who to follow</h3>
@@ -529,7 +532,7 @@ export default function Feed() {
                       className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition"
                     >
                       <img
-                        src={u.avatar_url || `https://ui-avatars.com/api/?name=${u.username}&background=6366F1&color=fff`}
+                        src={u.avatar_url || `https://ui-avatars.com/api/?name=${u.username}&background=0d9488&color=fff`}
                         alt=""
                         className="w-9 h-9 rounded-full object-cover"
                       />

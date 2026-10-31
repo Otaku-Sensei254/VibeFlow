@@ -50,13 +50,13 @@ export default function AdminRoles() {
 
   return (
     <>
-      <div className="rounded-3xl border border-slate-200/70 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur p-6 lg:p-8 shadow-sm mb-6">
+      <div className="rounded-2xl border border-gray-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 lg:p-8 shadow-sm mb-6">
         <h1 className="text-2xl font-extrabold text-gray-900 dark:text-gray-100">Role Management</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Create and manage roles with permissions.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200/70 dark:border-zinc-800 p-6">
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200/80 dark:border-zinc-800 p-6">
           <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Create New Role</h3>
           <div className="mb-4">
             <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5">Role Name</label>
@@ -96,7 +96,7 @@ export default function AdminRoles() {
           </button>
         </div>
 
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200/70 dark:border-zinc-800 p-6">
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200/80 dark:border-zinc-800 p-6">
           <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Existing Roles</h3>
           {loading ? (
             <div className="flex justify-center py-12">
@@ -112,7 +112,7 @@ export default function AdminRoles() {
           ) : (
             <div className="space-y-3">
               {roles.map((role) => (
-                <div key={role.id} className="border border-slate-200 dark:border-zinc-700 rounded-xl p-4">
+                <div key={role.id} className="border border-gray-200 dark:border-zinc-700 rounded-xl p-4">
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-bold text-sm text-gray-900 dark:text-white uppercase tracking-wide">{role.name}</span>
                     <span className="text-xs text-gray-400">{role.permissions?.length || 0} permissions</span>

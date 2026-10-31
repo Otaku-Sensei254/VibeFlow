@@ -298,7 +298,7 @@ export default function WaveViewer() {
       <div className="absolute top-8 left-3 z-10 flex items-center gap-2.5">
         <img
           src={current.user?.avatar_url ||
-            `https://ui-avatars.com/api/?name=${current.user?.username || "?"}&background=6366F1&color=fff`}
+            `https://ui-avatars.com/api/?name=${current.user?.username || "?"}&background=0d9488&color=fff`}
           alt=""
           className="w-8 h-8 rounded-full object-cover ring-2 ring-white/20"
         />
@@ -450,7 +450,7 @@ export default function WaveViewer() {
                     ).map((u) => (
                       <button key={u.id} onClick={() => handleShare(u.username)} disabled={sharing}
                         className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors disabled:opacity-50">
-                        <img src={u.avatar_url || `https://ui-avatars.com/api/?name=${u.username}&background=6366F1&color=fff`} alt="" className="w-10 h-10 rounded-full object-cover" />
+                        <img src={u.avatar_url || `https://ui-avatars.com/api/?name=${u.username}&background=0d9488&color=fff`} alt="" className="w-10 h-10 rounded-full object-cover" />
                         <span className="text-white text-sm font-medium">{u.username}</span>
                       </button>
                     ))
@@ -464,7 +464,7 @@ export default function WaveViewer() {
                 ) : shareResults.map((u) => (
                   <button key={u.id} onClick={() => handleShare(u.username)} disabled={sharing}
                     className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors disabled:opacity-50">
-                    <img src={u.avatar_url || `https://ui-avatars.com/api/?name=${u.username}&background=6366F1&color=fff`} alt="" className="w-10 h-10 rounded-full object-cover" />
+                    <img src={u.avatar_url || `https://ui-avatars.com/api/?name=${u.username}&background=0d9488&color=fff`} alt="" className="w-10 h-10 rounded-full object-cover" />
                     <span className="text-white text-sm font-medium">{u.username}</span>
                   </button>
                 ))}

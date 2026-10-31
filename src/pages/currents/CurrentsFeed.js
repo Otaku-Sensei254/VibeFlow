@@ -151,8 +151,13 @@ export default function CurrentsFeed() {
       {/* Video feed */}
       <div ref={containerRef} className="h-full overflow-y-auto snap-y snap-mandatory scrollbar-hide">
         {loading ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          <div className="flex flex-col items-center justify-center h-full gap-4">
+            <div className="relative w-14 h-14">
+              <div className="absolute inset-0 rounded-full border-[3px] border-tide-500/20" />
+              <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-tide-400 animate-spin" />
+              <div className="absolute inset-2 rounded-full border-[2px] border-transparent border-t-flow-400 animate-spin" style={{ animationDuration: '0.7s', animationDirection: 'reverse' }} />
+            </div>
+            <p className="text-white/30 text-xs font-medium tracking-widest uppercase animate-pulse">Loading currents</p>
           </div>
         ) : posts.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-white/60 px-8 gap-4">
@@ -199,7 +204,7 @@ export default function CurrentsFeed() {
             {/* Right action rail */}
             <div className="absolute right-3 bottom-24 z-10 flex flex-col items-center gap-5">
               <Link to={`/profile/${post.user?.username}`} className="block">
-                <img src={post.user?.avatar_url || `https://ui-avatars.com/api/?name=${post.user?.username || "?"}&background=6366F1&color=fff`}
+                <img src={post.user?.avatar_url || `https://ui-avatars.com/api/?name=${post.user?.username || "?"}&background=0d9488&color=fff`}
                   alt="" className="w-11 h-11 rounded-full object-cover ring-2 ring-white/30" />
               </Link>
               <div className="flex flex-col items-center gap-0.5">
@@ -226,7 +231,7 @@ export default function CurrentsFeed() {
             <div className="absolute bottom-6 left-4 right-16 z-10">
               <div className="flex items-center gap-2 mb-1">
 
-                <img src={post.user?.avatar_url || `https://ui-avatars.com/api/?name=${post.user?.username || "?"}&background=6366F1&color=fff`}
+                <img src={post.user?.avatar_url || `https://ui-avatars.com/api/?name=${post.user?.username || "?"}&background=0d9488&color=fff`}
                   alt="" className="w-6 h-6 rounded-full object-cover ring-2 ring-white/30" />
 
 

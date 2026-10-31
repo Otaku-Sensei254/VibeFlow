@@ -238,38 +238,48 @@ export default function PostDetail() {
 
   if (loading) {
     return (
-      <div className="max-w-2xl mx-auto px-3 sm:px-4 py-4 sm:py-6 animate-pulse">
-        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full w-16 mb-6" />
-        <div className="bg-white dark:bg-gray-800/80 rounded-2xl border border-gray-100 dark:border-gray-700/60 p-4 sm:p-5 mb-5">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700" />
-            <div className="space-y-1.5 flex-1">
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded-full w-32" />
-              <div className="h-3 bg-gray-100 dark:bg-gray-700/50 rounded-full w-20" />
+      <div className="min-h-screen bg-gray-50 dark:bg-zinc-950">
+        {/* Mobile header skeleton */}
+        <div className="lg:hidden bg-white dark:bg-zinc-950/90 px-4 py-3 flex items-center border-b border-gray-200 dark:border-zinc-800 sticky top-0 z-20 animate-pulse">
+          <div className="w-5 h-5 bg-gray-200 dark:bg-zinc-700 rounded mr-3" />
+          <div className="h-4 w-16 bg-gray-200 dark:bg-zinc-700 rounded-full" />
+        </div>
+        <div className="max-w-3xl mx-auto px-0 lg:px-6 py-0 lg:py-8 animate-pulse">
+          <div className="bg-white dark:bg-zinc-900 lg:rounded-3xl overflow-hidden">
+            <div className="h-1 bg-gray-100 dark:bg-zinc-800" />
+            <div className="h-64 bg-gray-100 dark:bg-zinc-800" />
+            <div className="p-5 sm:p-7 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-zinc-700" />
+                <div className="space-y-2 flex-1">
+                  <div className="h-4 bg-gray-200 dark:bg-zinc-700 rounded-full w-32" />
+                  <div className="h-3 bg-gray-100 dark:bg-zinc-700/50 rounded-full w-20" />
+                </div>
+                <div className="h-8 w-20 bg-gray-200 dark:bg-zinc-700 rounded-full" />
+              </div>
+              <div className="h-7 bg-gray-200 dark:bg-zinc-700 rounded-full w-3/4" />
+              <div className="h-5 bg-gray-200 dark:bg-zinc-700 rounded-full w-1/2" />
+              <div className="space-y-2 pt-2">
+                <div className="h-3.5 bg-gray-100 dark:bg-zinc-700/50 rounded-full w-full" />
+                <div className="h-3.5 bg-gray-100 dark:bg-zinc-700/50 rounded-full w-full" />
+                <div className="h-3.5 bg-gray-100 dark:bg-zinc-700/50 rounded-full w-5/6" />
+                <div className="h-3.5 bg-gray-100 dark:bg-zinc-700/50 rounded-full w-2/3" />
+              </div>
             </div>
           </div>
-          <div className="space-y-2 mb-4">
-            <div className="h-3.5 bg-gray-200 dark:bg-gray-700 rounded-full w-full" />
-            <div className="h-3.5 bg-gray-200 dark:bg-gray-700 rounded-full w-5/6" />
-            <div className="h-3 bg-gray-100 dark:bg-gray-700/50 rounded-full w-2/3" />
-          </div>
-          <div className="h-56 bg-gray-100 dark:bg-gray-700/50 rounded-xl mb-4" />
-          <div className="flex gap-4">
-            <div className="h-3 w-14 bg-gray-200 dark:bg-gray-700 rounded-full" />
-            <div className="h-3 w-14 bg-gray-200 dark:bg-gray-700 rounded-full" />
-            <div className="h-3 w-14 bg-gray-200 dark:bg-gray-700 rounded-full" />
+          <div className="mt-4 bg-white dark:bg-zinc-900 lg:rounded-3xl overflow-hidden p-5 space-y-3">
+            <div className="h-4 bg-gray-200 dark:bg-zinc-700 rounded-full w-24" />
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-start gap-3 py-3">
+                <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-zinc-700 shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-3 bg-gray-200 dark:bg-zinc-700 rounded-full w-1/4" />
+                  <div className="h-3 bg-gray-100 dark:bg-zinc-700/50 rounded-full w-3/4" />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-        <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded-full w-24 mb-4" />
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="flex items-start gap-3 p-4 bg-white dark:bg-gray-800/80 rounded-2xl border border-gray-100 dark:border-gray-700/60 mb-3">
-            <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 shrink-0" />
-            <div className="flex-1 space-y-2">
-              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full w-1/4" />
-              <div className="h-3 bg-gray-100 dark:bg-gray-700/50 rounded-full w-3/4" />
-            </div>
-          </div>
-        ))}
       </div>
     );
   }
@@ -295,86 +305,100 @@ export default function PostDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      {/* Mobile Header */}
-      <div className="lg:hidden bg-white dark:bg-gray-900 px-4 py-3 flex items-center border-b border-gray-200 dark:border-gray-800 sticky top-0 z-20">
-        <Link to="/feed" className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mr-3">
+    <div className="min-h-screen bg-gray-50 dark:bg-zinc-950">
+
+      {/* Mobile sticky header — back + title */}
+      <div className="lg:hidden bg-white/95 dark:bg-zinc-950/95 backdrop-blur-sm px-4 py-3 flex items-center gap-3 border-b border-gray-100 dark:border-zinc-800/60 sticky top-14 z-20">
+        <button
+          onClick={() => navigate(-1)}
+          className="p-1.5 -ml-1.5 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800 transition"
+        >
           <FiArrowLeft size={20} />
-        </Link>
-        <span className="text-sm font-semibold text-gray-900 dark:text-white">Post</span>
+        </button>
+        <span className="text-sm font-bold text-gray-900 dark:text-white truncate flex-1">{post.title}</span>
       </div>
 
-      <div className="max-w-3xl mx-auto px-0 lg:px-6 py-0 lg:py-8">
-        {/* Back Button (Desktop) */}
-        <Link to="/feed" className="hidden lg:inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-6 transition-colors">
-          <FiArrowLeft size={16} /> Back to feed
-        </Link>
+      <div className="max-w-3xl lg:max-w-7xl mx-auto px-0 lg:px-6 py-0 lg:py-8">
 
-        {/* Post Card */}
-        <div className="bg-white dark:bg-gray-900 lg:rounded-3xl lg:shadow-lg lg:border border-gray-100 dark:border-gray-800 overflow-hidden">
-          {/* Gradient accent */}
-          <div className="h-1 bg-gradient-to-r from-tide-500 via-flow-500 to-coral-500" />
+        {/* Desktop back link */}
+        <button
+          onClick={() => navigate(-1)}
+          className="hidden lg:inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-tide-600 dark:hover:text-tide-400 mb-5 transition-colors group"
+        >
+          <FiArrowLeft size={15} className="group-hover:-translate-x-0.5 transition-transform" />
+          Back
+        </button>
 
-          {/* Media */}
+        <div className="lg:grid lg:grid-cols-[minmax(0,1.2fr)_minmax(360px,0.8fr)] lg:items-start lg:gap-5">
+        {/* ── Main post card ── */}
+        <div className="bg-white dark:bg-zinc-900 lg:rounded-3xl lg:shadow-sm border-y lg:border border-gray-200/80 dark:border-zinc-800 overflow-hidden">
+          {/* Media — full bleed */}
           {post.media_files?.length > 0 && (
-            <div className="bg-black">
+            <div className="bg-zinc-950">
               <MediaCarousel files={post.media_files} />
             </div>
           )}
 
           <div className="p-5 sm:p-7 lg:p-8">
-            {/* User Header */}
-            <div className="flex items-center justify-between mb-6">
-              <Link to={`/profile/${post.user?.username}`} className="flex items-center gap-3 group">
-                <div className="relative">
+
+            {/* ── Author row ── */}
+            <div className="flex items-center justify-between mb-5">
+              <Link to={`/profile/${post.user?.username}`} className="flex items-center gap-3 group min-w-0">
+                <div className="relative shrink-0">
                   <img
-                    src={post.user?.avatar_url || `https://ui-avatars.com/api/?name=${post.user?.username || "?"}&background=6366F1&color=fff&bold=true`}
+                    src={post.user?.avatar_url || `https://ui-avatars.com/api/?name=${post.user?.username || "?"}&background=0d9488&color=fff&bold=true`}
                     alt={post.user?.username}
-                    className="w-11 h-11 rounded-full object-cover ring-2 ring-white dark:ring-gray-800 group-hover:ring-tide-300 transition-all"
+                    className="w-12 h-12 rounded-full object-cover ring-2 ring-white dark:ring-zinc-800 group-hover:ring-tide-300 dark:group-hover:ring-tide-700 transition-all"
                   />
+                  {/* Online dot placeholder — matches Chat pattern */}
                 </div>
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-semibold text-gray-900 dark:text-white group-hover:text-tide-600 dark:group-hover:text-tide-400 transition-colors">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="font-bold text-gray-900 dark:text-white group-hover:text-tide-600 dark:group-hover:text-tide-400 transition-colors">
                       {post.user?.username}
                     </span>
                     {post.user?.is_verified && (
-                      <img src="/images/vibeflow_verified2.png" alt="Verified" className="inline w-4 h-4" />
+                      <img src="/images/vibeflow_verified2.png" alt="Verified" className="w-4 h-4 inline" />
+                    )}
+                    {post.category && (
+                      <span className="text-[11px] font-semibold text-tide-500 bg-tide-50 dark:bg-tide-900/30 px-2 py-0.5 rounded-full">
+                        {post.category}
+                      </span>
                     )}
                   </div>
-                  <p className="text-xs text-gray-400">{formatTime(post.inserted_at)}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">{formatTime(post.inserted_at)}</p>
                 </div>
               </Link>
               {user?.id !== post.user?.id && (
                 <button
                   onClick={handleFollow}
                   disabled={followLoading}
-                  className={`shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold transition-all ${
+                  className={`shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold transition-all border ${
                     isFollowing
-                        ? "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-coral-50 hover:text-coral-500 dark:hover:bg-coral-900/20 dark:hover:text-coral-400 border border-gray-200 dark:border-gray-700"
-                      : "bg-tide-600 text-white hover:bg-tide-700 shadow-sm shadow-tide-200 dark:shadow-tide-900/30"
+                      ? "bg-transparent border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-gray-300 hover:border-coral-300 hover:text-coral-500 dark:hover:border-coral-700 dark:hover:text-coral-400"
+                      : "bg-tide-600 border-tide-600 text-white hover:bg-tide-700 hover:border-tide-700 shadow-sm shadow-tide-200 dark:shadow-tide-900/30"
                   }`}
-                  onMouseEnter={(e) => { if (isFollowing) e.target.textContent = "Unfollow"; }}
-                  onMouseLeave={(e) => { if (isFollowing) e.target.textContent = "Following"; }}
+                  onMouseEnter={(e) => { if (isFollowing) e.currentTarget.textContent = "Unfollow"; }}
+                  onMouseLeave={(e) => { if (isFollowing) e.currentTarget.textContent = "Following"; }}
                 >
                   {isFollowing ? "Following" : "Follow"}
                 </button>
               )}
             </div>
 
-            {/* Title */}
-            <h1 className="text-2xl sm:text-3xl font-bold mb-3 leading-tight text-gray-900 dark:text-gray-100">
+            {/* ── Title ── */}
+            <h1 className="text-2xl sm:text-3xl font-extrabold mb-3 leading-tight text-gray-900 dark:text-white tracking-tight">
               {post.title}
             </h1>
 
-            {/* Tags */}
+            {/* ── Tags ── */}
             {post.tags?.length > 0 && (
-              <div className="flex gap-2 flex-wrap mb-4">
+              <div className="flex gap-2 flex-wrap mb-5">
                 {post.tags.map((tag) => (
                   <Link
                     key={tag}
                     to={`/tags/${tag}`}
-                    className="text-xs font-semibold text-tide-600 dark:text-tide-400 bg-tide-50 dark:bg-tide-900/20 hover:bg-tide-100 dark:hover:bg-tide-900/40 px-2.5 py-1 rounded-full transition-colors"
+                    className="text-xs font-semibold text-tide-600 dark:text-tide-400 bg-tide-50 dark:bg-tide-900/20 hover:bg-tide-100 dark:hover:bg-tide-900/40 px-3 py-1 rounded-full transition-colors"
                   >
                     #{tag}
                   </Link>
@@ -382,74 +406,94 @@ export default function PostDetail() {
               </div>
             )}
 
-            {/* Content */}
-            <div className="text-gray-700 dark:text-gray-300 mb-6 whitespace-pre-wrap leading-relaxed text-sm sm:text-base">
+            {/* ── Content ── */}
+            <div className="text-gray-700 dark:text-gray-300 leading-relaxed text-sm sm:text-[15px] whitespace-pre-wrap mb-6 border-l-2 border-tide-500/40 dark:border-tide-500/30 pl-4">
               {post.content}
             </div>
 
-            {/* Divider */}
-            <div className="border-t border-gray-100 dark:border-gray-800 pt-4">
-              {/* Action Buttons */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1 sm:gap-2">
-                  <button
-                    onClick={toggleLike}
-                    className={`flex items-center gap-1.5 text-sm font-medium px-3 sm:px-4 py-2 rounded-xl transition-all ${
-                      post.is_liked
-                        ? "text-coral-500 bg-coral-50 dark:bg-coral-900/20"
-                              : "text-gray-500 dark:text-gray-400 hover:text-coral-500 hover:bg-coral-50 dark:hover:bg-coral-900/10"
-                    }`}
-                  >
-                    <FiHeart className={post.is_liked ? "fill-current" : ""} size={18} />
-                    {post.likes_count > 0 && <span>{post.likes_count}</span>}
-                  </button>
-
-                  <button
-                    onClick={toggleRepost}
-                    className={`flex items-center gap-1.5 text-sm font-medium px-3 sm:px-4 py-2 rounded-xl transition-all ${
-                      post.is_reposted
-                        ? "text-green-500 bg-green-50 dark:bg-green-900/20"
-                        : "text-gray-500 dark:text-gray-400 hover:text-green-500 hover:bg-green-50 dark:hover:bg-green-900/10"
-                    }`}
-                  >
-                    <FiRepeat size={18} className={post.is_reposted ? "fill-current" : ""} />
-                    {post.reposts_count > 0 && <span>{post.reposts_count}</span>}
-                  </button>
-
-                  <button
-                    onClick={openShareModal}
-                    className="flex items-center gap-1.5 text-sm font-medium px-3 sm:px-4 py-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-tide-500 hover:bg-tide-50 dark:hover:bg-tide-900/10 transition-all"
-                  >
-                    <FiSend size={18} />
-                  </button>
-
-                  <button
-                    onClick={toggleSave}
-                    className={`flex items-center gap-1.5 text-sm font-medium px-3 sm:px-4 py-2 rounded-xl transition-all ${
-                      post.is_saved
-                        ? "text-sun-500 bg-sun-50 dark:bg-sun-900/20"
-                        : "text-gray-500 dark:text-gray-400 hover:text-sun-500 hover:bg-sun-50 dark:hover:bg-sun-900/10"
-                    }`}
-                  >
-                    <FiBookmark size={18} className={post.is_saved ? "fill-current" : ""} />
-                    {post.saves_count > 0 && <span>{post.saves_count}</span>}
-                  </button>
-                </div>
-              </div>
+            {/* ── Engagement stats bar ── */}
+            <div className="flex items-center gap-4 py-3 border-y border-gray-200/70 dark:border-zinc-800 mb-4 text-sm text-gray-500 dark:text-gray-400">
+              {post.likes_count > 0 && (
+                <span className="font-semibold text-gray-700 dark:text-gray-200">
+                  {post.likes_count} <span className="font-normal text-gray-400 dark:text-gray-500">like{post.likes_count !== 1 ? "s" : ""}</span>
+                </span>
+              )}
+              {post.reposts_count > 0 && (
+                <span className="font-semibold text-gray-700 dark:text-gray-200">
+                  {post.reposts_count} <span className="font-normal text-gray-400 dark:text-gray-500">repost{post.reposts_count !== 1 ? "s" : ""}</span>
+                </span>
+              )}
+              {post.saves_count > 0 && (
+                <span className="font-semibold text-gray-700 dark:text-gray-200">
+                  {post.saves_count} <span className="font-normal text-gray-400 dark:text-gray-500">save{post.saves_count !== 1 ? "s" : ""}</span>
+                </span>
+              )}
+              {post.comments_count > 0 && (
+                <span className="font-semibold text-gray-700 dark:text-gray-200">
+                  {post.comments_count} <span className="font-normal text-gray-400 dark:text-gray-500">comment{post.comments_count !== 1 ? "s" : ""}</span>
+                </span>
+              )}
             </div>
+
+            {/* ── Action buttons ── */}
+            <div className="flex items-center gap-1">
+              <button
+                onClick={toggleLike}
+                className={`flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl transition-all ${
+                  post.is_liked
+                    ? "text-coral-500 bg-coral-50 dark:bg-coral-900/20"
+                    : "text-gray-500 dark:text-gray-400 hover:text-coral-500 hover:bg-coral-50 dark:hover:bg-coral-900/10"
+                }`}
+              >
+                <FiHeart className={post.is_liked ? "fill-current" : ""} size={18} />
+                <span>{post.is_liked ? "Liked" : "Like"}</span>
+              </button>
+
+              <button
+                onClick={toggleRepost}
+                className={`flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl transition-all ${
+                  post.is_reposted
+                    ? "text-tide-500 bg-tide-50 dark:bg-tide-900/20"
+                    : "text-gray-500 dark:text-gray-400 hover:text-tide-500 hover:bg-tide-50 dark:hover:bg-tide-900/10"
+                }`}
+              >
+                <FiRepeat size={18} className={post.is_reposted ? "fill-current" : ""} />
+                <span className="hidden sm:inline">{post.is_reposted ? "Reposted" : "Repost"}</span>
+              </button>
+
+              <button
+                onClick={openShareModal}
+                className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-flow-500 hover:bg-flow-50 dark:hover:bg-flow-900/10 transition-all"
+              >
+                <FiSend size={18} />
+                <span className="hidden sm:inline">Share</span>
+              </button>
+
+              <button
+                onClick={toggleSave}
+                className={`flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl transition-all ml-auto ${
+                  post.is_saved
+                    ? "text-sun-500 bg-sun-50 dark:bg-sun-900/20"
+                    : "text-gray-500 dark:text-gray-400 hover:text-sun-500 hover:bg-sun-50 dark:hover:bg-sun-900/10"
+                }`}
+              >
+                <FiBookmark size={18} className={post.is_saved ? "fill-current" : ""} />
+                <span className="hidden sm:inline">{post.is_saved ? "Saved" : "Save"}</span>
+              </button>
+            </div>
+
           </div>
         </div>
 
-
-
-
-        {/* Comments Section */}
-        <div className="bg-white dark:bg-gray-900 lg:rounded-3xl lg:shadow-lg lg:border border-gray-100 dark:border-gray-800 overflow-hidden mt-4 lg:mt-6">
+        {/* ── Comments section ── */}
+        <div className="bg-white dark:bg-zinc-900 lg:rounded-3xl lg:shadow-sm border-y lg:border border-gray-200/80 dark:border-zinc-800 overflow-hidden mt-3 lg:mt-0 lg:sticky lg:top-20 lg:h-[calc(100vh-6rem)]">
           <CommentSection uuid={uuid} user={user} />
         </div>
+        </div>
+
       </div>
 
-      {/* Share Modal */}
+      {/* ── Share Modal ── */}
       {showShareModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen px-4 py-10 text-center">
@@ -496,7 +540,7 @@ export default function PostDetail() {
                         : "hover:bg-gray-50 dark:hover:bg-zinc-800"
                     }`}
                   >
-                    <img src={u.avatar_url || `https://ui-avatars.com/api/?name=${u.username}&background=6366F1&color=fff`} alt="" className="w-9 h-9 rounded-full object-cover" />
+                    <img src={u.avatar_url || `https://ui-avatars.com/api/?name=${u.username}&background=0d9488&color=fff`} alt="" className="w-9 h-9 rounded-full object-cover" />
                     <div className="flex-1 text-left">
                       <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{u.username}</p>
                       {u.bio && <p className="text-xs text-gray-500 line-clamp-1">{u.bio}</p>}

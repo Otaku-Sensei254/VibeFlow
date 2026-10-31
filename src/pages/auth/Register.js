@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useAuth } from "../../context/AuthContext";
+import GoogleSignInButton from "../../components/auth/GoogleSignInButton";
 
 export default function Register() {
   const { register } = useAuth();
@@ -38,9 +39,9 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-56px)] flex items-center justify-center px-3 sm:px-4 bg-gradient-to-br from-tide-50/50 via-white to-flow-50/50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-[calc(100vh-56px)] flex items-center justify-center px-3 sm:px-4 bg-gradient-to-br from-tide-50/50 via-white to-flow-50/50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950">
       <div className="w-full max-w-sm">
-        <div className="bg-white dark:bg-gray-800/80 rounded-2xl border border-gray-100 dark:border-gray-700/60 shadow-sm p-6 sm:p-7">
+        <div className="bg-white dark:bg-zinc-900/80 rounded-2xl border border-gray-100 dark:border-gray-700/60 shadow-sm p-6 sm:p-7">
           <h1 className="text-2xl font-bold mb-1 text-center bg-gradient-to-r from-tide-600 to-flow-600 bg-clip-text text-transparent">
             Create Account
           </h1>
@@ -112,6 +113,18 @@ export default function Register() {
               {loading ? "Creating account..." : "Create Account"}
             </button>
           </form>
+
+          <div className="mt-5">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">Or continue with</span>
+              </div>
+            </div>
+            <GoogleSignInButton className="mt-4" />
+          </div>
 
           <p className="mt-5 text-center text-sm text-gray-400">
             Already have an account?{" "}

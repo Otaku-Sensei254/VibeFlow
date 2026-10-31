@@ -30,7 +30,7 @@ export default function CommentInput({ user, onSubmit, sending }) {
     <div className="px-5 sm:px-7 lg:px-8 py-4 border-b border-gray-100 dark:border-gray-800">
       <form onSubmit={handleSubmit} className="flex items-center gap-3">
         <img
-          src={user?.avatar_url || `https://ui-avatars.com/api/?name=${user?.username || "?"}&background=6366F1&color=fff&bold=true`}
+          src={user?.avatar_url || `https://ui-avatars.com/api/?name=${user?.username || "?"}&background=0d9488&color=fff&bold=true`}
           alt=""
           className="w-8 h-8 rounded-full object-cover shrink-0"
         />

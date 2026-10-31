@@ -6,8 +6,8 @@ import { FiX, FiHeart, FiMessageCircle, FiUserPlus, FiRepeat, FiAtSign, FiCheckC
 const NOTIF_ICONS = {
   like: { icon: FiHeart, color: "text-coral-500" },
   comment: { icon: FiMessageCircle, color: "text-tide-500" },
-  follow: { icon: FiUserPlus, color: "text-green-500" },
-  repost: { icon: FiRepeat, color: "text-green-500" },
+  follow: { icon: FiUserPlus, color: "text-tide-500" },
+  repost: { icon: FiRepeat, color: "text-flow-500" },
   mention: { icon: FiAtSign, color: "text-flow-500" },
 };
 

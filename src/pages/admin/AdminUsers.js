@@ -36,7 +36,7 @@ export default function AdminUsers() {
 
   return (
     <>
-      <div className="rounded-3xl border border-slate-200/70 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur p-6 lg:p-8 shadow-sm mb-6">
+      <div className="rounded-2xl border border-gray-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 lg:p-8 shadow-sm mb-6">
         <h1 className="text-2xl font-extrabold text-gray-900 dark:text-gray-100">User Management</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Search, filter, and manage user roles.</p>
       </div>
@@ -77,7 +77,7 @@ export default function AdminUsers() {
       ) : (
         <div className="space-y-3">
           {users.map((user) => (
-            <div key={user.id} className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200/70 dark:border-zinc-800 p-4 flex flex-col sm:flex-row sm:items-center gap-4">
+            <div key={user.id} className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200/80 dark:border-zinc-800 p-4 flex flex-col sm:flex-row sm:items-center gap-4">
               <div className="flex items-center gap-3 flex-1 min-w-0">
                 <img
                     src={user.avatar_url || `https://ui-avatars.com/api/?name=${user.username}&background=0d9488&color=fff&bold=true`}

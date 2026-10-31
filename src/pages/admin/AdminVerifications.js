@@ -39,7 +39,7 @@ export default function AdminVerifications() {
 
   return (
     <>
-      <div className="rounded-3xl border border-slate-200/70 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur p-6 lg:p-8 shadow-sm mb-6">
+      <div className="rounded-2xl border border-gray-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 lg:p-8 shadow-sm mb-6">
         <h1 className="text-2xl font-extrabold text-gray-900 dark:text-gray-100">Verification Requests</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Approve or reject user verification requests.</p>
       </div>
@@ -76,7 +76,7 @@ export default function AdminVerifications() {
       ) : (
         <div className="space-y-4">
           {requests.map((req) => (
-            <div key={req.id} className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200/70 dark:border-zinc-800 p-5">
+            <div key={req.id} className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200/80 dark:border-zinc-800 p-5">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <img

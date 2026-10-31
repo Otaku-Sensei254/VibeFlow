@@ -208,9 +208,8 @@ export default function Bottles() {
           {bottles.map((bottle) => (
             <div
               key={bottle.id}
-              className="group bg-white dark:bg-gray-800/80 rounded-2xl border border-gray-100 dark:border-gray-700/60 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden"
+              className="group bg-white dark:bg-zinc-900/90 rounded-2xl border border-gray-200/80 dark:border-zinc-800 hover:border-amber-400/50 dark:hover:border-amber-500/40 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden"
             >
-              <div className="h-1 bg-gradient-to-r from-amber-400 via-orange-500 to-coral-500 opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="p-4 sm:p-5">
                 <div className="flex items-start gap-3 mb-2">
                   <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
@@ -222,7 +221,7 @@ export default function Bottles() {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100 dark:border-gray-700/50">
+                <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100 dark:border-zinc-800">
                   <div className="flex items-center gap-3 text-xs text-gray-400">
                     <span className="flex items-center gap-1">
                       <FiClock size={12} />

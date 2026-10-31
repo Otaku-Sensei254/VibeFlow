@@ -209,9 +209,7 @@ export default function PostCard({ post, onLike: externalOnLike }) {
 
   return (
     <>
-      <div className="group bg-white dark:bg-gray-800/80 rounded-2xl border border-gray-100 dark:border-gray-700/60 shadow-sm hover:shadow-md hover:border-tide-200 dark:hover:border-tide-700/50 transition-all duration-200 overflow-hidden">
-        <div className="h-1 bg-gradient-to-r from-tide-500 via-flow-500 to-coral-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-
+      <div className="group bg-white dark:bg-zinc-900/90 rounded-2xl border border-gray-200/80 dark:border-zinc-800 hover:border-tide-400/60 dark:hover:border-tide-600/50 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
         <div className="p-4 sm:p-5">
           <div className="flex items-center gap-3 mb-3">
             <Link to={`/profile/${post.user?.username}`} className="shrink-0">
@@ -220,11 +218,11 @@ export default function PostCard({ post, onLike: externalOnLike }) {
                   <img
                     src={post.user.avatar_url}
                     alt={post.user?.username}
-                    className="w-10 h-10 rounded-full object-cover ring-2 ring-white dark:ring-gray-800"
+                    className="w-10 h-10 rounded-full object-cover ring-2 ring-white dark:ring-zinc-900"
                   />
                 ) : post.user?.username ? (
                   <img
-                    src={`https://ui-avatars.com/api/?name=${post.user.username}&background=6366F1&color=fff&bold=true`}
+                    src={`https://ui-avatars.com/api/?name=${post.user.username}&background=0d9488&color=fff&bold=true`}
                     alt={post.user.username}
                     className="w-10 h-10 rounded-full object-cover ring-2 ring-white dark:ring-gray-800"
                   />
@@ -239,7 +237,7 @@ export default function PostCard({ post, onLike: externalOnLike }) {
               <div className="flex items-center gap-2">
                 <Link
                   to={`/profile/${post.user?.username}`}
-                  className="font-semibold text-sm hover:text-tide-600 transition-colors truncate"
+                  className="font-bold text-sm hover:text-tide-600 transition-colors truncate"
                 >
                   {post.user?.username}
                 </Link>
@@ -280,12 +278,12 @@ export default function PostCard({ post, onLike: externalOnLike }) {
           </div>
 
           {post.media_files?.length > 0 && (
-            <div className="mb-3 rounded-xl overflow-hidden border border-gray-100 dark:border-gray-700/50">
+            <div className="mb-3 rounded-xl overflow-hidden border border-gray-100 dark:border-zinc-800">
               <MediaCarousel files={post.media_files} />
             </div>
           )}
           <Link to={`/posts/${post.uuid}`} className="block">
-            <h3 className="font-bold text-base sm:text-lg mb-1.5 leading-snug text-gray-900 dark:text-gray-100">
+            <h3 className="font-bold text-lg sm:text-xl mb-1.5 leading-snug text-gray-900 dark:text-gray-100">
               {post.title}
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-3 leading-relaxed">
@@ -325,7 +323,7 @@ export default function PostCard({ post, onLike: externalOnLike }) {
             </div>
           )}
 
-          <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-700/50">
+          <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-zinc-800">
             <div className="flex items-center gap-1 sm:gap-3">
               <button
                 onClick={handleLike}
@@ -351,8 +349,8 @@ export default function PostCard({ post, onLike: externalOnLike }) {
                 onClick={handleRepost}
                 className={`flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-full transition-all duration-200 ${
                   reposted
-                    ? "text-green-500 bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30"
-                    : "text-gray-500 dark:text-gray-400 hover:text-green-500 hover:bg-green-50 dark:hover:bg-green-900/10"
+                    ? "text-tide-500 bg-tide-50 dark:bg-tide-900/20 hover:bg-tide-100 dark:hover:bg-tide-900/30"
+                    : "text-gray-500 dark:text-gray-400 hover:text-tide-500 hover:bg-tide-50 dark:hover:bg-tide-900/10"
                 }`}
               >
                 <FiRepeat size={16} className={reposted ? "fill-current" : ""} />
@@ -362,7 +360,7 @@ export default function PostCard({ post, onLike: externalOnLike }) {
               {user && (
                 <button
                   onClick={openShareModal}
-                  className="flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-tide-500 hover:bg-tide-50 dark:hover:bg-tide-900/10 px-3 py-1.5 rounded-full transition-all duration-200"
+                  className="flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-flow-500 hover:bg-flow-50 dark:hover:bg-flow-900/10 px-3 py-1.5 rounded-full transition-all duration-200"
                 >
                   <FiSend size={15} />
                 </button>
@@ -434,7 +432,7 @@ export default function PostCard({ post, onLike: externalOnLike }) {
                      {u.avatar_url ? (
                        <img src={u.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover" />
                      ) : u.username ? (
-                       <img src={`https://ui-avatars.com/api/?name=${u.username}&background=6366F1&color=fff`} alt="" className="w-9 h-9 rounded-full object-cover" />
+                       <img src={`https://ui-avatars.com/api/?name=${u.username}&background=0d9488&color=fff`} alt="" className="w-9 h-9 rounded-full object-cover" />
                      ) : (
                        <div className="w-9 h-9 rounded-full bg-indigo-500 flex items-center justify-center">
                          <FaUser className="text-white" size={16} />

@@ -1,23 +1,23 @@
 export function PostCardSkeleton() {
   return (
-    <div className="bg-white dark:bg-gray-800/80 rounded-2xl border border-gray-100 dark:border-gray-700/60 p-4 animate-pulse">
+    <div className="bg-white dark:bg-zinc-900/80 rounded-2xl border border-gray-100 dark:border-zinc-800/60 p-4 animate-pulse">
       <div className="flex items-center gap-3 mb-3">
-        <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700" />
+        <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-zinc-700" />
         <div className="space-y-1.5 flex-1">
-          <div className="h-3.5 bg-gray-200 dark:bg-gray-700 rounded-full w-28" />
-          <div className="h-2.5 bg-gray-100 dark:bg-gray-700/50 rounded-full w-20" />
+          <div className="h-3.5 bg-gray-200 dark:bg-zinc-700 rounded-full w-28" />
+          <div className="h-2.5 bg-gray-100 dark:bg-zinc-700/50 rounded-full w-20" />
         </div>
       </div>
       <div className="space-y-2 mb-3">
-        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full w-full" />
-        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full w-3/4" />
-        <div className="h-3 bg-gray-100 dark:bg-gray-700/50 rounded-full w-1/2" />
+        <div className="h-4 bg-gray-200 dark:bg-zinc-700 rounded-full w-full" />
+        <div className="h-4 bg-gray-200 dark:bg-zinc-700 rounded-full w-3/4" />
+        <div className="h-3 bg-gray-100 dark:bg-zinc-700/50 rounded-full w-1/2" />
       </div>
-      <div className="h-40 bg-gray-100 dark:bg-gray-700/50 rounded-xl mb-3" />
+      <div className="h-40 bg-gray-100 dark:bg-zinc-700/50 rounded-xl mb-3" />
       <div className="flex gap-4">
-        <div className="h-3 w-12 bg-gray-200 dark:bg-gray-700 rounded-full" />
-        <div className="h-3 w-12 bg-gray-200 dark:bg-gray-700 rounded-full" />
-        <div className="h-3 w-12 bg-gray-200 dark:bg-gray-700 rounded-full" />
+        <div className="h-3 w-12 bg-gray-200 dark:bg-zinc-700 rounded-full" />
+        <div className="h-3 w-12 bg-gray-200 dark:bg-zinc-700 rounded-full" />
+        <div className="h-3 w-12 bg-gray-200 dark:bg-zinc-700 rounded-full" />
       </div>
     </div>
   );
@@ -61,21 +61,21 @@ export function StorePowerUpSkeleton() {
 
 export function ProfileCardSkeleton() {
   return (
-    <div className="bg-white dark:bg-gray-800/80 rounded-2xl border border-gray-100 dark:border-gray-700/60 p-5 animate-pulse">
+    <div className="bg-white dark:bg-zinc-900/80 rounded-2xl border border-gray-100 dark:border-zinc-800/60 p-5 animate-pulse">
       <div className="flex items-center gap-4 mb-4">
-        <div className="w-14 h-14 rounded-full bg-gray-200 dark:bg-gray-700" />
+        <div className="w-14 h-14 rounded-full bg-gray-200 dark:bg-zinc-700" />
         <div className="space-y-2 flex-1">
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded-full w-32" />
-          <div className="h-3 bg-gray-100 dark:bg-gray-700/50 rounded-full w-24" />
+          <div className="h-4 bg-gray-200 dark:bg-zinc-700 rounded-full w-32" />
+          <div className="h-3 bg-gray-100 dark:bg-zinc-700/50 rounded-full w-24" />
         </div>
       </div>
       <div className="space-y-2">
-        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full" />
-        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full w-2/3" />
+        <div className="h-3 bg-gray-200 dark:bg-zinc-700 rounded-full" />
+        <div className="h-3 bg-gray-200 dark:bg-zinc-700 rounded-full w-2/3" />
       </div>
       <div className="flex gap-3 mt-4">
-        <div className="h-9 bg-gray-200 dark:bg-gray-700 rounded-xl flex-1" />
-        <div className="h-9 bg-gray-200 dark:bg-gray-700 rounded-xl flex-1" />
+        <div className="h-9 bg-gray-200 dark:bg-zinc-700 rounded-xl flex-1" />
+        <div className="h-9 bg-gray-200 dark:bg-zinc-700 rounded-xl flex-1" />
       </div>
     </div>
   );

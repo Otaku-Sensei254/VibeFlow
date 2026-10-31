@@ -100,13 +100,13 @@ const DriftModal = ({ drift, isOpen, onClose, onReact, onReply, onDelete, onEdit
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="relative w-full max-w-4xl max-h-[90vh] bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden flex flex-col"
+            className="relative w-full max-w-4xl max-h-[90vh] bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl shadow-xl overflow-hidden flex flex-col"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-zinc-800">
               <div className="flex items-center gap-3">
                 <img
-                  src={drift.user?.avatar_url || `https://ui-avatars.com/api/?name=${drift.user?.username}&background=6366F1&color=fff`}
+                  src={drift.user?.avatar_url || `https://ui-avatars.com/api/?name=${drift.user?.username}&background=0d9488&color=fff`}
                   alt={drift.user?.username}
                   className="w-10 h-10 rounded-full object-cover"
                 />
@@ -122,7 +122,7 @@ const DriftModal = ({ drift, isOpen, onClose, onReact, onReply, onDelete, onEdit
               </div>
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
               >
                 <X size={20} className="text-gray-500 dark:text-gray-400" />
               </button>
@@ -138,7 +138,7 @@ const DriftModal = ({ drift, isOpen, onClose, onReact, onReply, onDelete, onEdit
                     <textarea
                       value={editText}
                       onChange={(e) => setEditText(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-base resize-none focus:ring-2 focus:ring-tide-500 outline-none"
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-gray-800 dark:text-gray-200 text-base resize-none focus:ring-2 focus:ring-tide-500 outline-none"
                       rows={3}
                       autoFocus
                       disabled={isSubmitting}
@@ -154,7 +154,7 @@ const DriftModal = ({ drift, isOpen, onClose, onReact, onReply, onDelete, onEdit
                       </button>
                       <button
                         onClick={cancelEdit}
-                        className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+                        className="flex-1 px-4 py-2 bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors"
                       >
                         Cancel
                       </button>
@@ -186,7 +186,7 @@ const DriftModal = ({ drift, isOpen, onClose, onReact, onReply, onDelete, onEdit
                     {reactions.map((reaction, index) => (
                       <div
                         key={index}
-                        className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-full px-3 py-1"
+                        className="flex items-center gap-1 bg-gray-100 dark:bg-zinc-800 rounded-full px-3 py-1"
                       >
                         <span className="text-sm">{reaction.emoji}</span>
                         <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -213,7 +213,7 @@ const DriftModal = ({ drift, isOpen, onClose, onReact, onReply, onDelete, onEdit
                           key={index}
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3"
+                          className="bg-gray-50 dark:bg-zinc-800/60 border border-gray-200/60 dark:border-zinc-700/50 rounded-lg p-3"
                         >
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
@@ -234,20 +234,20 @@ const DriftModal = ({ drift, isOpen, onClose, onReact, onReply, onDelete, onEdit
             </div>
 
             {/* Actions */}
-            <div className="border-t border-gray-200 dark:border-gray-700 p-4">
+            <div className="border-t border-gray-200 dark:border-zinc-800 p-4">
               <div className="flex flex-wrap gap-2 mb-4">
                 {standardEmojis.map((emoji) => (
                   <button
                     key={emoji}
                     onClick={() => handleEmojiSelect(emoji)}
-                    className="w-10 h-10 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg flex items-center justify-center text-lg transition-colors"
+                    className="w-10 h-10 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg flex items-center justify-center text-lg transition-colors"
                   >
                     {emoji}
                   </button>
                 ))}
                 <button
                   onClick={() => setEmojiPickerVisible(!emojiPickerVisible)}
-                  className="w-10 h-10 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg flex items-center justify-center transition-colors"
+                  className="w-10 h-10 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg flex items-center justify-center transition-colors"
                 >
                   <Smile size={18} className="text-gray-600 dark:text-gray-300" />
                 </button>
@@ -255,7 +255,7 @@ const DriftModal = ({ drift, isOpen, onClose, onReact, onReply, onDelete, onEdit
 
               {/* Emoji Picker (simple version) */}
               {emojiPickerVisible && (
-                <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                <div className="mb-4 p-3 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg">
                   <div className="grid grid-cols-8 gap-1">
                     {['😀', '😁', '😂', '🤣', '😃', '😄', '😅', '😆',
                       '😇', '😈', '😉', '😊', '😋', '😌', '😍', '😎',
@@ -277,7 +277,7 @@ const DriftModal = ({ drift, isOpen, onClose, onReact, onReply, onDelete, onEdit
                       <button
                         key={emoji}
                         onClick={() => handleEmojiSelect(emoji)}
-                        className="w-8 h-8 hover:bg-gray-200 dark:hover:bg-gray-600 rounded flex items-center justify-center text-lg transition-colors"
+                        className="w-8 h-8 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded flex items-center justify-center text-lg transition-colors"
                       >
                         {emoji}
                       </button>
@@ -311,7 +311,7 @@ const DriftModal = ({ drift, isOpen, onClose, onReact, onReply, onDelete, onEdit
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
                     placeholder="Add a reply..."
-                    className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-sm focus:ring-2 focus:ring-tide-500 focus:border-transparent outline-none"
+                    className="flex-1 px-4 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-sm focus:ring-2 focus:ring-tide-500 focus:border-transparent outline-none"
                     disabled={isSubmitting}
                   />
                   <button

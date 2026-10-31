@@ -29,19 +29,19 @@ export default function AdminDashboard() {
 
   return (
     <>
-      <div className="rounded-3xl border border-slate-200/70 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur p-6 lg:p-8 shadow-sm">
+      <div className="rounded-2xl border border-gray-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 lg:p-8 shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h1 className="text-3xl lg:text-4xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">System Overview</h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Admin control center and live content pulse.</p>
+            <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">System Overview</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Admin control center and live content pulse.</p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="inline-flex items-center gap-2 bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-full px-4 py-2 text-sm font-semibold text-gray-800 dark:text-gray-100">
-              Welcome {user?.username}
+            <div className="inline-flex items-center gap-2 bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-full px-4 py-1.5 text-xs font-semibold text-gray-700 dark:text-gray-200">
+              Welcome, {user?.username}
             </div>
             <Link
               to={`/profile/${user?.username}`}
-              className="text-sm font-semibold text-flow-600 dark:text-flow-400 hover:underline"
+              className="text-xs font-semibold text-tide-600 dark:text-tide-400 hover:underline"
             >
               &larr; Back to Profile
             </Link>
@@ -54,41 +54,62 @@ export default function AdminDashboard() {
           <div className="w-10 h-10 rounded-full border-[3px] border-tide-100 dark:border-tide-900/30 border-t-tide-500 animate-spin" />
         </div>
       ) : error ? (
-        <div className="rounded-3xl border-2 border-red-200 dark:border-red-900/50 mt-8 py-12 text-center bg-red-50/50 dark:bg-red-900/10">
+        <div className="rounded-2xl border border-red-200 dark:border-red-900/50 mt-8 py-12 text-center bg-red-50/50 dark:bg-red-900/10">
           <p className="text-red-600 dark:text-red-400 text-sm font-medium">{error}</p>
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 mb-8">
-            <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-slate-200/70 dark:border-zinc-800">
-              <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Total Users</div>
-              <div className="mt-2 text-3xl font-bold text-gray-900 dark:text-gray-100">{stats?.total_users ?? 0}</div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 mb-6">
+            <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-gray-200/80 dark:border-zinc-800">
+              <div className="flex items-center justify-between">
+                <div className="text-xs uppercase font-semibold tracking-wider text-gray-500 dark:text-gray-400">Total Users</div>
+                <div className="w-8 h-8 rounded-lg bg-tide-50 dark:bg-tide-900/30 text-tide-600 dark:text-tide-400 flex items-center justify-center">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                </div>
+              </div>
+              <div className="mt-3 text-3xl font-extrabold text-gray-900 dark:text-gray-100">{stats?.total_users ?? 0}</div>
             </div>
-            <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-slate-200/70 dark:border-zinc-800">
-              <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Total Posts</div>
-              <div className="mt-2 text-3xl font-bold text-flow-600 dark:text-flow-400">{stats?.total_posts ?? 0}</div>
+            <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-gray-200/80 dark:border-zinc-800">
+              <div className="flex items-center justify-between">
+                <div className="text-xs uppercase font-semibold tracking-wider text-gray-500 dark:text-gray-400">Total Posts</div>
+                <div className="w-8 h-8 rounded-lg bg-flow-50 dark:bg-flow-900/30 text-flow-600 dark:text-flow-400 flex items-center justify-center">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                  </svg>
+                </div>
+              </div>
+              <div className="mt-3 text-3xl font-extrabold text-flow-600 dark:text-flow-400">{stats?.total_posts ?? 0}</div>
             </div>
-            <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-slate-200/70 dark:border-zinc-800">
-              <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Total Comments</div>
-              <div className="mt-2 text-3xl font-bold text-tide-600 dark:text-tide-400">{stats?.total_comments ?? 0}</div>
+            <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-gray-200/80 dark:border-zinc-800">
+              <div className="flex items-center justify-between">
+                <div className="text-xs uppercase font-semibold tracking-wider text-gray-500 dark:text-gray-400">Total Comments</div>
+                <div className="w-8 h-8 rounded-lg bg-tide-50 dark:bg-tide-900/30 text-tide-600 dark:text-tide-400 flex items-center justify-center">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                </div>
+              </div>
+              <div className="mt-3 text-3xl font-extrabold text-tide-600 dark:text-tide-400">{stats?.total_comments ?? 0}</div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-slate-200/70 dark:border-zinc-800">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 border-b border-slate-200/70 dark:border-zinc-800 pb-2">Categories Performance</h3>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-gray-200/80 dark:border-zinc-800">
+              <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 mb-4 border-b border-gray-100 dark:border-zinc-800 pb-3">Categories Performance</h3>
               {categories.length === 0 ? (
                 <p className="text-gray-500 dark:text-gray-400 text-sm">No stats available yet.</p>
               ) : (
                 <div className="space-y-4">
                   {categories.map((c) => (
                     <div key={c.category} className="flex items-center justify-between group">
-                      <span className="font-medium text-gray-700 dark:text-gray-300">{c.category}</span>
+                      <span className="font-medium text-sm text-gray-700 dark:text-gray-300">{c.category}</span>
                       <div className="flex items-center gap-3">
-                        <div className="h-2 w-24 bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-                          <div className="h-full bg-gradient-to-r from-tide-500 to-flow-500 rounded-full" style={{ width: `${Math.min(c.count * 10, 100)}%` }} />
+                        <div className="h-2 w-28 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                          <div className="h-full bg-tide-500 rounded-full transition-all duration-300" style={{ width: `${Math.min(c.count * 10, 100)}%` }} />
                         </div>
-                        <span className="text-sm text-gray-500 dark:text-gray-400 w-12 text-right">{c.count} posts</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 w-16 text-right font-medium">{c.count} posts</span>
                       </div>
                     </div>
                   ))}
@@ -96,16 +117,16 @@ export default function AdminDashboard() {
               )}
             </div>
 
-            <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-slate-200/70 dark:border-zinc-800">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 border-b border-slate-200/70 dark:border-zinc-800 pb-2">Trending Tags</h3>
+            <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-gray-200/80 dark:border-zinc-800">
+              <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 mb-4 border-b border-gray-100 dark:border-zinc-800 pb-3">Trending Tags</h3>
               {tags.length === 0 ? (
                 <p className="text-gray-500 dark:text-gray-400 text-sm">No tags used yet.</p>
               ) : (
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-2.5">
                   {tags.map((t) => (
-                    <div key={t.tag} className="flex items-center bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-full px-3 py-1.5">
-                      <span className="text-gray-700 dark:text-gray-200 font-medium text-sm">#{t.tag}</span>
-                      <span className="ml-2 bg-tide-100 text-tide-700 dark:bg-tide-900/40 dark:text-tide-300 text-xs font-bold px-2 py-0.5 rounded-full">{t.count}</span>
+                    <div key={t.tag} className="flex items-center bg-gray-50 dark:bg-zinc-800/80 border border-gray-200/80 dark:border-zinc-700 rounded-full px-3 py-1">
+                      <span className="text-gray-700 dark:text-gray-300 font-medium text-xs">#{t.tag}</span>
+                      <span className="ml-1.5 bg-tide-100 text-tide-700 dark:bg-tide-900/40 dark:text-tide-300 text-[10px] font-bold px-1.5 py-0.5 rounded-full">{t.count}</span>
                     </div>
                   ))}
                 </div>

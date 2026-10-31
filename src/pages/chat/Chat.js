@@ -401,16 +401,16 @@ function MessageBubble({ msg, isMe, skin = "default", onImageClick, onReply, onD
             <FiMoreHorizontal size={13} />
           </button>
           {menuOpen && (
-            <div className={`absolute ${isMe ? "right-0 top-full" : "left-0 top-full"} mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-10 min-w-[120px]`} onClick={(e) => e.stopPropagation()}>
+            <div className={`absolute ${isMe ? "right-0 top-full" : "left-0 top-full"} mt-1 bg-white dark:bg-zinc-900 rounded-lg shadow-lg border border-gray-200 dark:border-zinc-800 py-1 z-10 min-w-[120px]`} onClick={(e) => e.stopPropagation()}>
               {isMe && (
-                <button onClick={startEdit} className="w-full px-3 py-1.5 text-xs text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-gray-700 dark:text-gray-200">
+                <button onClick={startEdit} className="w-full px-3 py-1.5 text-xs text-left hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 text-gray-700 dark:text-gray-200">
                   <FiEdit3 size={12} /> Edit
                 </button>
               )}
-              <button onClick={() => { onDelete?.(msg); closeMenu(); }} className="w-full px-3 py-1.5 text-xs text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-red-500">
+              <button onClick={() => { onDelete?.(msg); closeMenu(); }} className="w-full px-3 py-1.5 text-xs text-left hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 text-red-500">
                 <FiTrash2 size={12} /> Delete
               </button>
-              <button onClick={() => { onStar?.(msg); closeMenu(); }} className="w-full px-3 py-1.5 text-xs text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 text-gray-700 dark:text-gray-200">
+              <button onClick={() => { onStar?.(msg); closeMenu(); }} className="w-full px-3 py-1.5 text-xs text-left hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 text-gray-700 dark:text-gray-200">
                 <FiStar size={12} className={isStarred ? "text-amber-400 fill-amber-400" : ""} /> {isStarred ? "Unstar" : "Star"}
               </button>
             </div>
@@ -477,7 +477,7 @@ function MessageBubble({ msg, isMe, skin = "default", onImageClick, onReply, onD
             <textarea
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-2xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-tide-500 outline-none resize-none"
+              className="flex-1 px-3 py-2 rounded-2xl border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm focus:ring-2 focus:ring-tide-500 outline-none resize-none"
               rows={2}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); saveEdit(); }
@@ -485,7 +485,7 @@ function MessageBubble({ msg, isMe, skin = "default", onImageClick, onReply, onD
               }}
               autoFocus
             />
-            <button onClick={saveEdit} className="shrink-0 p-2 text-tide-600 hover:text-tide-700 dark:text-tide-400 dark:hover:text-tide-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <button onClick={saveEdit} className="shrink-0 p-2 text-tide-600 hover:text-tide-700 dark:text-tide-400 dark:hover:text-tide-300 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors">
               <FiCheck size={16} />
             </button>
           </div>
@@ -530,18 +530,18 @@ function VoiceCallModal({ onClose, otherUser }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md" onClick={onClose}>
-      <div className="bg-gray-900 text-white rounded-3xl p-8 w-80 text-center shadow-2xl" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-zinc-950 text-white rounded-3xl p-8 w-80 text-center shadow-2xl border border-zinc-800" onClick={(e) => e.stopPropagation()}>
         <AvatarWithStatus src={otherUser?.avatar_url} username={otherUser?.username} size="w-16 h-16" />
         <h3 className="text-lg font-bold mt-3">{otherUser?.username || "Unknown"}</h3>
         <p className="text-sm text-gray-400 mt-1">{fmt(callTime)}</p>
         <div className="flex items-center justify-center gap-4 mt-6">
-          <button className="p-3 rounded-full bg-gray-700 hover:bg-gray-600 transition-colors">
+          <button className="p-3 rounded-full bg-zinc-800 hover:bg-zinc-700 transition-colors">
             <FiVolume2 size={20} />
           </button>
           <button onClick={onClose} className="p-4 rounded-full bg-red-600 hover:bg-red-700 transition-colors shadow-lg">
             <FiPhoneOff size={24} />
           </button>
-          <button className="p-3 rounded-full bg-gray-700 hover:bg-gray-600 transition-colors">
+          <button className="p-3 rounded-full bg-zinc-800 hover:bg-zinc-700 transition-colors">
             <FiMic size={20} />
           </button>
         </div>
@@ -1168,11 +1168,11 @@ export default function Chat() {
   const currentUserHasDrift = filteredDrifts.some(d => d.user?.id === user?.id);
 
   return (
-    <div className="flex h-dvh overflow-hidden bg-white dark:bg-gray-900">
+    <div className="flex h-dvh overflow-hidden bg-white dark:bg-zinc-950">
       {/* ─── Sidebar ─── */}
-      <div className={`${showSidebar ? "flex" : "hidden"} w-full md:flex md:w-80 lg:w-96 flex-col bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700`}>
+      <div className={`${showSidebar ? "flex" : "hidden"} w-full md:flex md:w-80 lg:w-96 flex-col bg-white dark:bg-zinc-950 border-r border-gray-200 dark:border-zinc-800`}>
         {/* Search */}
-        <div className="p-3 border-b border-gray-200 dark:border-gray-700 space-y-2">
+        <div className="p-3 border-b border-gray-200 dark:border-zinc-800 space-y-2">
           <div className="flex items-center justify-between gap-2">
             <button
               onClick={() => setShowAccountsModal(true)}
@@ -1209,11 +1209,11 @@ export default function Chat() {
                 placeholder="Search users..."
                 value={searchQuery}
                 onChange={(e) => searchUsers(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-tide-500 outline-none"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-sm focus:ring-2 focus:ring-tide-500 outline-none"
               />
             </div>
           </div>
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
+          <div className="border-t border-gray-200 dark:border-zinc-800 pt-2">
             <div className="mb-2 flex items-center justify-between px-1">
               <h3 className="text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">Drifts</h3>
               <span className="relative flex h-2 w-2">
@@ -1228,14 +1228,14 @@ export default function Chat() {
                   className="flex min-w-[120px] max-w-[116px] shrink-0 flex-col items-center cursor-pointer"
                   onClick={() => setShowCreateDrift(true)}
                 >
-                  <div className="relative mb-2 w-auto rounded-[24px] border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-2.5 py-2 text-center shadow-sm flex items-center justify-center">
+                  <div className="relative mb-2 w-auto rounded-[24px] border-2 border-dashed border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 px-2.5 py-2 text-center shadow-sm flex items-center justify-center">
                     <p className="text-[11px] leading-tight text-gray-500 dark:text-gray-400">
                       Drop a thought
                     </p>
                   </div>
                   <div className="flex flex-col items-center gap-1">
                     <img
-                      src={user?.avatar_url || `https://ui-avatars.com/api/?name=${user?.username || 'You'}&background=6366F1&color=fff`}
+                      src={user?.avatar_url || `https://ui-avatars.com/api/?name=${user?.username || 'You'}&background=0d9488&color=fff`}
                       alt={user?.username || 'You'}
                       className="h-11 w-11 rounded-full border-2 border-white object-cover shadow-md dark:border-gray-700"
                     />
@@ -1248,16 +1248,16 @@ export default function Chat() {
               
               {filteredDrifts.map((drift) => (
                 <div key={drift.id} className=" flex min-w-[120px] max-w-[116px] shrink-0 flex-col items-center cursor-pointer" onClick={() => setSelectedDrift(drift)}>
-                  <div className="relative mb-2 w-auto rounded-[24px] border border-gray-200 bg-white px-2.5 py-2 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                  <div className="relative mb-2 w-auto rounded-[24px] border border-gray-200 bg-white px-2.5 py-2 text-center shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
 
-                    <div className="absolute -right-1.5 top-2 h-3.5 w-2 rounded-full border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800" />
+                    <div className="absolute -right-1.5 top-2 h-3.5 w-2 rounded-full border border-gray-200 bg-white dark:border-zinc-700 dark:bg-zinc-900" />
                     <p className="relative z-10 break-words text-[11px] leading-tight text-gray-900 dark:text-gray-100">
                       {drift.note}
                     </p>
                   </div>
                   <div className="flex flex-col items-center gap-1">
                     <img
-                      src={drift.user?.avatar_url || `https://ui-avatars.com/api/?name=${drift.user?.username || 'Anonymous'}&background=${drift.user?.id === user?.id ? '6366F1' : '0d9488'}&color=fff`}
+                      src={drift.user?.avatar_url || `https://ui-avatars.com/api/?name=${drift.user?.username || 'Anonymous'}&background=${drift.user?.id === user?.id ? '0f766e' : '0d9488'}&color=fff`}
                       alt={drift.user?.username || 'Anonymous'}
                       className="h-11 w-11 rounded-full border-2 border-white object-cover shadow-md dark:border-gray-700"
                     />
@@ -1272,7 +1272,7 @@ export default function Chat() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-6 px-2 pt-3 pb-2 border-b border-gray-200 dark:border-gray-700 overflow-x-auto scrollbar-hide">
+        <div className="flex gap-6 px-2 pt-3 pb-2 border-b border-gray-200 dark:border-zinc-800 overflow-x-auto scrollbar-hide">
           {TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.key;
@@ -1282,7 +1282,7 @@ export default function Chat() {
                   ? tab.key === "bottles"
                     ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300"
                     : "bg-tide-100 dark:bg-tide-900/30 text-tide-700 dark:text-tide-300"
-                  : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                  : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-900"
                   }`}
               >
                 <Icon size={14} /> {tab.label}
@@ -1315,6 +1315,16 @@ export default function Chat() {
                   <p className="text-xs text-gray-500 px-6 text-center">Search for someone above or visit their profile to send a message</p>
                 </>
               )}
+              <button
+                onClick={() => {
+                  if (activeTab === "bottles") setShowBottleModal(true);
+                  else if (activeTab === "groups") setShowGroupModal(true);
+                  else setShowStartModal(true);
+                }}
+                className="mt-4 px-4 py-2 bg-tide-600 hover:bg-tide-700 text-white text-xs font-semibold rounded-xl transition-colors shadow-sm"
+              >
+                {activeTab === "bottles" ? "Drop a Bottle" : activeTab === "groups" ? "Create Group" : "Start a Chat"}
+              </button>
             </div>
           ) : (
             <div className="">
@@ -1323,23 +1333,32 @@ export default function Chat() {
                 const isSelected = activeConvo?.uuid === conv.uuid;
                 return (
                   <button key={conv.uuid} onClick={() => handleSelectConvo(conv)}
-                    className={`w-full flex items-center gap-3 px-3 py-3.5 hover:bg-gray-50 dark:hover:bg-gray-800 text-left transition-colors ${isSelected ? "bg-tide-50 dark:bg-tide-900/20 md:border-l-2 md:border-tide-500" : ""
+                    className={`w-full flex items-center gap-3 px-3 py-3.5 hover:bg-gray-50 dark:hover:bg-zinc-900 text-left transition-colors ${isSelected ? "bg-tide-50 dark:bg-tide-900/20 md:border-l-2 md:border-tide-500" : ""
                       }`}
                   >
                     <ConversationAvatar conv={conv} online={(conv.type === "direct" || conv.type === "bottle") && !!onlineUsers[String(conv.other_user?.id)] && showPresence} />
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-between gap-2">
                         <span className="text-sm font-semibold truncate">
                           {conv.type === "direct" ? conv.other_user?.username || "Unknown" : conv.name || "Message in a Bottle"}
 
                         </span>
-                        {conv.type !== "direct" && <Icon size={12} className="text-gray-400 shrink-0" />}
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          {conv.unread_count > 0 && (
+                            <span className="text-[10px] bg-tide-600 text-white px-1.5 py-0.5 rounded-full font-bold leading-none">
+                              {conv.unread_count}
+                            </span>
+                          )}
+                          {conv.type !== "direct" && <Icon size={12} className="text-gray-400" />}
+                        </div>
                       </div>
-                      {conv.unread_count > 0 && (
-                        <span className="inline-block mt-1 text-xs bg-tide-600 text-white px-2 py-0.5 rounded-full font-medium">
-                          {conv.unread_count}
-                        </span>
-                      )}
+                      {conv.last_message?.content ? (
+                        <p className="text-xs text-gray-400 dark:text-zinc-500 truncate mt-0.5 line-clamp-1">
+                          {conv.last_message.content}
+                        </p>
+                      ) : conv.last_message?.media_files?.length > 0 ? (
+                        <p className="text-xs text-gray-400 dark:text-zinc-500 truncate mt-0.5">📎 Media</p>
+                      ) : null}
                     </div>
                   </button>
                 );
@@ -1350,13 +1369,13 @@ export default function Chat() {
       </div>
 
       {/* ─── Main Panel ─── */}
-      <div className={`${showChat ? "flex" : "hidden"} flex-1 md:flex flex-col bg-white dark:bg-gray-900 min-w-0`}>
+      <div className={`${showChat ? "flex" : "hidden"} flex-1 md:flex flex-col bg-white dark:bg-zinc-950 min-w-0`}>
 
         {activeConvo ? (
           <>
             {/* Header */}
-            <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center gap-3 shrink-0 bg-white dark:bg-gray-900">
-              <button onClick={handleBack} className="md:hidden p-1.5 text-gray-500 hover:text-tide-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+            <div className="px-4 py-3 border-b border-gray-200 dark:border-zinc-800 flex items-center gap-3 shrink-0 bg-white dark:bg-zinc-950">
+              <button onClick={handleBack} className="md:hidden p-1.5 text-gray-500 hover:text-tide-600 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-900">
                 <FiArrowLeft size={20} />
               </button>
               <ConversationAvatar conv={activeConvo} size="w-9 h-9 md:w-9 md:h-9" online={otherUserOnline} isFound={activeConvo?.type === "bottle" ? messages.some((m) => m.is_bottle && m.is_found) : undefined} />
@@ -1374,14 +1393,14 @@ export default function Chat() {
               <div className="flex items-center gap-1">
                 {isDirectChat && (
                   <button onClick={() => setShowCall(true)}
-                    className="p-2 text-gray-500 hover:text-tide-600 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    className="p-2 text-gray-500 hover:text-tide-600 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-900 transition-colors"
                     title="Voice call"
                   >
                     <FiPhone size={18} />
                   </button>
                 )}
                 <button onClick={() => setShowSettings(true)}
-                  className="p-2 text-gray-500 hover:text-tide-600 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  className="p-2 text-gray-500 hover:text-tide-600 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-900 transition-colors"
                   title="Chat settings"
                 >
                   <FiSettings size={18} />
@@ -1433,7 +1452,7 @@ export default function Chat() {
 
             {/* Reply bar */}
             {replyingTo && (
-              <div className="px-3 py-2 flex items-center gap-2 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+              <div className="px-3 py-2 flex items-center gap-2 border-t border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900/50">
                 <svg className="w-4 h-4 shrink-0 text-tide-500 dark:text-tide-400" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M7.707 3.293a1 1 0 010 1.414L5.414 7H11a5 5 0 015 5v2.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 111.414-1.414L15 12.586V12a3 3 0 00-3-3H5.414l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
@@ -1449,7 +1468,7 @@ export default function Chat() {
 
             {/* Upload previews */}
             {uploadedFiles.length > 0 && (
-              <div className="px-3 py-2 flex gap-2 overflow-x-auto scrollbar-hide border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+              <div className="px-3 py-2 flex gap-2 overflow-x-auto scrollbar-hide border-t border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900/50">
                 {uploadedFiles.map((f, i) => (
                   <div key={i} className="relative shrink-0 group">
                     {f.type === "image" ? (
@@ -1459,7 +1478,7 @@ export default function Chat() {
                         <FiMic size={22} className="text-tide-600" />
                       </div>
                     ) : (
-                      <div className="h-16 w-16 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center border">
+                      <div className="h-16 w-16 rounded-lg bg-gray-100 dark:bg-zinc-800 flex items-center justify-center border border-gray-200 dark:border-zinc-700">
                         <FiImage size={22} className="text-gray-400" />
                       </div>
                     )}
@@ -1474,18 +1493,18 @@ export default function Chat() {
             )}
 
             {/* Composer */}
-            <div className="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+            <div className="border-t border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
               <form onSubmit={sendMessage} className="px-3 py-2 flex items-end gap-2">
                 {/* Emoji */}
                 <div className="relative" ref={emojiRef}>
                   <button type="button" onClick={() => setShowEmoji(!showEmoji)}
-                    className="shrink-0 p-2 text-gray-400 hover:text-tide-600 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    className="shrink-0 p-2 text-gray-400 hover:text-tide-600 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-900 transition-colors"
                   >
                     <FiSmile size={20} />
                   </button>
                   {showEmoji && (
                     <div className="absolute bottom-full left-0 mb-2 z-50">
-                      <div className="shadow-2xl rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
+                      <div className="shadow-2xl rounded-2xl overflow-hidden border border-gray-200 dark:border-zinc-700">
                         <Picker data={data} onEmojiSelect={onEmojiSelect} theme={document.documentElement.classList.contains("dark") ? "dark" : "light"} previewPosition="none" skinTonePosition="none" set="native" />
                       </div>
                     </div>
@@ -1495,7 +1514,7 @@ export default function Chat() {
                 {/* Media upload */}
                 <input ref={fileInputRef} type="file" accept="image/*,video/*,audio/*" multiple className="hidden" onChange={handleFileChange} />
                 <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}
-                  className="shrink-0 p-2 text-gray-400 hover:text-tide-600 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
+                  className="shrink-0 p-2 text-gray-400 hover:text-tide-600 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-900 transition-colors disabled:opacity-50"
                 >
                   <FiImage size={20} />
                 </button>
@@ -1525,7 +1544,7 @@ export default function Chat() {
                   </div>
                 ) : (
                   <button type="button" onClick={startRecording}
-                    className="shrink-0 p-2 text-gray-400 hover:text-tide-600 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    className="shrink-0 p-2 text-gray-400 hover:text-tide-600 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-900 transition-colors"
                   >
                     <FiMic size={20} />
                   </button>
@@ -1546,7 +1565,7 @@ export default function Chat() {
                       placeholder={replyingTo ? "Reply..." : "Type a message..."}
                       rows={1}
                       ref={textareaRef}
-                      className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-sm focus:ring-2 focus:ring-tide-500 outline-none resize-none overflow-y-auto scrollbar-hide max-h-32"
+                      className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-900 text-sm focus:ring-2 focus:ring-tide-500 outline-none resize-none overflow-y-auto scrollbar-hide max-h-32"
                     />
                     <button type="submit"
                       disabled={!messageText.trim() && uploadedFiles.length === 0}
@@ -1666,7 +1685,7 @@ export default function Chat() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="w-full max-w-xl rounded-3xl bg-white dark:bg-gray-800 shadow-2xl"
+            className="w-full max-w-xl rounded-3xl bg-white dark:bg-zinc-900 shadow-2xl border border-gray-200 dark:border-zinc-800"
           >
             <div className="p-5">
               <div className="mb-4 flex items-start justify-between gap-4">
@@ -1676,7 +1695,7 @@ export default function Chat() {
                 </div>
                 <button
                   onClick={() => setShowCreateDrift(false)}
-                  className="rounded-full p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-200"
+                  className="rounded-full p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-zinc-800 dark:hover:text-gray-200"
                 >
                   <FiX size={20} />
                 </button>
@@ -1686,7 +1705,7 @@ export default function Chat() {
                 value={newDriftText}
                 onChange={(e) => setNewDriftText(e.target.value)}
                 placeholder="What's on your mind?"
-                className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-4 py-3 text-sm text-gray-900 dark:text-gray-200 outline-none transition focus:border-tide-500 focus:ring-2 focus:ring-tide-500"
+                className="w-full rounded-xl border border-gray-300 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-200 outline-none transition focus:border-tide-500 focus:ring-2 focus:ring-tide-500"
                 rows={3}
                 autoFocus
               />
@@ -1694,7 +1713,7 @@ export default function Chat() {
               <div className="mt-4 flex gap-2">
                 <button
                   onClick={() => setShowCreateDrift(false)}
-                  className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                  className="flex-1 px-4 py-2 bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-200 rounded-xl hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors"
                 >
                   Cancel
                 </button>

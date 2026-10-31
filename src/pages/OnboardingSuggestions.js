@@ -78,7 +78,7 @@ export default function OnboardingSuggestions() {
                   className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition group"
                 >
                   <img
-                    src={u.avatar_url || `https://ui-avatars.com/api/?name=${u.username}&background=6366F1&color=fff`}
+                    src={u.avatar_url || `https://ui-avatars.com/api/?name=${u.username}&background=0d9488&color=fff`}
                     alt=""
                     className="w-10 h-10 rounded-full object-cover"
                   />

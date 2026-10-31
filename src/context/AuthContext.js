@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
-import api from "../utils/api";
+import api, { getSocketCsrfToken } from "../utils/api";
 import { connectSocket, disconnectSocket, joinChannel, setStatusChangeCallback } from "../utils/realtime";
 import { showToast } from "../utils/toast";
 
@@ -78,11 +78,11 @@ export function AuthProvider({ children }) {
     } catch {}
   }, []);
 
-  const setupRealtime = useCallback((token) => {
+  const setupRealtime = useCallback(() => {
     setStatusChangeCallback(setConnectionStatus);
     setConnectionStatus("connecting");
 
-    connectSocket(token, () => {
+    connectSocket(getSocketCsrfToken(), () => {
       joinChannel("relay:user", {
         new_notification: () => {
           setNotificationCount((c) => c + 1);
@@ -128,8 +128,6 @@ export function AuthProvider({ children }) {
             duration: 4000,
           });
         },
-        // Backend always pushes the full authoritative presence_state on both
-        // initial join AND every presence_diff – so we just replace state here.
         presence_state: (state) => {
           if (!state) return;
           const ids = {};
@@ -143,24 +141,26 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
-      api
-        .get("/auth/me")
-        .then((res) => {
+    const initAuth = async () => {
+      if (token) {
+        try {
+          const res = await api.get("/auth/me");
           const u = res.data.data.user;
           setUser(u);
           localStorage.setItem("user", JSON.stringify(u));
-          setupRealtime(token);
-        })
-        .catch(() => {
+          setupRealtime();
+        } catch (e) {
           localStorage.removeItem("token");
           localStorage.removeItem("user");
           setUser(null);
-        })
-        .finally(() => setLoading(false));
-    } else {
-      setLoading(false);
-    }
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+    initAuth();
     return () => disconnectSocket();
   }, [setupRealtime]);
 
@@ -170,7 +170,7 @@ export function AuthProvider({ children }) {
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(u));
     setUser(u);
-    setupRealtime(token);
+    setupRealtime();
     return u;
   };
 
@@ -180,13 +180,30 @@ export function AuthProvider({ children }) {
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(u));
     setUser(u);
-    setupRealtime(token);
+    setupRealtime();
     return u;
   };
+
+  const loginWithNeon = useCallback(async (neonSession) => {
+    const { getNeonJWT } = await import('../lib/auth-client');
+    const token = await getNeonJWT() || neonSession?.token || neonSession?.session?.token || neonSession?.session?.accessToken || localStorage.getItem('neon_token');
+    if (!token) throw new Error('No token available');
+    localStorage.setItem('token', token);
+    const res = await api.get('/auth/me');
+    const u = res.data.data.user;
+    setUser(u);
+    localStorage.setItem("user", JSON.stringify(u));
+    setupRealtime();
+    return u;
+  }, [setupRealtime]);
 
   const logout = async () => {
     try {
       await api.post("/auth/logout");
+    } catch {}
+    try {
+      const { signOutNeon } = await import('../utils/neonAuth');
+      await signOutNeon();
     } catch {}
     disconnectSocket();
     localStorage.removeItem("token");
@@ -221,7 +238,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, login, register, logout, updateUser, notificationCount, chatUnreadCount, fetchCounts, onlineUsers, connectionStatus, sidebarRefresh, showPresence, setShowPresence, streak, pingUser }}
+      value={{ user, loading, login, register, logout, updateUser, loginWithNeon, notificationCount, chatUnreadCount, fetchCounts, onlineUsers, connectionStatus, sidebarRefresh, showPresence, setShowPresence, streak, pingUser }}
     >
       {children}
     </AuthContext.Provider>

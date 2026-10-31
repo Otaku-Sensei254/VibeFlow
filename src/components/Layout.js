@@ -95,9 +95,9 @@ export default function Layout() {
       ];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div className="min-h-screen bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-100">
 {location.pathname !== "/" && !location.pathname.startsWith("/currents") && (
-  <nav className={`fixed top-0 z-50 w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur border-b border-gray-200 dark:border-gray-700 ${location.pathname.startsWith("/chat") ? "hidden md:block" : ""}`}>
+  <nav className={`fixed top-0 z-50 w-full bg-white/90 dark:bg-zinc-950/90 backdrop-blur border-b border-gray-200 dark:border-gray-700 ${location.pathname.startsWith("/chat") ? "hidden md:block" : ""}`}>
         <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2 shrink-0 md:gap-0">
             <Link to={user ? "/feed" : "/"} className="hidden md:flex items-center gap-2">
@@ -166,7 +166,7 @@ export default function Layout() {
                   className="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
                 >
                   <img
-                    src={user.avatar_url || `https://ui-avatars.com/api/?name=${user.username}&background=6366F1&color=fff&bold=true`}
+                    src={user.avatar_url || `https://ui-avatars.com/api/?name=${user.username}&background=0d9488&color=fff&bold=true`}
                     alt={user.username}
                     className="w-7 h-7 rounded-full object-cover ring-2 ring-white dark:ring-gray-800"
                   />
@@ -182,7 +182,7 @@ export default function Layout() {
                 </button>
 
                     {profileOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-xl shadow-black/5 dark:shadow-black/20 py-1.5 z-50">
+                  <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-xl shadow-black/5 dark:shadow-black/20 py-1.5 z-50">
                     <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 mb-1">
                       <p className="font-semibold text-sm">{user.username}</p>
                       <p className="text-xs text-gray-500 truncate">{user.email}</p>
@@ -258,7 +258,7 @@ export default function Layout() {
       )}
 
       <div
-        className={`fixed top-14 right-0 z-50 h-full w-64 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 transform transition-transform duration-200 ease-in-out md:hidden ${
+        className={`fixed top-14 right-0 z-50 h-full w-64 bg-white dark:bg-zinc-900 border-l border-gray-200 dark:border-gray-700 transform transition-transform duration-200 ease-in-out md:hidden ${
           menuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -267,7 +267,7 @@ export default function Layout() {
             <>
               <div className="flex items-center gap-3 p-3 border-b border-gray-200 dark:border-gray-700 mb-2">
                 <img
-                  src={user.avatar_url || `https://ui-avatars.com/api/?name=${user.username}&background=6366F1&color=fff&bold=true`}
+                  src={user.avatar_url || `https://ui-avatars.com/api/?name=${user.username}&background=0d9488&color=fff&bold=true`}
                   alt=""
                   className="w-10 h-10 rounded-full object-cover"
                 />
@@ -370,7 +370,7 @@ export default function Layout() {
           <div className="fixed inset-0 z-40 bg-black/30" onClick={() => setPostModalOpen(false)} />
           <div
             ref={postModalRef}
-            className="fixed left-0 right-0 z-50 bg-white dark:bg-gray-800 shadow-2xl md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:max-w-sm md:rounded-2xl md:border md:border-gray-200 dark:md:border-gray-700 bottom-0 rounded-t-2xl border-t border-gray-100 dark:border-gray-700 animate-slide-up"
+            className="fixed left-0 right-0 z-50 bg-white dark:bg-zinc-900 shadow-2xl md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:max-w-sm md:rounded-2xl md:border md:border-gray-200 dark:md:border-gray-700 bottom-0 rounded-t-2xl border-t border-gray-100 dark:border-gray-700 animate-slide-up"
           >
             <div className="flex items-center justify-center pt-3 pb-1 md:hidden">
               <div className="w-10 h-1 rounded-full bg-gray-300 dark:bg-gray-600" />
@@ -391,8 +391,8 @@ export default function Layout() {
                     <FiMusic size={18} className="text-white" />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-semibold">Wave</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Share a photo, video, or sound</p>
+                    <p className="text-base font-bold">Wave</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Share a photo, video, or sound</p>
                   </div>
                 </button>
                 <button
@@ -403,8 +403,8 @@ export default function Layout() {
                     <FiPlayCircle size={18} className="text-white" />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-semibold">Current</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Upload a short video</p>
+                    <p className="text-base font-bold">Current</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Upload a short video</p>
                   </div>
                 </button>
                 <button
@@ -415,8 +415,8 @@ export default function Layout() {
                     <FiEdit size={18} className="text-white" />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-semibold">Post</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Write a text post with media</p>
+                    <p className="text-base font-bold">Post</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Write a text post with media</p>
                   </div>
                 </button>
               </div>
@@ -433,7 +433,7 @@ export default function Layout() {
       </main>
 
       {location.pathname !== "/" && !location.pathname.startsWith("/waves/") && !location.pathname.match(/^\/chat\/[^/]+$/) && location.pathname !== "/currents/new" && (
-      <nav className="fixed bottom-0 z-50 w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur border-t border-gray-200 dark:border-gray-700 md:hidden">
+      <nav className="fixed bottom-0 z-50 w-full bg-white/90 dark:bg-zinc-950/90 backdrop-blur border-t border-gray-200 dark:border-gray-700 md:hidden">
         <div className="flex items-center justify-around h-16">
           {bottomLinks.map((link) => {
             const isProfile = link.label === "Profile";
@@ -442,15 +442,15 @@ export default function Layout() {
               <Link
                 key={link.to}
                 to={link.to}
-                className={`flex flex-col items-center gap-0.5 px-3 py-1 text-xs transition ${
+                className={`flex flex-col items-center gap-0.5 py-1 text-xs transition ${
                   isActive(link.to)
-                    ? "text-tide-600"
-                    : "text-gray-500 dark:text-gray-400 hover:text-tide-600"
+                    ? "text-tide-600 bg-tide-50 dark:bg-tide-900/20 rounded-xl px-3"
+                    : "text-gray-500 dark:text-gray-400 hover:text-tide-600 px-3"
                 }`}
               >
                 {isProfile && user ? (
                   <img
-                    src={user.avatar_url || `https://ui-avatars.com/api/?name=${user.username}&background=6366F1&color=fff&bold=true`}
+                    src={user.avatar_url || `https://ui-avatars.com/api/?name=${user.username}&background=0d9488&color=fff&bold=true`}
                     alt=""
                     className="w-6 h-6 rounded-full object-cover ring-2 ring-white dark:ring-gray-800"
                   />
@@ -473,7 +473,7 @@ export default function Layout() {
       )}
 
       {location.pathname !== "/" && !location.pathname.startsWith("/chat") && (
-      <footer className="hidden md:block border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+      <footer className="hidden md:block border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-zinc-950">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-center gap-6 text-xs text-gray-400 dark:text-gray-500">
             <span>&copy; 2026 Vibeflow</span>

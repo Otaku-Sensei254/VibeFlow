@@ -33,7 +33,7 @@ export default function InviteLanding() {
                 <>
                   <div className="flex justify-center mb-4">
                     <img
-                      src={inviter.avatar_url || `https://ui-avatars.com/api/?name=${inviter.username}&background=6366F1&color=fff`}
+                      src={inviter.avatar_url || `https://ui-avatars.com/api/?name=${inviter.username}&background=0d9488&color=fff`}
                       alt={inviter.username}
                       className="w-16 h-16 rounded-full object-cover ring-4 ring-white dark:ring-gray-800 shadow-md"
                     />

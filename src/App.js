@@ -11,6 +11,7 @@ import Register from "./pages/auth/Register";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import ConfirmEmail from "./pages/auth/ConfirmEmail";
+import NeonCallback from "./pages/auth/NeonCallback";
 import Feed from "./pages/feed/Feed";
 import PostDetail from "./pages/posts/PostDetail";
 import CreatePost from "./pages/posts/CreatePost";
@@ -63,6 +64,7 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/auth/callback" element={<NeonCallback />} />
             <Route path="/onboarding" element={<ProtectedRoute><OnboardingSuggestions /></ProtectedRoute>} />
             <Route path="/invite" element={<ProtectedRoute><Invite /></ProtectedRoute>} />
             <Route path="/invite/:code" element={<InviteLanding />} />

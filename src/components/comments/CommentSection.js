@@ -241,7 +241,7 @@ export default function CommentSection({ uuid, user }) {
                 <div className="flex items-start gap-3">
                   <Link to={`/profile/${comment.user?.username}`} className="shrink-0">
                     <img
-                      src={comment.user?.avatar_url || `https://ui-avatars.com/api/?name=${comment.user?.username || "?"}&background=6366F1&color=fff&bold=true`}
+                      src={comment.user?.avatar_url || `https://ui-avatars.com/api/?name=${comment.user?.username || "?"}&background=0d9488&color=fff&bold=true`}
                       alt={comment.user?.username}
                       className="w-8 h-8 rounded-full object-cover mt-0.5"
                     />

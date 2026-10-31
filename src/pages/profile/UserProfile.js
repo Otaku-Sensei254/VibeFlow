@@ -472,13 +472,13 @@ export default function UserProfile() {
                   </Link>
                 )}
                 {currentUser?.roles?.some((r) => r.name === "moderator") && (
-                  <a href={`${process.env.REACT_APP_API_URL?.replace("/api/v1", "") || "http://localhost:4001"}/moderator/dashboard`} className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-blue-600/25 hover:shadow-blue-600/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all">
+                  <a href={`${process.env.REACT_APP_API_URL?.replace("/api/v1", "") || "http://localhost:4000"}/moderator/dashboard`} className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-blue-600/25 hover:shadow-blue-600/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all">
                     <FiShield size={14} />
                     Mod Dashboard
                   </a>
                 )}
                 {currentUser?.roles?.some((r) => r.name === "sales_executive") && (
-                  <a href={`${process.env.REACT_APP_API_URL?.replace("/api/v1", "") || "http://localhost:4001"}/sales-executive/dashboard`} className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-green-600/25 hover:shadow-green-600/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all">
+                  <a href={`${process.env.REACT_APP_API_URL?.replace("/api/v1", "") || "http://localhost:4000"}/sales-executive/dashboard`} className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-green-600/25 hover:shadow-green-600/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all">
                     <FiShield size={14} />
                     Sales Dashboard
                   </a>
@@ -676,7 +676,7 @@ export default function UserProfile() {
                 <div className="space-y-3 max-h-96 overflow-y-auto">
                   {followers.map((f) => (
                     <Link key={f.id} to={`/profile/${f.username}`} onClick={() => setShowFollowersModal(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-zinc-800 transition">
-                      <img src={f.avatar_url || `https://ui-avatars.com/api/?name=${f.username}&background=6366F1&color=fff&bold=true`} alt="" className="w-10 h-10 rounded-full object-cover" />
+                      <img src={f.avatar_url || `https://ui-avatars.com/api/?name=${f.username}&background=0d9488&color=fff&bold=true`} alt="" className="w-10 h-10 rounded-full object-cover" />
                       <div>
                         <p className="font-semibold text-sm text-gray-900 dark:text-white">{f.username}</p>
                         {f.bio && <p className="text-xs text-gray-500 truncate max-w-[250px]">{f.bio}</p>}
@@ -705,7 +705,7 @@ export default function UserProfile() {
                 <div className="space-y-3 max-h-96 overflow-y-auto">
                   {following.map((f) => (
                     <Link key={f.id} to={`/profile/${f.username}`} onClick={() => setShowFollowingModal(false)} className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-zinc-800 transition">
-                      <img src={f.avatar_url || `https://ui-avatars.com/api/?name=${f.username}&background=6366F1&color=fff&bold=true`} alt="" className="w-10 h-10 rounded-full object-cover" />
+                      <img src={f.avatar_url || `https://ui-avatars.com/api/?name=${f.username}&background=0d9488&color=fff&bold=true`} alt="" className="w-10 h-10 rounded-full object-cover" />
                       <div>
                         <p className="font-semibold text-sm text-gray-900 dark:text-white">{f.username}</p>
                         {f.bio && <p className="text-xs text-gray-500 truncate max-w-[250px]">{f.bio}</p>}
