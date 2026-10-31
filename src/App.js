@@ -71,6 +71,7 @@ export default function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route path="/confirm-email/:token" element={<ConfirmEmail />} />
+            <Route path="/users/confirm/:token" element={<ConfirmEmail />} />
             <Route path="/feed" element={<Feed />} />
             <Route path="/posts/:uuid" element={<PostDetail />} />
             <Route
