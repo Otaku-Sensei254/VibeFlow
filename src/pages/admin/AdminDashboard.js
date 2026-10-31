@@ -2,14 +2,31 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import api from "../../utils/api";
 import { useAuth } from "../../context/AuthContext";
+import { useTheme } from "../../context/ThemeContext";
+import pumpkinHat from "../../components/images/pumkin-hat.png";
 
 export default function AdminDashboard() {
   const { user } = useAuth();
+  const { halloweenEnabled, halloweenThemeLoading, setHalloweenEnabled } = useTheme();
   const [stats, setStats] = useState(null);
   const [categories, setCategories] = useState([]);
   const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [themeSaving, setThemeSaving] = useState(false);
+  const [themeError, setThemeError] = useState("");
+
+  const toggleHalloweenTheme = async () => {
+    setThemeSaving(true);
+    setThemeError("");
+    try {
+      await setHalloweenEnabled(!halloweenEnabled);
+    } catch (err) {
+      setThemeError(err?.response?.data?.error || "Could not update the seasonal theme.");
+    } finally {
+      setThemeSaving(false);
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -48,6 +65,41 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
+
+      <section className="mt-6 rounded-2xl border border-orange-200/80 dark:border-orange-900/40 bg-gradient-to-r from-orange-50 via-white to-violet-50 dark:from-orange-950/20 dark:via-zinc-900 dark:to-violet-950/20 p-5 sm:p-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <img src={pumpkinHat} alt="" aria-hidden="true" className="h-12 w-12 shrink-0 object-contain" />
+            <div>
+              <h2 className="font-bold text-gray-900 dark:text-gray-100">Halloween atmosphere</h2>
+              <p className="mt-1 max-w-xl text-sm text-gray-600 dark:text-gray-400">
+                {halloweenEnabled
+                  ? "Bats, cobwebs, and seasonal ember glow are showing across VibeFlow."
+                  : "The seasonal decorations are currently hidden for everyone."}
+              </p>
+              {themeError && <p role="alert" className="mt-2 text-sm text-red-600 dark:text-red-400">{themeError}</p>}
+            </div>
+          </div>
+
+          <button
+            type="button"
+            role="switch"
+            aria-checked={halloweenEnabled}
+            onClick={toggleHalloweenTheme}
+            disabled={halloweenThemeLoading || themeSaving}
+            className={`inline-flex min-w-40 items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition disabled:cursor-wait disabled:opacity-60 ${
+              halloweenEnabled
+                ? "bg-orange-600 text-white hover:bg-orange-700"
+                : "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-gray-200 dark:hover:bg-zinc-700"
+            }`}
+          >
+            <span>{themeSaving ? "Saving…" : halloweenEnabled ? "Theme on" : "Theme off"}</span>
+            <span className={`relative h-5 w-9 rounded-full transition ${halloweenEnabled ? "bg-orange-300/50" : "bg-gray-300 dark:bg-zinc-600"}`}>
+              <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${halloweenEnabled ? "translate-x-4" : "translate-x-0.5"}`} />
+            </span>
+          </button>
+        </div>
+      </section>
 
       {loading ? (
         <div className="flex justify-center py-24">

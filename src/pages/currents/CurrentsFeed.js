@@ -239,7 +239,7 @@ export default function CurrentsFeed() {
                   className=" flex flex-row text-white font-semibold text-sm hover:underline  mb-1">
                   {post.user?.username}
 
-                  {user.is_verified ? (
+                  {post.user?.is_verified ? (
                     <img src={verified} alt="Verified" className="w-4 h-4 ml-1" />
                   ) : null}
                 </Link>

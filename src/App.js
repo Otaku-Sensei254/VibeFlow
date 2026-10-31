@@ -4,6 +4,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { FollowProvider } from "./context/FollowContext";
 import Layout from "./components/Layout";
+import HalloweenDecorations from "./components/HalloweenDecorations";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
 import Login from "./pages/auth/Login";
@@ -59,6 +60,7 @@ export default function App() {
       <AuthProvider>
         <ThemeProvider>
         <FollowProvider>
+        <HalloweenDecorations />
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
