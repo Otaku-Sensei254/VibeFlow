@@ -47,6 +47,8 @@ export default function Settings() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [socialAccounts, setSocialAccounts] = useState([]);
+  const [socialAccountsLoading, setSocialAccountsLoading] = useState(true);
+  const [socialAccountsError, setSocialAccountsError] = useState("");
   const [socialPlatform, setSocialPlatform] = useState("youtube");
   const [socialUsername, setSocialUsername] = useState("");
   const [addingSocial, setAddingSocial] = useState(false);
@@ -158,10 +160,20 @@ export default function Settings() {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+    setSocialAccountsLoading(true);
+    setSocialAccountsError("");
+
     api.get("/users/social-accounts").then((res) => {
-      setSocialAccounts(res.data.data?.accounts || []);
-    }).catch(() => {});
-  }, []);
+      if (!cancelled) setSocialAccounts(res.data.data?.accounts || []);
+    }).catch(() => {
+      if (!cancelled) setSocialAccountsError("Could not load your linked socials. Please refresh and try again.");
+    }).finally(() => {
+      if (!cancelled) setSocialAccountsLoading(false);
+    });
+
+    return () => { cancelled = true; };
+  }, [user?.id]);
 
   const hasGlow = ownedItems?.["profile-glow"] === true;
   const styleMap = isDark ? DARK_USERNAME_STYLES : USERNAME_STYLES;
@@ -407,7 +419,15 @@ export default function Settings() {
               <span className="text-xs text-gray-400 dark:text-gray-500">{socialAccounts.length}/3</span>
             </div>
             <div className="rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900/30 p-4 min-h-[180px]">
-              {socialAccounts.length === 0 ? (
+              {socialAccountsLoading ? (
+                <div className="h-full flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm">
+                  Loading linked socials…
+                </div>
+              ) : socialAccountsError ? (
+                <div role="alert" className="h-full flex items-center justify-center text-center text-red-500 dark:text-red-400 text-sm">
+                  {socialAccountsError}
+                </div>
+              ) : socialAccounts.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 text-sm">
                   <FiPlus size={24} className="mb-2 opacity-50" />
                   No socials linked yet
