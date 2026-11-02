@@ -128,6 +128,7 @@ function PostGridCard({ post }) {
 export default function UserProfile() {
   const { username } = useParams();
   const { user: currentUser, onlineUsers, showPresence } = useAuth();
+  const isOwnProfile = currentUser?.username?.toLowerCase() === username?.toLowerCase();
   const { followedUsers, setFollowing: setFollowState } = useFollow();
   const [profile, setProfile] = useState(null);
   const [posts, setPosts] = useState([]);
@@ -158,7 +159,7 @@ export default function UserProfile() {
       setSocialAccounts(res.data.data.user.social_accounts || []);
       setPosts(res.data.data.posts || []);
       setCurrents(res.data.data.currents || []);
-      if (currentUser?.username === username) {
+      if (isOwnProfile) {
         const saved = await api.get("/users/saved-posts");
         setSavedPosts(saved.data.data.posts || []);
         const ver = await api.get("/users/verification-status");
@@ -168,7 +169,7 @@ export default function UserProfile() {
       setHasWaves((wavesRes.data.data?.waves || []).length > 0);
     } catch {}
     setLoading(false);
-  }, [username, currentUser]);
+  }, [username, isOwnProfile]);
 
   useEffect(() => { loadProfile(); }, [loadProfile]);
 
@@ -265,7 +266,7 @@ export default function UserProfile() {
   }
 
   const u = profile.user;
-  const isOwn = currentUser?.username === username;
+  const isOwn = isOwnProfile;
   const styleMap = isDark ? DARK_USERNAME_STYLES : USERNAME_STYLES;
   const currentStyle = u.glow
     ? styleMap[u.username_style || "neon-green"] || styleMap["none"]
