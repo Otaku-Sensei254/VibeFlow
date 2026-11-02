@@ -148,6 +148,7 @@ export default function Settings() {
   };
 
   const [ownedItems, setOwnedItems] = useState(null);
+  const [verifiedGlow, setVerifiedGlow] = useState(false);
   const [inventoryLoading, setInventoryLoading] = useState(true);
 
   useEffect(() => {
@@ -156,8 +157,17 @@ export default function Settings() {
       const owned = {};
       items.forEach((item) => { owned[item.item_slug] = item.owned; });
       setOwnedItems(owned);
+      setVerifiedGlow(items.some((item) => item.item_slug === "profile-glow" && item.verified_benefit));
     }).catch(() => {}).finally(() => setInventoryLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (!inventoryLoading && ownedItems && !ownedItems["profile-glow"] && !verifiedGlow) {
+      setForm((current) => current.username_style === "none"
+        ? current
+        : { ...current, username_style: "none" });
+    }
+  }, [inventoryLoading, ownedItems, verifiedGlow]);
 
   useEffect(() => {
     let cancelled = false;
@@ -175,7 +185,7 @@ export default function Settings() {
     return () => { cancelled = true; };
   }, [user?.id]);
 
-  const hasGlow = ownedItems?.["profile-glow"] === true;
+  const hasGlow = ownedItems?.["profile-glow"] === true || verifiedGlow;
   const styleMap = isDark ? DARK_USERNAME_STYLES : USERNAME_STYLES;
 
   return (
@@ -317,6 +327,11 @@ export default function Settings() {
                     </button>
                   );
                 })}
+                {verifiedGlow && !ownedItems?.["profile-glow"] && (
+                  <p className="col-span-full text-xs text-emerald-600 dark:text-emerald-400">
+                    Profile Glow is included while your account is verified.
+                  </p>
+                )}
               </div>
             ) : (
               <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/15 border border-amber-200 dark:border-amber-800/50">

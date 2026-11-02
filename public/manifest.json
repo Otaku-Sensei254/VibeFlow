@@ -3,12 +3,12 @@
   "name": "Vibeflow - Connect, create, and share",
   "icons": [
     {
-      "src": "hallowee.png",
+      "src": "halloween.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "hallowee.png",
+      "src": "halloween.png",
       "type": "image/png",
       "sizes": "512x512"
     }

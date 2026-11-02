@@ -184,11 +184,9 @@ export function AuthProvider({ children }) {
     return u;
   };
 
-  const loginWithNeon = useCallback(async (neonSession) => {
-    const { getNeonJWT } = await import('../lib/auth-client');
-    const token = await getNeonJWT() || neonSession?.token || neonSession?.session?.token || neonSession?.session?.accessToken || localStorage.getItem('neon_token');
-    if (!token) throw new Error('No token available');
-    localStorage.setItem('token', token);
+  const loginWithNeon = useCallback(async (neonToken) => {
+    if (!neonToken) throw new Error('Google sign-in did not provide an API token.');
+    localStorage.setItem('token', neonToken);
     const res = await api.get('/auth/me');
     const u = res.data.data.user;
     setUser(u);

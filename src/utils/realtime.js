@@ -8,10 +8,9 @@ const getSocketUrl = () => {
   }
   const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
   if (process.env.NODE_ENV === "development") {
-    // Keep the browser socket on the React dev server's origin so it sends
-    // the same HttpOnly session cookie as the proxied /api requests. The dev
-    // server forwards /socket to Phoenix on port 4000 (see setupProxy.js).
-    return `${protocol}//${window.location.host}/socket`;
+    // Explicitly connect to Phoenix backend port 4000
+    // (The dev server proxy for /socket may not work reliably for WebSockets)
+    return `${protocol}//localhost:4000/socket`;
   }
   // Default production: assume same-origin (change via REACT_APP_WS_URL)
   return `${protocol}//${window.location.host}/socket`;
@@ -65,6 +64,9 @@ export function connectSocket(csrfToken, onReady) {
     return;
   }
 
+  // Get the auth token for Phoenix socket authentication
+  const authToken = localStorage.getItem("token");
+
   if (socket) {
     if (isSocketReady && onReady) {
       onReady();
@@ -78,10 +80,12 @@ export function connectSocket(csrfToken, onReady) {
     return;
   }
 
-  // Phoenix requires a CSRF token to validate the HttpOnly session cookie for
-  // a WebSocket handshake. This is not the user's bearer/authentication token.
+  // Phoenix socket authentication - use bearer token in params
   socket = new Socket(SOCKET_URL, {
-    params: { _csrf_token: csrfToken },
+    params: { 
+      _csrf_token: csrfToken,
+      auth_token: authToken  // Send bearer token for cross-origin WebSocket auth
+    },
     heartbeatIntervalMs: 15000,
   });
 

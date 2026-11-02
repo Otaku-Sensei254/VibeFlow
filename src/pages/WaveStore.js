@@ -22,6 +22,15 @@ function timeRemaining(expiresAt) {
   return `${minutes}m`;
 }
 
+function displayDuration(duration) {
+  const match = /^(\d+)d$/i.exec(duration || "");
+  if (match) {
+    const days = Number(match[1]);
+    return `${days} day${days === 1 ? "" : "s"}`;
+  }
+  return duration || "Permanent";
+}
+
 const previews = {
   glassmorphism: {
     icon: FiDroplet,
@@ -178,6 +187,9 @@ function FlipCard({ item, category, onPurchase, purchasing }) {
   const cat = categoryConfig[category] || {};
   const isPowerUp = category === "power_ups";
   const owned = item.owned;
+  const verifiedBenefit = Boolean(item.verified_benefit);
+  const active = owned || verifiedBenefit;
+  const verificationIncluded = verifiedBenefit && !owned;
   const remaining = timeRemaining(item.expires_at);
   const isPermanent = owned && !item.expires_at;
 
@@ -226,13 +238,13 @@ function FlipCard({ item, category, onPurchase, purchasing }) {
   }
 
   return (
-    <div className={`group relative overflow-hidden rounded-2xl border ${owned ? "border-emerald-300/60 dark:border-emerald-600/50 bg-gradient-to-br from-emerald-50/80 to-white dark:from-emerald-900/20 dark:to-zinc-800/60" : "border-zinc-200/60 dark:border-zinc-700/60 bg-white dark:bg-zinc-800/80"} transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 ${cat.cardBorder}`}>
-      <div className={`relative h-32 ${owned ? "bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-950/30" : "bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-800 dark:to-zinc-900"} border-b ${owned ? "border-emerald-200/50 dark:border-emerald-700/30" : "border-zinc-100 dark:border-zinc-700/50"} overflow-hidden`}>
-        {owned && (
+    <div className={`group relative overflow-hidden rounded-2xl border ${active ? "border-emerald-300/60 dark:border-emerald-600/50 bg-gradient-to-br from-emerald-50/80 to-white dark:from-emerald-900/20 dark:to-zinc-800/60" : "border-zinc-200/60 dark:border-zinc-700/60 bg-white dark:bg-zinc-800/80"} transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 ${cat.cardBorder}`}>
+      <div className={`relative h-32 ${active ? "bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/30 dark:to-emerald-950/30" : "bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-800 dark:to-zinc-900"} border-b ${active ? "border-emerald-200/50 dark:border-emerald-700/30" : "border-zinc-100 dark:border-zinc-700/50"} overflow-hidden`}>
+        {active && (
           <div className="absolute inset-0 bg-emerald-500/5 dark:bg-emerald-400/5 z-10 flex items-center justify-center">
             <div className="bg-emerald-500/20 dark:bg-emerald-400/20 backdrop-blur-sm rounded-full px-4 py-2 flex items-center gap-2 border border-emerald-400/30 dark:border-emerald-500/30">
-              <FiCheck className="text-emerald-600 dark:text-emerald-400" size={18} />
-              <span className="text-emerald-700 dark:text-emerald-300 font-bold text-sm uppercase tracking-wider">Owned</span>
+              {verificationIncluded ? <FiShield className="text-emerald-600 dark:text-emerald-400" size={18} /> : <FiCheck className="text-emerald-600 dark:text-emerald-400" size={18} />}
+              <span className="text-emerald-700 dark:text-emerald-300 font-bold text-sm uppercase tracking-wider">{verificationIncluded ? "Included while verified" : "Owned"}</span>
             </div>
           </div>
         )}
@@ -251,7 +263,7 @@ function FlipCard({ item, category, onPurchase, purchasing }) {
         <h3 className="font-bold text-zinc-800 dark:text-white text-sm truncate">{item.item_name}</h3>
         <div className="flex items-center gap-2 mt-1.5 text-[11px] text-zinc-400 dark:text-zinc-500">
           <FiClock size={11} />
-          <span>{isPermanent ? "Permanent" : item.duration || "Permanent"}</span>
+          <span>{verificationIncluded ? "Included while verified" : isPermanent ? "Permanent" : displayDuration(item.duration)}</span>
         </div>
 
         {owned && !isPermanent && remaining && (
@@ -265,8 +277,8 @@ function FlipCard({ item, category, onPurchase, purchasing }) {
 
         <div className="flex items-center justify-between mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-700/50">
           <div className="flex items-baseline gap-1">
-            {owned ? (
-              <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">Owned</span>
+            {active ? (
+              <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">{verificationIncluded ? "Included" : "Owned"}</span>
             ) : (
               <>
                 <span className="text-lg font-black text-zinc-800 dark:text-white">{item.worth}</span>
@@ -274,7 +286,7 @@ function FlipCard({ item, category, onPurchase, purchasing }) {
               </>
             )}
           </div>
-          {!owned && (
+          {!active && (
             <button
               onClick={() => onPurchase(item)}
               disabled={purchasing === item.id}
@@ -332,11 +344,11 @@ export default function WaveStore() {
       const res = await api.post("/store/purchase", { id: item.id });
       const d = res.data.data;
       setPointsBalance(d.points_balance);
-      setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, owned: true } : i)));
+      setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, owned: true, expires_at: d.expires_at } : i)));
       setGrouped((prev) => {
         const next = {};
         Object.entries(prev).forEach(([cat, catItems]) => {
-          next[cat] = catItems.map((i) => (i.id === item.id ? { ...i, owned: true } : i));
+          next[cat] = catItems.map((i) => (i.id === item.id ? { ...i, owned: true, expires_at: d.expires_at } : i));
         });
         return next;
       });

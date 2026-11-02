@@ -7,7 +7,12 @@ import pumpkinHat from "../../components/images/pumkin-hat.png";
 
 export default function AdminDashboard() {
   const { user } = useAuth();
-  const { halloweenEnabled, halloweenThemeLoading, setHalloweenEnabled } = useTheme();
+  const {
+    halloweenEnabled,
+    halloweenThemeLoading,
+    halloweenThemeLoadError,
+    setHalloweenEnabled,
+  } = useTheme();
   const [stats, setStats] = useState(null);
   const [categories, setCategories] = useState([]);
   const [tags, setTags] = useState([]);
@@ -77,6 +82,11 @@ export default function AdminDashboard() {
                   ? "Bats, cobwebs, and seasonal ember glow are showing across VibeFlow."
                   : "The seasonal decorations are currently hidden for everyone."}
               </p>
+              {halloweenThemeLoadError && (
+                <p role="alert" className="mt-2 text-sm text-amber-700 dark:text-amber-400">
+                  Could not load the saved theme setting. The switch may be out of date until the setting loads.
+                </p>
+              )}
               {themeError && <p role="alert" className="mt-2 text-sm text-red-600 dark:text-red-400">{themeError}</p>}
             </div>
           </div>
@@ -94,8 +104,8 @@ export default function AdminDashboard() {
             }`}
           >
             <span>{themeSaving ? "Saving…" : halloweenEnabled ? "Theme on" : "Theme off"}</span>
-            <span className={`relative h-5 w-9 rounded-full transition ${halloweenEnabled ? "bg-orange-300/50" : "bg-gray-300 dark:bg-zinc-600"}`}>
-              <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${halloweenEnabled ? "translate-x-4" : "translate-x-0.5"}`} />
+            <span className={`relative h-5 w-9  rounded-full transition ${halloweenEnabled ? "bg-orange-300/50" : "bg-gray-300 dark:bg-zinc-600"}`}>
+              <span className={`absolute top-0.5 left-0 h-4 w-4 rounded-full bg-white shadow transition-transform ${halloweenEnabled ? "translate-x-4" : "translate-x-0.5"}`} />
             </span>
           </button>
         </div>

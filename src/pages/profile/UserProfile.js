@@ -267,7 +267,9 @@ export default function UserProfile() {
   const u = profile.user;
   const isOwn = currentUser?.username === username;
   const styleMap = isDark ? DARK_USERNAME_STYLES : USERNAME_STYLES;
-  const currentStyle = u.username_style ? styleMap[u.username_style] || styleMap["none"] : styleMap["none"];
+  const currentStyle = u.glow
+    ? styleMap[u.username_style || "neon-green"] || styleMap["none"]
+    : styleMap["none"];
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 sm:py-8">

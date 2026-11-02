@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { authClient } from '../../utils/neonAuth';
+import { authClient, getNeonJWT } from '../../lib/auth-client';
 
 export default function NeonCallback() {
   const navigate = useNavigate();
@@ -12,11 +12,19 @@ export default function NeonCallback() {
     let active = true;
     (async () => {
       try {
-        const { data, error: sessionError } = await authClient.getSession();
-        if (sessionError) throw sessionError;
-        if (!data?.session) throw new Error('Google sign-in did not return a session.');
-        await loginWithNeon(data.session);
-        if (active) navigate('/feed', { replace: true });
+        // Wait for Neon Auth to establish session after OAuth redirect
+        for (let attempt = 0; attempt < 10; attempt++) {
+          const { data, error: sessionError } = await authClient.getSession();
+          if (sessionError) throw sessionError;
+          if (data?.session) {
+            const neonToken = await getNeonJWT();
+            await loginWithNeon(neonToken);
+            if (active) navigate('/feed', { replace: true });
+            return;
+          }
+          await new Promise(r => setTimeout(r, 500));
+        }
+        throw new Error('Google sign-in did not return a session in time.');
       } catch (err) {
         if (active) setError(err?.message || 'Could not complete Google sign-in.');
       }

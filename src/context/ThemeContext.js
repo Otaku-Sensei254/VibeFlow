@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import api from "../utils/api";
 
 const ThemeContext = createContext();
@@ -6,6 +6,8 @@ const ThemeContext = createContext();
 export function ThemeProvider({ children }) {
   const [halloweenEnabled, setHalloweenEnabledState] = useState(true);
   const [halloweenThemeLoading, setHalloweenThemeLoading] = useState(true);
+  const [halloweenThemeLoadError, setHalloweenThemeLoadError] = useState(false);
+  const halloweenRequestId = useRef(0);
   const [theme, setTheme] = useState(() => {
     const saved = localStorage.getItem("vibeflow-theme");
     if (saved === "dark" || saved === "light") return saved;
@@ -23,13 +25,25 @@ export function ThemeProvider({ children }) {
   }, [theme]);
 
   const refreshHalloweenTheme = useCallback(async () => {
+    const requestId = ++halloweenRequestId.current;
     try {
       const response = await api.get("/site/theme");
-      setHalloweenEnabledState(response.data.data?.halloween_enabled !== false);
+      const enabled = response.data.data?.halloween_enabled;
+      if (typeof enabled !== "boolean") {
+        throw new Error("Theme settings response did not include a boolean value");
+      }
+      if (requestId === halloweenRequestId.current) {
+        setHalloweenEnabledState(enabled);
+        setHalloweenThemeLoadError(false);
+      }
     } catch {
-      // Keep the seasonal look on if settings are temporarily unavailable.
+      if (requestId === halloweenRequestId.current) {
+        setHalloweenThemeLoadError(true);
+      }
     } finally {
-      setHalloweenThemeLoading(false);
+      if (requestId === halloweenRequestId.current) {
+        setHalloweenThemeLoading(false);
+      }
     }
   }, []);
 
@@ -51,8 +65,14 @@ export function ThemeProvider({ children }) {
 
   const setHalloweenEnabled = async (enabled) => {
     const response = await api.put("/admin/halloween-theme", { enabled });
-    const savedValue = response.data.data?.halloween_enabled === true;
+    const savedValue = response.data.data?.halloween_enabled;
+    if (typeof savedValue !== "boolean") {
+      throw new Error("Theme settings response did not include a boolean value");
+    }
+    // Ignore any GET that began before this successful save.
+    halloweenRequestId.current += 1;
     setHalloweenEnabledState(savedValue);
+    setHalloweenThemeLoadError(false);
     return savedValue;
   };
 
@@ -63,6 +83,7 @@ export function ThemeProvider({ children }) {
         toggleTheme,
         halloweenEnabled,
         halloweenThemeLoading,
+        halloweenThemeLoadError,
         setHalloweenEnabled,
       }}
     >

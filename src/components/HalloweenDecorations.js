@@ -5,8 +5,8 @@ import pumpkinStack from "./images/pumkin-stack.png";
 import spiderWeb from "./images/spider-web.png";
 
 export default function HalloweenDecorations() {
-  const { halloweenEnabled } = useTheme();
-  if (!halloweenEnabled) return null;
+  const { halloweenEnabled, halloweenThemeLoading } = useTheme();
+  if (halloweenThemeLoading || !halloweenEnabled) return null;
 
   return (
     <div className="halloween-decorations" aria-hidden="true">
